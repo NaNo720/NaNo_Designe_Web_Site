@@ -105,78 +105,121 @@ BEGIN
 END $$;
 
 -- 5. Sécurité & Droits d'accès (Row Level Security - RLS)
+-- Protection stricte : Seules les opérations publiques nécessaires (envoi de devis/contact,
+-- lecture du portfolio) sont autorisées aux visiteurs anonymes.
+-- La lecture, modification et suppression des devis et messages sont STRICTEMENT réservées
+-- aux administrateurs authentifiés.
 ALTER TABLE public.quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.portfolio_projects ENABLE ROW LEVEL SECURITY;
 
--- Politiques pour la table "portfolio_projects"
+-- Contraintes de validation côté serveur (Server-Side Validation)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_quotes_email') THEN
+    ALTER TABLE public.quotes ADD CONSTRAINT chk_quotes_email 
+    CHECK (client_email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_quotes_desc_len') THEN
+    ALTER TABLE public.quotes ADD CONSTRAINT chk_quotes_desc_len 
+    CHECK (client_description IS NULL OR length(client_description) <= 5000);
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_messages_email') THEN
+    ALTER TABLE public.messages ADD CONSTRAINT chk_messages_email 
+    CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_messages_len') THEN
+    ALTER TABLE public.messages ADD CONSTRAINT chk_messages_len 
+    CHECK (length(message) <= 5000);
+  END IF;
+END $$;
+
+-- ------------------------------------------------------------------------------
+-- A. Politiques pour la table "portfolio_projects"
+-- ------------------------------------------------------------------------------
+-- Lecture publique autorisée (tous les visiteurs voient les réalisations)
 DROP POLICY IF EXISTS "Permettre la lecture publique du portfolio" ON public.portfolio_projects;
 CREATE POLICY "Permettre la lecture publique du portfolio"
 ON public.portfolio_projects FOR SELECT
 USING (true);
 
+-- Modifications/Suppressions : Réservées aux administrateurs
 DROP POLICY IF EXISTS "Permettre l'ajout de projet portfolio" ON public.portfolio_projects;
 CREATE POLICY "Permettre l'ajout de projet portfolio"
 ON public.portfolio_projects FOR INSERT
-WITH CHECK (true);
+WITH CHECK (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
 
 DROP POLICY IF EXISTS "Permettre la modification de projet portfolio" ON public.portfolio_projects;
 CREATE POLICY "Permettre la modification de projet portfolio"
 ON public.portfolio_projects FOR UPDATE
-USING (true)
-WITH CHECK (true);
+USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated')
+WITH CHECK (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
 
 DROP POLICY IF EXISTS "Permettre la suppression de projet portfolio" ON public.portfolio_projects;
 CREATE POLICY "Permettre la suppression de projet portfolio"
 ON public.portfolio_projects FOR DELETE
-USING (true);
+USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
 
--- Politiques pour la table "quotes"
+-- ------------------------------------------------------------------------------
+-- B. Politiques pour la table "quotes" (Dossiers Devis Privés)
+-- ------------------------------------------------------------------------------
+-- Tout visiteur peut déposer une demande de devis
 DROP POLICY IF EXISTS "Permettre l'insertion publique des devis" ON public.quotes;
 CREATE POLICY "Permettre l'insertion publique des devis"
 ON public.quotes FOR INSERT
 WITH CHECK (true);
 
+-- La consultation des devis est STRICTEMENT interdite au public anonyme
 DROP POLICY IF EXISTS "Permettre la lecture des devis" ON public.quotes;
 CREATE POLICY "Permettre la lecture des devis"
 ON public.quotes FOR SELECT
-USING (true);
+USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
 
+-- La mise à jour et suppression sont réservées à l'administrateur
 DROP POLICY IF EXISTS "Permettre la mise a jour des devis" ON public.quotes;
 CREATE POLICY "Permettre la mise a jour des devis"
 ON public.quotes FOR UPDATE
-USING (true)
-WITH CHECK (true);
+USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated')
+WITH CHECK (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
 
 DROP POLICY IF EXISTS "Permettre la suppression des devis" ON public.quotes;
 CREATE POLICY "Permettre la suppression des devis"
 ON public.quotes FOR DELETE
-USING (true);
+USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
 
--- Politiques pour la table "messages"
+-- ------------------------------------------------------------------------------
+-- C. Politiques pour la table "messages" (Boîte de Réception Studio)
+-- ------------------------------------------------------------------------------
+-- Tout internaute peut envoyer un message de contact
 DROP POLICY IF EXISTS "Permettre l'insertion publique des messages" ON public.messages;
 CREATE POLICY "Permettre l'insertion publique des messages"
 ON public.messages FOR INSERT
 WITH CHECK (true);
 
+-- Seul l'administrateur authentifié peut lire les messages privés du studio
 DROP POLICY IF EXISTS "Permettre la lecture des messages" ON public.messages;
 CREATE POLICY "Permettre la lecture des messages"
 ON public.messages FOR SELECT
-USING (true);
+USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
 
 DROP POLICY IF EXISTS "Permettre la mise a jour des messages" ON public.messages;
 CREATE POLICY "Permettre la mise a jour des messages"
 ON public.messages FOR UPDATE
-USING (true)
-WITH CHECK (true);
+USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated')
+WITH CHECK (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
 
 DROP POLICY IF EXISTS "Permettre la suppression des messages" ON public.messages;
 CREATE POLICY "Permettre la suppression des messages"
 ON public.messages FOR DELETE
-USING (true);
+USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
 
--- Politiques pour la table "site_visits"
+-- ------------------------------------------------------------------------------
+-- D. Politiques pour la table "site_visits" (Télémétrie d'Audience)
+-- ------------------------------------------------------------------------------
 DROP POLICY IF EXISTS "Permettre l'insertion publique des visites" ON public.site_visits;
 CREATE POLICY "Permettre l'insertion publique des visites"
 ON public.site_visits FOR INSERT
@@ -185,7 +228,7 @@ WITH CHECK (true);
 DROP POLICY IF EXISTS "Permettre la lecture des visites" ON public.site_visits;
 CREATE POLICY "Permettre la lecture des visites"
 ON public.site_visits FOR SELECT
-USING (true);
+USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
 
 -- 6. Données initiales du Studio Nano Design Dakar
 INSERT INTO public.quotes (

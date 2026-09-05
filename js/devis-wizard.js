@@ -224,11 +224,17 @@
         return;
       }
 
-      state.client.name = name;
-      state.client.company = company || 'Particulier';
-      state.client.email = email;
-      state.client.phone = phone;
-      state.client.description = desc;
+      const sec = window.StudioSecurity ? window.StudioSecurity.sanitize : null;
+      if (sec && !sec.isValidEmail(email)) {
+        alert('Veuillez saisir une adresse email valide.');
+        return;
+      }
+
+      state.client.name = sec ? sec.cleanText(name, 120) : name;
+      state.client.company = (sec ? sec.cleanText(company, 150) : company) || 'Particulier';
+      state.client.email = sec ? sec.cleanText(email, 150) : email;
+      state.client.phone = sec ? sec.cleanText(phone, 40) : phone;
+      state.client.description = sec ? sec.cleanText(desc, 3000) : desc;
 
       // Génération de la référence du devis
       const randomNum = Math.floor(1000 + Math.random() * 9000);

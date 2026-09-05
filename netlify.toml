@@ -29,15 +29,23 @@
   force = true
 
 [[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'self';"
+
+[[headers]]
   for = "/admin*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet"
     Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
-    X-Frame-Options = "SAMEORIGIN"
+    X-Frame-Options = "DENY"
 
 [[headers]]
   for = "/studio*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet"
     Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
-    X-Frame-Options = "SAMEORIGIN"
+    X-Frame-Options = "DENY"

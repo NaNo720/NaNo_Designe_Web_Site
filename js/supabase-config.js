@@ -1,15 +1,25 @@
 // ==============================================================================
 // CONFIGURATION SUPABASE — NANO DESIGN STUDIO DAKAR
 // ==============================================================================
-// Vous pouvez renseigner directement vos identifiants ci-dessous, ou les saisir 
-// depuis le tableau de bord Admin (ils seront conservés en mémoire sécurisée).
-// Pour trouver ces valeurs : Console Supabase > Project Settings > API
+// RÈGLE DE SÉCURITÉ CRITIQUE :
+// Seule la clé PUBLIQUE "anon" (ou publishable) doit être utilisée ici.
+// Ne JAMAIS renseigner la clé "service_role" (clé secrète maître) dans le code front-end.
 // ==============================================================================
 
-window.SUPABASE_CONFIG = {
-  // URL de votre projet Supabase
-  url: localStorage.getItem('nano_supabase_url') || 'https://cdttbypmfpzqmwtmkqjk.supabase.co',
+(function () {
+  'use strict';
 
-  // Clé publique anon / publishable
-  anonKey: localStorage.getItem('nano_supabase_key') || 'sb_publishable_m77_5YvDdFHy0vbiKcc2sQ_8zZ0LDzf'
-};
+  const storedUrl = localStorage.getItem('nano_supabase_url') || 'https://cdttbypmfpzqmwtmkqjk.supabase.co';
+  let storedKey = localStorage.getItem('nano_supabase_key') || 'sb_publishable_m77_5YvDdFHy0vbiKcc2sQ_8zZ0LDzf';
+
+  // Détection et blocage de sécurité en cas de clé service_role accidentelle
+  if (storedKey && (storedKey.includes('service_role') || storedKey.startsWith('sb_secret_'))) {
+    console.error('ALERTE SÉCURITÉ : Une clé service_role confidentielle a été détectée. Elle est bloquée côté client pour votre sécurité.');
+    storedKey = 'sb_publishable_m77_5YvDdFHy0vbiKcc2sQ_8zZ0LDzf';
+  }
+
+  window.SUPABASE_CONFIG = {
+    url: storedUrl,
+    anonKey: storedKey
+  };
+})();

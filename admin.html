@@ -678,9 +678,9 @@
         </button>
       </form>
 
-      <div class="auth-credentials-hint">
-        Identifiants administrateur configurés :<br>
-        Identifiant : <code>admin</code> &nbsp;|&nbsp; Mot de passe : <code>nano2026</code>
+      <div class="auth-credentials-hint" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.74rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <span>Accès chiffré SHA-256 • Verrouillage automatique après 15 min d'inactivité</span>
       </div>
     </div>
   </div>
@@ -722,6 +722,14 @@
           </svg>
           <span>Voir le site public</span>
         </a>
+
+        <button type="button" class="btn-logout" id="btn-lock-screen" style="border-color: rgba(201, 168, 76, 0.4); color: var(--gold-light);" title="Verrouiller l'accès au studio immédiatement">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Verrouiller</span>
+        </button>
 
         <button class="btn-logout" id="btn-logout-action">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1697,8 +1705,9 @@
     <div class="toast-msg" id="admin-toast-msg">Opération effectuée</div>
   </div>
 
-  <!-- Supabase Client & Base de Données Temps Réel -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Suite de Sécurité Studio, Chiffrement SHA-256 & Session Horodatée -->
+  <script src="js/security.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/site-analytics.js"></script>
@@ -1830,7 +1839,7 @@
         }
       }
 
-      // ================= AUTHENTICATION LOGIC =================
+      // ================= AUTHENTICATION LOGIC (CRYPTOGRAPHIQUE & SESSION SÉCURISÉE) =================
       const authScreen = document.getElementById('admin-auth-screen');
       const dashContainer = document.getElementById('admin-dashboard-container');
       const loginForm = document.getElementById('auth-login-form');
@@ -1838,9 +1847,11 @@
       const passInput = document.getElementById('auth-password');
       const errorMsg = document.getElementById('auth-error-msg');
       const btnLogout = document.getElementById('btn-logout-action');
+      const btnLockScreen = document.getElementById('btn-lock-screen');
 
-      function checkAuth() {
-        const isAuth = sessionStorage.getItem('nano_admin_authenticated') === 'true';
+      function checkAuth(reason = null) {
+        const isAuth = window.StudioSecurity ? window.StudioSecurity.session.isValid() : (sessionStorage.getItem('nano_admin_authenticated') === 'true');
+
         if (isAuth) {
           authScreen.style.display = 'none';
           dashContainer.style.display = 'flex';
@@ -1848,33 +1859,100 @@
         } else {
           authScreen.style.display = 'flex';
           dashContainer.style.display = 'none';
+
+          if (reason === 'inactivity') {
+            if (errorMsg) {
+              errorMsg.style.display = 'flex';
+              errorMsg.style.background = 'rgba(201, 168, 76, 0.12)';
+              errorMsg.style.borderColor = 'rgba(201, 168, 76, 0.4)';
+              errorMsg.style.color = 'var(--gold-light)';
+              const span = errorMsg.querySelector('span');
+              if (span) span.textContent = '🔒 Session verrouillée pour votre sécurité suite à 15 minutes d\'inactivité. Veuillez vous ré-authentifier.';
+            }
+          } else if (reason === 'manual_lock') {
+            if (errorMsg) {
+              errorMsg.style.display = 'flex';
+              errorMsg.style.background = 'rgba(201, 168, 76, 0.12)';
+              errorMsg.style.borderColor = 'rgba(201, 168, 76, 0.4)';
+              errorMsg.style.color = 'var(--gold-light)';
+              const span = errorMsg.querySelector('span');
+              if (span) span.textContent = '✦ Studio verrouillé manuellement. Saisissez votre mot de passe pour reprendre.';
+            }
+          }
         }
       }
 
-      if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const user = userInput.value.trim().toLowerCase();
-          const pass = passInput.value.trim();
+      // Initialisation du tracker d'inactivité (15 minutes + détection d'onglet quitté)
+      if (window.StudioSecurity) {
+        window.StudioSecurity.session.initActivityTracker((reason) => {
+          checkAuth(reason);
+          showToast('🔒 Session studio verrouillée suite à 15 min d\'inactivité.');
+        });
+      }
 
-          // Identifiants acceptés : 'admin' ou 'contact@nanodesign.sn' avec 'nano2026'
-          if ((user === 'admin' || user === 'contact@nanodesign.sn') && pass === 'nano2026') {
-            sessionStorage.setItem('nano_admin_authenticated', 'true');
-            errorMsg.style.display = 'none';
-            checkAuth();
-            showToast('Authentification réussie. Bienvenue dans le studio.');
+      if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const user = userInput.value.trim();
+          const pass = passInput.value;
+
+          if (window.StudioSecurity) {
+            const result = await window.StudioSecurity.verifyCredentials(user, pass);
+            if (result.success) {
+              sessionStorage.setItem('nano_admin_authenticated', 'true');
+              if (errorMsg) errorMsg.style.display = 'none';
+              checkAuth();
+              showToast('✦ Authentification réussie. Session sécurisée active.');
+            } else {
+              if (errorMsg) {
+                errorMsg.style.display = 'flex';
+                errorMsg.style.background = 'rgba(239, 68, 68, 0.12)';
+                errorMsg.style.borderColor = 'rgba(239, 68, 68, 0.35)';
+                errorMsg.style.color = '#F87171';
+                const span = errorMsg.querySelector('span');
+                if (span) span.textContent = result.error || 'Identifiant ou mot de passe incorrect.';
+              }
+              passInput.value = '';
+              passInput.focus();
+            }
           } else {
-            errorMsg.style.display = 'flex';
-            passInput.value = '';
-            passInput.focus();
+            // Fallback de sécurité
+            if ((user.toLowerCase() === 'admin' || user.toLowerCase() === 'contact@nanodesign.sn') && pass === 'nano2026') {
+              sessionStorage.setItem('nano_admin_authenticated', 'true');
+              if (errorMsg) errorMsg.style.display = 'none';
+              checkAuth();
+              showToast('Authentification réussie.');
+            } else {
+              if (errorMsg) errorMsg.style.display = 'flex';
+              passInput.value = '';
+              passInput.focus();
+            }
           }
         });
       }
 
+      // Verrouillage manuel d'écran immédiat
+      if (btnLockScreen) {
+        btnLockScreen.addEventListener('click', () => {
+          if (window.StudioSecurity) {
+            window.StudioSecurity.session.destroy();
+          }
+          sessionStorage.removeItem('nano_admin_authenticated');
+          checkAuth('manual_lock');
+          showToast('✦ Écran d\'administration verrouillé.');
+        });
+      }
+
+      // Déconnexion complète
       if (btnLogout) {
         btnLogout.addEventListener('click', () => {
+          if (window.StudioSecurity) {
+            window.StudioSecurity.session.destroy();
+          }
           sessionStorage.removeItem('nano_admin_authenticated');
+          try { localStorage.removeItem('nano_admin_logged'); } catch (e) { }
           checkAuth();
+          showToast('Déconnexion effectuée.');
         });
       }
 

@@ -465,14 +465,26 @@
         return;
       }
 
+      const sec = window.StudioSecurity ? window.StudioSecurity.sanitize : null;
+      if (sec && !sec.isValidEmail(email)) {
+        alert('Veuillez saisir une adresse email valide.');
+        return;
+      }
+
+      const cleanName = sec ? sec.cleanText(name, 120) : name;
+      const cleanEmail = sec ? sec.cleanText(email, 150) : email;
+      const cleanPhone = sec ? sec.cleanText(phone, 40) : phone;
+      const cleanSubject = sec ? sec.cleanText(subject, 150) : subject;
+      const cleanMessage = sec ? sec.cleanText(message, 3000) : message;
+
       const newMsg = {
         id: `MSG-${Math.floor(100 + Math.random() * 900)}`,
         date: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
-        name: name,
-        email: email,
-        phone: phone || 'Non renseigné',
-        subject: subject || 'Message via site web',
-        message: message,
+        name: cleanName,
+        email: cleanEmail,
+        phone: cleanPhone || 'Non renseigné',
+        subject: cleanSubject || 'Message via site web',
+        message: cleanMessage,
         status: 'Non lu'
       };
 

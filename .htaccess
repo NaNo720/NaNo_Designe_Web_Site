@@ -30,22 +30,37 @@ RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^([^\.]+)$ $1.html [NC,L]
 
 # -------------------------------------------------------------------
-# 3. Sécurité & Protection anti-indexation des robots
+# 3. Sécurité & Protection de niveau bancaire
 # -------------------------------------------------------------------
 # Interdire le listing public des répertoires
 Options -Indexes
 
-# Protection des fichiers sensibles
-<FilesMatch "^\.(htaccess|htpasswd|env|git)">
+# Protection des fichiers sensibles et secrets
+<FilesMatch "(^\.|\.(env|git|htaccess|htpasswd|log|sql|md|json)$)">
     Order allow,deny
     Deny from all
 </FilesMatch>
 
-# En-têtes stricts pour la page d'administration
+# Autoriser spécifiquement le manifest PWA
+<Files "admin-manifest.json">
+    Order allow,deny
+    Allow from all
+</Files>
+
+# En-têtes HTTP de sécurité globaux
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'self';"
+</IfModule>
+
+# En-têtes stricts spécifiques pour la page d'administration
 <Files "admin.html">
     Header set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
     Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
 </Files>
