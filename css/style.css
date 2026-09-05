@@ -826,7 +826,7 @@ button, input, textarea, select {
   position: relative;
   width: 100%;
   height: 250px;
-  background: #111119;
+  background: radial-gradient(circle at 50% 50%, #151522 0%, #090910 100%);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -838,12 +838,41 @@ button, input, textarea, select {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Présentation spécifique Logos & Branding pour une netteté absolue sans étirement ni pixellisation */
+.project-card[data-category="logos"] .project-thumb-wrapper,
+.project-card[data-category="logo"] .project-thumb-wrapper {
+  background: radial-gradient(circle at 50% 50%, #171726 0%, #07070B 100%);
+  padding: 1.5rem;
+}
+
+.project-card[data-category="logos"] .project-thumb-img,
+.project-card[data-category="logo"] .project-thumb-img,
+.project-thumb-img.thumb-logo {
+  object-fit: contain !important;
+  max-width: 82% !important;
+  max-height: 82% !important;
+  width: auto !important;
+  height: auto !important;
+  margin: auto !important;
+  image-rendering: -webkit-optimize-contrast;
+  border-radius: var(--radius-sm);
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.5));
+}
+
+.project-card[data-category="logos"]:hover .project-thumb-img,
+.project-card[data-category="logo"]:hover .project-thumb-img {
+  transform: scale(1.03);
 }
 
 .project-card:hover .project-thumb-svg,
 .project-card:hover .project-thumb-img {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 .project-badge-cat {
@@ -912,22 +941,85 @@ button, input, textarea, select {
 .project-footer-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  width: 100%;
   border-top: 1px solid var(--border-subtle);
   padding-top: 1.2rem;
+  margin-top: auto;
 }
 
+/* Élimination des tags demandée par le client pour aérer le design */
 .project-tech-tags {
-  display: flex;
-  gap: 0.4rem;
+  display: none !important;
 }
 
 .tech-tag {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.04);
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  display: none !important;
+}
+
+/* Bouton Devis Similaire Studio Haute Fidélité */
+.btn-project-devis,
+.project-footer-row .link-more {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.82rem 1.25rem;
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.09) 0%, rgba(201, 168, 76, 0.03) 100%);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  border-radius: var(--radius-md);
+  color: var(--gold-light, #E5C875);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.btn-project-devis::before,
+.project-footer-row .link-more::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn-project-devis:hover::before,
+.project-footer-row .link-more:hover::before {
+  left: 100%;
+}
+
+.btn-project-devis::after,
+.project-footer-row .link-more::after {
+  display: none !important;
+}
+
+.btn-project-devis svg,
+.project-footer-row .link-more svg {
+  stroke: var(--gold-light, #E5C875);
+  transition: transform 0.25s ease, stroke 0.25s ease;
+  flex-shrink: 0;
+}
+
+.btn-project-devis:hover,
+.project-footer-row .link-more:hover {
+  background: var(--gold-gradient, linear-gradient(135deg, #E5C875 0%, #C9A84C 100%)) !important;
+  color: #07070B !important;
+  border-color: #E5C875 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201, 168, 76, 0.32), 0 0 14px rgba(201, 168, 76, 0.15);
+}
+
+.btn-project-devis:hover svg,
+.project-footer-row .link-more:hover svg {
+  stroke: #07070B !important;
+  transform: translateX(4px);
 }
 
 .portfolio-cta-box {

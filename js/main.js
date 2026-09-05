@@ -194,7 +194,8 @@
   // SVGs vectoriels haute fidélité pour les réalisations initiales ou fallback
   function getProjectThumbnailHtml(project) {
     if (project.imageUrl && project.imageUrl.trim()) {
-      return `<img src="${project.imageUrl}" alt="${project.title}" class="project-thumb-img" loading="lazy">`;
+      const isLogo = project.category === 'logos' || project.category === 'logo';
+      return `<img src="${project.imageUrl}" alt="${project.title}" class="project-thumb-img ${isLogo ? 'thumb-logo' : ''}" loading="lazy">`;
     }
 
     switch (project.id) {
@@ -335,10 +336,13 @@
           <h4 class="project-title">${p.title}</h4>
           <p class="project-summary">${p.description}</p>
           <div class="project-footer-row">
-            <div class="project-tech-tags">
-              ${tagsHtml}
-            </div>
-            <a href="#devis" class="link-more">Devis similaire →</a>
+            <a href="#devis" class="btn-project-devis">
+              <span>Devis similaire pour votre projet</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
           </div>
         </div>
       `;
