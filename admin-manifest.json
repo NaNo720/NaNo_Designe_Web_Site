@@ -1,0 +1,18 @@
+{
+  "name": "Nano Design — Studio Admin",
+  "short_name": "Studio Nano",
+  "start_url": "./admin",
+  "display": "standalone",
+  "background_color": "#07070B",
+  "theme_color": "#07070B",
+  "orientation": "portrait",
+  "description": "Portail d'administration confidentiel du studio créatif Nano Design Dakar",
+  "icons": [
+    {
+      "src": "assets/Logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+# ===================================================================
+# Robots.txt — Nano Design Studio Dakar (https://nanodesign.sn)
+# ===================================================================
+
+User-agent: *
+# Autoriser les pages publiques et leurs ressources
+Allow: /
+Allow: /assets/
+Allow: /css/
+Allow: /js/
+
+# Interdire formellement l'indexation de l'espace administration privé
+Disallow: /admin
+Disallow: /admin/
+Disallow: /admin.html
+Disallow: /studio
+Disallow: /studio/
+Disallow: /studio.html
+Disallow: /manage
+Disallow: /manage/
+
+# Empêcher les robots d'explorer les fichiers de configuration
+Disallow: /.htaccess
+Disallow: /vercel.json
+Disallow: /netlify.toml
+Disallow: /_redirects
+
+Sitemap: https://nanodesign.sn/sitemap.xml

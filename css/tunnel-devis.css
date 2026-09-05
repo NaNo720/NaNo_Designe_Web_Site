@@ -1,0 +1,542 @@
+/* ==========================================================================
+   TUNNEL DE DEVIS INTERACTIF (WIZARD HAUTE COUTURE)
+   Nano Design Dakar — Section Centrale
+   ========================================================================== */
+
+.devis-section {
+  position: relative;
+  background: radial-gradient(circle at 50% 30%, rgba(201, 168, 76, 0.09) 0%, transparent 60%),
+              var(--bg-secondary);
+  overflow: hidden;
+}
+
+.devis-wizard-wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Barre de Progression du Wizard */
+.wizard-progress-bar-container {
+  background: rgba(10, 10, 16, 0.9);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 1.5rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 640px) {
+  .wizard-progress-bar-container {
+    padding: 1.2rem;
+  }
+}
+
+.wizard-steps-indicator {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  justify-content: space-between;
+  position: relative;
+}
+
+.wizard-step-node {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  position: relative;
+  z-index: 2;
+  cursor: default;
+}
+
+.node-number {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-tech);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: all var(--transition-normal);
+}
+
+.wizard-step-node.active .node-number {
+  background: var(--gold-gradient);
+  border-color: var(--gold-primary);
+  color: #08080C;
+  box-shadow: 0 0 18px rgba(201, 168, 76, 0.4);
+}
+
+.wizard-step-node.completed .node-number {
+  background: rgba(201, 168, 76, 0.2);
+  border-color: var(--gold-primary);
+  color: var(--gold-light);
+}
+
+.node-info {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 640px) {
+  .node-info {
+    display: none;
+  }
+}
+
+.node-label {
+  font-family: var(--font-tech);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.node-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.wizard-step-node.active .node-title {
+  color: var(--text-primary);
+}
+
+/* Step Panes */
+.wizard-body {
+  padding: 3.5rem;
+}
+
+@media (max-width: 768px) {
+  .wizard-body {
+    padding: 2rem 1.4rem;
+  }
+}
+
+.wizard-pane {
+  display: none;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.wizard-pane.is-active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Étape 1 : Choix de Prestation */
+.step-header {
+  text-align: center;
+  margin-bottom: 2.8rem;
+}
+
+.step-header h3 {
+  font-size: 1.85rem;
+  margin-bottom: 0.6rem;
+}
+
+.step-header p {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+}
+
+/* Grid des 3 Options Principales */
+.services-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (max-width: 860px) {
+  .services-choice-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.service-choice-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 2rem 1.5rem;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  user-select: none;
+}
+
+.service-choice-card:hover {
+  border-color: var(--border-medium);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-4px);
+}
+
+.service-choice-card.selected {
+  border-color: var(--gold-primary);
+  background: linear-gradient(180deg, rgba(201, 168, 76, 0.12) 0%, rgba(201, 168, 76, 0.03) 100%);
+  box-shadow: 0 0 25px rgba(201, 168, 76, 0.2);
+}
+
+.choice-icon-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(201, 168, 76, 0.08);
+  border: 1px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-light);
+  margin-bottom: 1.3rem;
+  transition: all var(--transition-fast);
+}
+
+.service-choice-card.selected .choice-icon-wrap {
+  background: var(--gold-primary);
+  color: #08080C;
+  box-shadow: 0 0 15px rgba(201, 168, 76, 0.5);
+}
+
+.choice-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.choice-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.choice-check-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  font-size: 0.75rem;
+  transition: all var(--transition-fast);
+}
+
+.service-choice-card.selected .choice-check-badge {
+  background: var(--gold-primary);
+  border-color: var(--gold-primary);
+  color: #08080C;
+}
+
+/* Sous-options par branche */
+.sub-options-container {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px dashed var(--border-gold);
+  border-radius: var(--radius-md);
+  padding: 1.8rem;
+  margin-top: 1.5rem;
+  animation: fadeInSub 0.35s ease;
+}
+
+@keyframes fadeInSub {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sub-options-title {
+  font-family: var(--font-tech);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold-light);
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+.sub-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+@media (max-width: 640px) {
+  .sub-options-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sub-option-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 1.2rem 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all var(--transition-fast);
+}
+
+.sub-option-card:hover {
+  border-color: var(--border-medium);
+  background: var(--bg-card-hover);
+}
+
+.sub-option-card.selected {
+  border-color: var(--gold-primary);
+  background: rgba(201, 168, 76, 0.08);
+}
+
+.sub-option-info h5 {
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
+
+.sub-option-info p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.sub-radio-disc {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.sub-option-card.selected .sub-radio-disc {
+  border-color: var(--gold-primary);
+}
+
+.sub-option-card.selected .sub-radio-disc::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+}
+
+/* Wizard Navigation Actions */
+.wizard-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Étape 2 : Formulaire Final & Récapitulatif */
+.step-summary-banner {
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.15) 0%, rgba(13, 13, 20, 0.8) 100%);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  padding: 1.4rem 1.8rem;
+  margin-bottom: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.summary-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-eyebrow {
+  font-family: var(--font-tech);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold-light);
+  margin-bottom: 0.2rem;
+}
+
+.summary-selection-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.btn-modify-choice {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-modify-choice:hover {
+  border-color: var(--gold-primary);
+  color: var(--gold-light);
+}
+
+/* Sélecteurs de Budget et Délais */
+.budget-options-row, .timeline-options-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .budget-options-row, .timeline-options-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.budget-chip, .timeline-chip {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.6rem;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.budget-chip:hover, .timeline-chip:hover {
+  border-color: var(--border-medium);
+  color: var(--text-primary);
+}
+
+.budget-chip.selected, .timeline-chip.selected {
+  background: rgba(201, 168, 76, 0.12);
+  border-color: var(--gold-primary);
+  color: var(--gold-light);
+  font-weight: 600;
+}
+
+/* Étape 3 : Confirmation & Succès */
+.wizard-success-pane {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.success-symbol {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(201, 168, 76, 0.1);
+  border: 2px solid var(--gold-primary);
+  color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem auto;
+  font-size: 2.2rem;
+  box-shadow: 0 0 30px rgba(201, 168, 76, 0.3);
+}
+
+.success-title {
+  font-size: 2.2rem;
+  margin-bottom: 0.8rem;
+}
+
+.success-desc {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 580px;
+  margin: 0 auto 2.5rem auto;
+  line-height: 1.6;
+}
+
+.devis-reference-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  max-width: 540px;
+  margin: 0 auto 2.5rem auto;
+  padding: 1.8rem;
+  text-align: left;
+}
+
+.reference-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.reference-id {
+  font-family: var(--font-tech);
+  font-size: 1.2rem;
+  color: var(--gold-light);
+  font-weight: 700;
+}
+
+.reference-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+}
+
+.reference-details-list .row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.reference-details-list .label {
+  color: var(--text-muted);
+}
+
+.reference-details-list .value {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.success-actions-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.btn-whatsapp-direct {
+  background: #25D366;
+  color: #08080C;
+  font-weight: 700;
+}
+
+.btn-whatsapp-direct:hover {
+  background: #20BA5A;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  transform: translateY(-2px);
+}

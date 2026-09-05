@@ -1,0 +1,179 @@
+-- ==============================================================================
+-- NANO DESIGN STUDIO DAKAR — SCHÉMA SUPABASE (POSTGRESQL)
+-- À exécuter dans le "SQL Editor" de votre tableau de bord Supabase (1 clic)
+-- ==============================================================================
+
+-- 1. Table des Devis & Dossiers Clients
+CREATE TABLE IF NOT EXISTS public.quotes (
+    id TEXT PRIMARY KEY,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    date TEXT NOT NULL,
+    service_category TEXT,
+    service_variant TEXT,
+    service_label TEXT NOT NULL,
+    client_name TEXT NOT NULL,
+    client_company TEXT,
+    client_phone TEXT,
+    client_email TEXT NOT NULL,
+    client_description TEXT,
+    client_budget TEXT,
+    client_timeline TEXT,
+    status TEXT DEFAULT 'Nouveau',
+    payment_status TEXT DEFAULT 'Non généré',
+    amount TEXT DEFAULT 'Sur devis',
+    provider TEXT,
+    txn TEXT,
+    paid_date TEXT
+);
+
+-- 2. Table des Messages de Contact
+CREATE TABLE IF NOT EXISTS public.messages (
+    id TEXT PRIMARY KEY,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    date TEXT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT,
+    subject TEXT,
+    message TEXT NOT NULL,
+    status TEXT DEFAULT 'Non lu'
+);
+
+-- 3. Table des Visites & Télémétrie d'Audience (Analytics Réel)
+CREATE TABLE IF NOT EXISTS public.site_visits (
+    id TEXT PRIMARY KEY,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    visitor_id TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    section TEXT DEFAULT 'accueil',
+    country TEXT DEFAULT 'Sénégal',
+    is_conversion BOOLEAN DEFAULT false
+);
+
+-- Index pour accélérer les recherches fréquentes
+CREATE INDEX IF NOT EXISTS idx_quotes_created_at ON public.quotes(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_quotes_payment_status ON public.quotes(payment_status);
+CREATE INDEX IF NOT EXISTS idx_messages_created_at ON public.messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_site_visits_created_at ON public.site_visits(created_at DESC);
+
+-- 4. Activation du Temps Réel (Supabase Realtime)
+-- Permet à l'admin de voir les devis et paiements en direct sans recharger la page
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND tablename = 'quotes'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.quotes;
+  END IF;
+  
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND tablename = 'messages'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND tablename = 'site_visits'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.site_visits;
+  END IF;
+END $$;
+
+-- 5. Sécurité & Droits d'accès (Row Level Security - RLS)
+ALTER TABLE public.quotes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
+
+-- Politiques pour la table "quotes"
+DROP POLICY IF EXISTS "Permettre l'insertion publique des devis" ON public.quotes;
+CREATE POLICY "Permettre l'insertion publique des devis"
+ON public.quotes FOR INSERT
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Permettre la lecture des devis" ON public.quotes;
+CREATE POLICY "Permettre la lecture des devis"
+ON public.quotes FOR SELECT
+USING (true);
+
+DROP POLICY IF EXISTS "Permettre la mise a jour des devis" ON public.quotes;
+CREATE POLICY "Permettre la mise a jour des devis"
+ON public.quotes FOR UPDATE
+USING (true)
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Permettre la suppression des devis" ON public.quotes;
+CREATE POLICY "Permettre la suppression des devis"
+ON public.quotes FOR DELETE
+USING (true);
+
+-- Politiques pour la table "messages"
+DROP POLICY IF EXISTS "Permettre l'insertion publique des messages" ON public.messages;
+CREATE POLICY "Permettre l'insertion publique des messages"
+ON public.messages FOR INSERT
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Permettre la lecture des messages" ON public.messages;
+CREATE POLICY "Permettre la lecture des messages"
+ON public.messages FOR SELECT
+USING (true);
+
+DROP POLICY IF EXISTS "Permettre la mise a jour des messages" ON public.messages;
+CREATE POLICY "Permettre la mise a jour des messages"
+ON public.messages FOR UPDATE
+USING (true)
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Permettre la suppression des messages" ON public.messages;
+CREATE POLICY "Permettre la suppression des messages"
+ON public.messages FOR DELETE
+USING (true);
+
+-- Politiques pour la table "site_visits"
+DROP POLICY IF EXISTS "Permettre l'insertion publique des visites" ON public.site_visits;
+CREATE POLICY "Permettre l'insertion publique des visites"
+ON public.site_visits FOR INSERT
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Permettre la lecture des visites" ON public.site_visits;
+CREATE POLICY "Permettre la lecture des visites"
+ON public.site_visits FOR SELECT
+USING (true);
+
+-- 6. Données initiales du Studio Nano Design Dakar
+INSERT INTO public.quotes (
+    id, date, service_category, service_variant, service_label,
+    client_name, client_company, client_phone, client_email,
+    client_description, client_budget, client_timeline,
+    status, payment_status, amount, provider, txn, paid_date
+) VALUES 
+(
+    'ND-2026-4821', '04 septembre 2026', 'website', 'ecommerce', 'Créer un site web — Site e-commerce performant',
+    'Moussa Diop', 'Teranga Prestige Hospitality', '+221 77 452 10 98', 'moussa@terangagroup.sn',
+    'Refonte complète de notre portail de réservation hôtelière aux Almadies. Intégration paiement Wave/OM.',
+    '1 500 000 – 3 000 000 FCFA', '1 à 2 mois',
+    'Validé', 'Payé', '1 800 000 FCFA', 'Wave Business', 'TRX-WAVE-2026-8821', '04 septembre 2026'
+),
+(
+    'ND-2026-3914', '03 septembre 2026', 'logo', 'with-guidelines', 'Créer un logo — Avec charte graphique complète',
+    'Aminata Fall', 'Baobab Fintech Dakar', '+221 78 120 45 67', 'a.fall@baobabpay.sn',
+    'Identité visuelle premium pour notre solution de paiement mobile destinée aux commerçants de Dakar.',
+    '500 000 – 1 000 000 FCFA', 'Moins d''1 mois',
+    'En cours', 'En attente', '750 000 FCFA', NULL, NULL, NULL
+),
+(
+    'ND-2026-2105', '02 septembre 2026', 'visual', 'print', 'Visuel / Support — Support imprimé haut de gamme',
+    'Ibrahima Sarr', 'Galerie Renaissance Plateau', '+221 76 890 12 34', 'contact@renaissance-art.sn',
+    'Habillage mural grand format et catalogues d''exposition d''art contemporain africain.',
+    'Moins de 500 000 FCFA', 'Flexible',
+    'Nouveau', 'Non généré', 'À définir', NULL, NULL, NULL
+)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.messages (id, date, name, email, phone, subject, message, status)
+VALUES 
+('MSG-401', '04 sept. 2026', 'Dr. Cheikh Ndiaye', 'c.ndiaye@clinique-madeleine.sn', '+221 77 654 32 10', 'Refonte identité visuelle', 'Bonjour studio Nano Design, nous souhaitons moderniser la signalétique et le logo de notre clinique.', 'Non lu'),
+('MSG-402', '03 sept. 2026', 'Fatou Kiné Sow', 'f.sow@dakartransit.com', '+221 70 333 44 55', 'Devis site vitrine', 'Nous avons besoin d''un site corporate bilingue FR/EN pour notre société de logistique portuaire.', 'Lu')
+ON CONFLICT (id) DO NOTHING;

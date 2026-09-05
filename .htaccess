@@ -1,0 +1,51 @@
+# ===================================================================
+# Nano Design Dakar — Configuration Apache & Réécriture d'URL
+# ===================================================================
+
+RewriteEngine On
+
+# -------------------------------------------------------------------
+# 1. Sous-domaine dédié : studio.nanodesign.sn ou admin.nanodesign.sn
+# -------------------------------------------------------------------
+# Si la visite provient du sous-domaine 'studio' ou 'admin', servir directement admin.html
+RewriteCond %{HTTP_HOST} ^(studio|admin)\. [NC]
+RewriteCond %{REQUEST_URI} !^/admin\.html
+RewriteCond %{REQUEST_URI} !^/(assets|css|js)/ [NC]
+RewriteRule ^$ admin.html [L,QSA]
+
+# -------------------------------------------------------------------
+# 2. URL privées et propres (Clean URLs sans extension .html)
+# -------------------------------------------------------------------
+# Accès via https://nanodesign.sn/admin ou https://nanodesign.sn/studio
+RewriteRule ^admin/?$ admin.html [L,QSA]
+RewriteRule ^studio/?$ admin.html [L,QSA]
+RewriteRule ^manage/?$ admin.html [L,QSA]
+RewriteRule ^pay/?$ pay.html [L,QSA]
+RewriteRule ^paiement/?$ pay.html [L,QSA]
+
+# Supprimer l'extension .html pour les fichiers existants
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^([^\.]+)$ $1.html [NC,L]
+
+# -------------------------------------------------------------------
+# 3. Sécurité & Protection anti-indexation des robots
+# -------------------------------------------------------------------
+# Interdire le listing public des répertoires
+Options -Indexes
+
+# Protection des fichiers sensibles
+<FilesMatch "^\.(htaccess|htpasswd|env|git)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# En-têtes stricts pour la page d'administration
+<Files "admin.html">
+    Header set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet"
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Header set Pragma "no-cache"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+</Files>

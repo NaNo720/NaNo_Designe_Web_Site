@@ -1,0 +1,42 @@
+# ==============================================================================
+# NANO DESIGN DAKAR — GITIGNORE
+# Fichiers et dossiers exclus du versionnement Git / GitHub
+# ==============================================================================
+
+# Fichiers système d'exploitation
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Fichiers éditeurs et IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Fichiers journaux et caches
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Dépendances éventuelles
+node_modules/
+dist/
+.cache/
+
+# Variables d'environnement locales secrètes
+.env
+.env.local
+.env.*.local

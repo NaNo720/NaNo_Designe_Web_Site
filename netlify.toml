@@ -1,0 +1,43 @@
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/studio"
+  to = "/admin.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/manage"
+  to = "/admin.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/pay"
+  to = "/pay.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/paiement"
+  to = "/pay.html"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/admin*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet"
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+    X-Frame-Options = "SAMEORIGIN"
+
+[[headers]]
+  for = "/studio*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet"
+    Cache-Control = "no-store, no-cache, must-revalidate, max-age=0"
+    X-Frame-Options = "SAMEORIGIN"
