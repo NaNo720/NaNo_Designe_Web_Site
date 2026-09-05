@@ -1344,11 +1344,20 @@ button, input, textarea, select {
   transition: all var(--transition-fast);
 }
 
+.form-input::placeholder, .form-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
 .form-input:focus, .form-textarea:focus, .form-select:focus {
   outline: none;
   border-color: var(--gold-primary);
   background: rgba(201, 168, 76, 0.05);
   box-shadow: 0 0 15px rgba(201, 168, 76, 0.2);
+}
+
+.form-select option {
+  background: #0E0E17;
+  color: #FFFFFF;
 }
 
 .form-textarea {

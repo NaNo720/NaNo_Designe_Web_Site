@@ -436,6 +436,92 @@
       padding-top: 0.8rem;
       border-top: 1px solid var(--border-subtle);
     }
+
+    /* Styles Dark Premium des champs de formulaires & modales */
+    .form-input,
+    .form-select,
+    .form-textarea,
+    .auth-input,
+    .proj-modal-input {
+      width: 100%;
+      background: #0D0D15 !important;
+      border: 1px solid rgba(201, 168, 76, 0.3) !important;
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      color: #FFFFFF !important;
+      font-size: 0.88rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .form-input::placeholder,
+    .form-textarea::placeholder,
+    .auth-input::placeholder,
+    .proj-modal-input::placeholder {
+      color: rgba(255, 255, 255, 0.45) !important;
+      font-style: normal;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus,
+    .auth-input:focus,
+    .proj-modal-input:focus {
+      outline: none;
+      border-color: var(--gold-light) !important;
+      background: #131320 !important;
+      box-shadow: 0 0 15px rgba(201, 168, 76, 0.28) !important;
+      color: #FFFFFF !important;
+    }
+
+    select.form-input,
+    select.auth-input,
+    select.proj-modal-input {
+      background-color: #0D0D15 !important;
+      color: #FFFFFF !important;
+      cursor: pointer;
+    }
+
+    select.form-input option,
+    select.auth-input option,
+    select.proj-modal-input option {
+      background: #0E0E17 !important;
+      color: #FFFFFF !important;
+      padding: 0.5rem;
+    }
+
+    input[type="file"]#proj-form-file {
+      background: transparent !important;
+      color: var(--text-secondary) !important;
+      font-size: 0.82rem;
+      border: none !important;
+      padding: 0.2rem 0;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    input[type="file"]#proj-form-file::file-selector-button {
+      background: rgba(201, 168, 76, 0.15);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-tech);
+      font-size: 0.76rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      margin-right: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    input[type="file"]#proj-form-file::file-selector-button:hover {
+      background: var(--gold-light);
+      color: #08080C;
+      box-shadow: 0 0 12px rgba(201, 168, 76, 0.4);
+    }
   </style>
 </head>
 
@@ -1308,21 +1394,21 @@
         <form id="form-portfolio-project" style="display: flex; flex-direction: column; gap: 1.1rem;">
           <input type="hidden" id="proj-form-id" value="">
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
             <div>
-              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Titre de la création *</label>
-              <input type="text" id="proj-form-title" class="auth-input" placeholder="Ex: Plateforme E-commerce & Mobile" required style="width: 100%; border-radius: var(--radius-sm);">
+              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Titre de la création *</label>
+              <input type="text" id="proj-form-title" class="form-input proj-modal-input" placeholder="Ex: Plateforme E-commerce & Mobile" required>
             </div>
             <div>
-              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Client & Ville *</label>
-              <input type="text" id="proj-form-client" class="auth-input" placeholder="Ex: Maison Baobab • Dakar" required style="width: 100%; border-radius: var(--radius-sm);">
+              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Client & Ville *</label>
+              <input type="text" id="proj-form-client" class="form-input proj-modal-input" placeholder="Ex: Maison Baobab • Dakar" required>
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
             <div>
-              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Catégorie *</label>
-              <select id="proj-form-category" class="auth-input" required style="width: 100%; border-radius: var(--radius-sm); background: #0E0E16; color: #FFF;">
+              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Catégorie *</label>
+              <select id="proj-form-category" class="form-input proj-modal-input" required>
                 <option value="web">Sites Web & Mobile</option>
                 <option value="logos">Logos & Branding</option>
                 <option value="supports">Signalétique & Supports Muraux</option>
@@ -1330,39 +1416,39 @@
               </select>
             </div>
             <div>
-              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Mots-clés / Tags</label>
-              <input type="text" id="proj-form-tags" class="auth-input" placeholder="Ex: UI/UX, Wave, Luxe (séparés par des virgules)" style="width: 100%; border-radius: var(--radius-sm);">
+              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Mots-clés / Tags</label>
+              <input type="text" id="proj-form-tags" class="form-input proj-modal-input" placeholder="Ex: UI/UX, Wave, Luxe (séparés par des virgules)">
             </div>
           </div>
 
           <!-- Section Image / Visuel -->
-          <div style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 1rem;">
-            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem;">Visuel du projet (Image ou Capture)</label>
-            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-              <div id="proj-preview-box" style="width: 130px; height: 85px; background: #09090E; border: 1px solid var(--border-gold); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+          <div style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 1.1rem;">
+            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.5rem; letter-spacing: 0.04em;">Visuel du projet (Image ou Capture)</label>
+            <div style="display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap;">
+              <div id="proj-preview-box" style="width: 140px; height: 90px; background: #07070B; border: 1px solid var(--border-gold); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
                 <span id="proj-preview-placeholder" style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 0.4rem;">Aperçu</span>
                 <img id="proj-preview-img" src="" alt="Aperçu" style="width: 100%; height: 100%; object-fit: cover; display: none;">
               </div>
-              <div style="flex: 1; min-width: 200px;">
-                <input type="file" id="proj-form-file" accept="image/*" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">
-                <input type="text" id="proj-form-image-url" class="auth-input" placeholder="Ou collez un lien d'image web (https://...)" style="width: 100%; font-size: 0.8rem; border-radius: var(--radius-sm);">
+              <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 0.5rem;">
+                <input type="file" id="proj-form-file" accept="image/*">
+                <input type="text" id="proj-form-image-url" class="form-input proj-modal-input" placeholder="Ou collez un lien d'image web (https://...)">
               </div>
             </div>
           </div>
 
           <div>
-            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Description du projet *</label>
-            <textarea id="proj-form-desc" class="auth-input" rows="3" placeholder="Présentez le challenge, la solution apportée et la valeur créée pour le client..." required style="width: 100%; border-radius: var(--radius-sm); resize: vertical;"></textarea>
+            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Description du projet *</label>
+            <textarea id="proj-form-desc" class="form-input proj-modal-input" rows="3" placeholder="Présentez le challenge, la solution apportée et la valeur créée pour le client..." required style="resize: vertical;"></textarea>
           </div>
 
           <div>
-            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Lien externe vers le site (optionnel)</label>
-            <input type="url" id="proj-form-url" class="auth-input" placeholder="Ex: https://client-website.sn" style="width: 100%; border-radius: var(--radius-sm);">
+            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Lien externe vers le site (optionnel)</label>
+            <input type="url" id="proj-form-url" class="form-input proj-modal-input" placeholder="Ex: https://client-website.sn">
           </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border-subtle);">
-            <button type="button" class="btn btn-secondary" id="btn-cancel-project" style="padding: 0.55rem 1.1rem; font-size: 0.84rem;">Annuler</button>
-            <button type="submit" class="btn btn-primary" id="btn-save-project" style="padding: 0.55rem 1.3rem; font-size: 0.84rem;">Enregistrer la création ✦</button>
+          <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 0.8rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-project" style="padding: 0.6rem 1.2rem; font-size: 0.84rem;">Annuler</button>
+            <button type="submit" class="btn btn-primary" id="btn-save-project" style="padding: 0.6rem 1.4rem; font-size: 0.84rem;">Enregistrer la création ✦</button>
           </div>
         </form>
       </div>
