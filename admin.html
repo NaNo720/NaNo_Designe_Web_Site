@@ -325,8 +325,17 @@
     }
 
     @keyframes alertBadgePulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.06); opacity: 0.92; }
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.06);
+        opacity: 0.92;
+      }
     }
 
     .dash-pane {
@@ -376,7 +385,7 @@
     .admin-project-card:hover {
       border-color: var(--border-gold);
       transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
     .admin-project-thumb {
@@ -522,6 +531,35 @@
       color: #08080C;
       box-shadow: 0 0 12px rgba(201, 168, 76, 0.4);
     }
+
+    /* Modal Projet : Soulèvement et aération des boutons Annuler et Enregistrer */
+    #dash-project-modal .invoice-modal-container {
+      max-width: 700px;
+      width: 95%;
+      border-radius: var(--radius-lg);
+      background: #0B0B13;
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.95), 0 0 45px rgba(201, 168, 76, 0.2);
+    }
+
+    #dash-project-modal .invoice-modal-body {
+      padding: 1.8rem 2.2rem 3.2rem 2.2rem !important;
+      display: block !important;
+      background: #0B0B13 !important;
+      max-height: calc(88vh - 75px);
+      overflow-y: auto;
+    }
+
+    #dash-project-modal .proj-modal-footer-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.6rem;
+      padding-top: 1.2rem;
+      padding-bottom: 1.8rem;
+      border-top: 1px solid var(--border-subtle);
+    }
   </style>
 </head>
 
@@ -598,13 +636,15 @@
 
       <div class="dashboard-actions">
         <!-- Indicateur Base de données Supabase -->
-        <button type="button" id="btn-open-supabase-modal" class="btn-db-status" title="Configuration de la Base de Données Supabase">
+        <button type="button" id="btn-open-supabase-modal" class="btn-db-status"
+          title="Configuration de la Base de Données Supabase">
           <span class="db-status-dot" id="db-status-dot"></span>
           <span id="db-status-label">Base de données</span>
         </button>
 
         <!-- Bouton Alertes Sonores & Notifications Push -->
-        <button type="button" id="btn-toggle-alerts" class="btn-db-status" title="Gérer les alertes sonores et notifications de bureau">
+        <button type="button" id="btn-toggle-alerts" class="btn-db-status"
+          title="Gérer les alertes sonores et notifications de bureau">
           <span id="alerts-status-icon">🔔</span>
           <span id="alerts-status-label">Alertes Actives</span>
         </button>
@@ -631,21 +671,27 @@
     <main class="dashboard-main-content">
       <!-- Onglets de Navigation -->
       <div class="dashboard-nav-tabs-bar">
-        <button class="dash-tab-btn active" data-dash-target="pane-dash-quotes" id="tab-btn-quotes" title="Devis reçus via le tunnel">
+        <button class="dash-tab-btn active" data-dash-target="pane-dash-quotes" id="tab-btn-quotes"
+          title="Devis reçus via le tunnel">
           <span>Devis Reçus</span>
           <span class="dash-counter" id="dash-quotes-counter" title="Total des devis">3</span>
-          <span class="dash-counter-alert" id="dash-quotes-alert" style="display: none;" title="Nouveaux devis à traiter">+0</span>
+          <span class="dash-counter-alert" id="dash-quotes-alert" style="display: none;"
+            title="Nouveaux devis à traiter">+0</span>
         </button>
-        <button class="dash-tab-btn" data-dash-target="pane-dash-messages" id="tab-btn-messages" title="Messages du formulaire de contact">
+        <button class="dash-tab-btn" data-dash-target="pane-dash-messages" id="tab-btn-messages"
+          title="Messages du formulaire de contact">
           <span>Messages Contact</span>
           <span class="dash-counter" id="dash-messages-counter" title="Total des messages">2</span>
-          <span class="dash-counter-alert is-unread" id="dash-messages-alert" style="display: none;" title="Messages non lus">0</span>
+          <span class="dash-counter-alert is-unread" id="dash-messages-alert" style="display: none;"
+            title="Messages non lus">0</span>
         </button>
-        <button class="dash-tab-btn" data-dash-target="pane-dash-portfolio" id="tab-btn-portfolio" title="Gérer les créations affichées sur le site public">
+        <button class="dash-tab-btn" data-dash-target="pane-dash-portfolio" id="tab-btn-portfolio"
+          title="Gérer les créations affichées sur le site public">
           <span>Portfolio Studio</span>
           <span class="dash-counter" id="dash-portfolio-counter">6</span>
         </button>
-        <button class="dash-tab-btn" data-dash-target="pane-dash-payments" id="tab-btn-payments" title="Paiements Wave, Orange Money et Statistiques">
+        <button class="dash-tab-btn" data-dash-target="pane-dash-payments" id="tab-btn-payments"
+          title="Paiements Wave, Orange Money et Statistiques">
           <span>Paiements & Stats</span>
         </button>
       </div>
@@ -735,17 +781,25 @@
         </div>
 
         <!-- En-tête des Statistiques Réelles -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem;">
           <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <span style="display: inline-block; width: 8px; height: 8px; background: #34D399; border-radius: 50%; box-shadow: 0 0 10px #34D399; animation: alertBadgePulse 2s infinite;"></span>
-            <h4 style="color: var(--text-primary); font-size: 1.05rem; margin: 0; font-weight: 600;">Statistiques de Fréquentation & Tunnel (En Direct)</h4>
+            <span
+              style="display: inline-block; width: 8px; height: 8px; background: #34D399; border-radius: 50%; box-shadow: 0 0 10px #34D399; animation: alertBadgePulse 2s infinite;"></span>
+            <h4 style="color: var(--text-primary); font-size: 1.05rem; margin: 0; font-weight: 600;">Statistiques de
+              Fréquentation & Tunnel (En Direct)</h4>
           </div>
           <div style="display: flex; gap: 0.6rem; align-items: center;">
-            <button type="button" id="btn-refresh-analytics" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle); color: var(--text-secondary); border-radius: var(--radius-sm); padding: 0.35rem 0.8rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <button type="button" id="btn-refresh-analytics"
+              style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle); color: var(--text-secondary); border-radius: var(--radius-sm); padding: 0.35rem 0.8rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+              </svg>
               <span>Actualiser les métriques</span>
             </button>
-            <span id="analytics-live-tag" style="background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.3); color: #34D399; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: var(--radius-full);">● Données Réelles</span>
+            <span id="analytics-live-tag"
+              style="background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.3); color: #34D399; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: var(--radius-full);">●
+              Données Réelles</span>
           </div>
         </div>
 
@@ -753,32 +807,41 @@
           <div class="stat-box-admin">
             <span class="sub">VISITEURS UNIQUES RÉELS</span>
             <div class="num" id="stat-unique-visitors" style="color: var(--gold-light);">--</div>
-            <small style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.35rem; display: block;">Appareils distincts enregistrés</small>
+            <small style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.35rem; display: block;">Appareils
+              distincts enregistrés</small>
           </div>
           <div class="stat-box-admin">
             <span class="sub">PAGES CONSULTÉES / SESSION</span>
             <div class="num" id="stat-pages-session">--</div>
-            <small style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.35rem; display: block;">Profondeur de navigation moyenne</small>
+            <small style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.35rem; display: block;">Profondeur
+              de navigation moyenne</small>
           </div>
           <div class="stat-box-admin">
             <span class="sub">CONVERSIONS TUNNEL DEVIS</span>
             <div class="num" id="stat-conversion-rate" style="color: #34D399;">--</div>
-            <small style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.35rem; display: block;">Devis reçus / Visiteurs tunnel</small>
+            <small style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.35rem; display: block;">Devis
+              reçus / Visiteurs tunnel</small>
           </div>
           <div class="stat-box-admin">
             <span class="sub">PAYS DOMINANTS DÉTECTÉS</span>
-            <div class="num" id="stat-dominant-countries" style="font-size: 1.05rem; margin-top: 0.5rem; white-space: normal; line-height: 1.4;">--</div>
-            <small style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.35rem; display: block;">Origines géographiques réelles</small>
+            <div class="num" id="stat-dominant-countries"
+              style="font-size: 1.05rem; margin-top: 0.5rem; white-space: normal; line-height: 1.4;">--</div>
+            <small style="color: var(--text-muted); font-size: 0.72rem; margin-top: 0.35rem; display: block;">Origines
+              géographiques réelles</small>
           </div>
         </div>
 
         <!-- Répartition par Sections du Site -->
-        <div style="background: #11111B; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.4rem; margin-top: 1.5rem;">
+        <div
+          style="background: #11111B; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.4rem; margin-top: 1.5rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold-light); font-weight: 700;">Affluence Réelle par Section du Site</span>
+            <span
+              style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold-light); font-weight: 700;">Affluence
+              Réelle par Section du Site</span>
             <span style="font-size: 0.75rem; color: var(--text-muted);">Sections les plus explorées</span>
           </div>
-          <div id="analytics-sections-breakdown" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.8rem;">
+          <div id="analytics-sections-breakdown"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.8rem;">
             <!-- Rempli dynamiquement par JS avec les vraies vues -->
           </div>
         </div>
@@ -786,27 +849,40 @@
 
       <!-- ================= PANNEAU 4 : GESTION DU PORTFOLIO ================= -->
       <div class="dash-pane" id="pane-dash-portfolio">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h3 style="font-size: 1.35rem; color: var(--text-primary); margin-bottom: 0.35rem;">Catalogue des Réalisations du Studio</h3>
-            <p style="color: var(--text-secondary); font-size: 0.88rem;">Ajoutez, modifiez ou retirez des projets affichés sur le site public de Nano Design sans toucher au code.</p>
+            <h3 style="font-size: 1.35rem; color: var(--text-primary); margin-bottom: 0.35rem;">Catalogue des
+              Réalisations du Studio</h3>
+            <p style="color: var(--text-secondary); font-size: 0.88rem;">Ajoutez, modifiez ou retirez des projets
+              affichés sur le site public de Nano Design sans toucher au code.</p>
           </div>
-          <button type="button" class="btn btn-primary" id="btn-add-portfolio-proj" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.3rem;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>+ Ajouter une réalisation</span>
+          <button type="button" class="btn btn-primary" id="btn-add-portfolio-proj"
+            style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.3rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span> Ajouter une réalisation</span>
           </button>
         </div>
 
         <!-- Filtres par Catégorie du Portfolio Admin -->
-        <div style="display: flex; gap: 0.6rem; margin-bottom: 1.5rem; flex-wrap: wrap;" id="portfolio-admin-filter-bar">
-          <button class="portfolio-admin-filter active" data-admin-filter="all">Tous les projets (<span id="count-filter-all">0</span>)</button>
-          <button class="portfolio-admin-filter" data-admin-filter="logos">Logos & Branding (<span id="count-filter-logos">0</span>)</button>
-          <button class="portfolio-admin-filter" data-admin-filter="web">Sites Web & Mobile (<span id="count-filter-web">0</span>)</button>
-          <button class="portfolio-admin-filter" data-admin-filter="supports">Signalétique & Supports (<span id="count-filter-supports">0</span>)</button>
+        <div style="display: flex; gap: 0.6rem; margin-bottom: 1.5rem; flex-wrap: wrap;"
+          id="portfolio-admin-filter-bar">
+          <button class="portfolio-admin-filter active" data-admin-filter="all">Tous les projets (<span
+              id="count-filter-all">0</span>)</button>
+          <button class="portfolio-admin-filter" data-admin-filter="logos">Logos & Branding (<span
+              id="count-filter-logos">0</span>)</button>
+          <button class="portfolio-admin-filter" data-admin-filter="web">Sites Web & Mobile (<span
+              id="count-filter-web">0</span>)</button>
+          <button class="portfolio-admin-filter" data-admin-filter="supports">Signalétique & Supports (<span
+              id="count-filter-supports">0</span>)</button>
         </div>
 
         <!-- Grille des Cartes Réalisations Admin -->
-        <div class="admin-portfolio-grid" id="admin-portfolio-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+        <div class="admin-portfolio-grid" id="admin-portfolio-grid"
+          style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
           <!-- Injecté dynamiquement par JS -->
         </div>
       </div>
@@ -860,7 +936,8 @@
           </button>
           <!-- Bouton Fermer (Croix centrée au milieu du cercle) -->
           <button type="button" class="btn-invoice-close" id="btn-inv-close" aria-label="Fermer la facture">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round" style="display: block;">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -1035,7 +1112,8 @@
       <!-- Bouton fermeture croix en haut à droite (centrage SVG géométrique parfait) -->
       <button type="button" id="btn-dash-close-pay-x" aria-label="Fermer"
         style="position: absolute; top: 1rem; right: 1.1rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(--text-secondary); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: all 0.2s;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+          stroke-linecap="round" stroke-linejoin="round" style="display: block;">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
@@ -1148,16 +1226,18 @@
       <!-- Bouton fermeture croix -->
       <button type="button" id="btn-close-supabase-modal" aria-label="Fermer"
         style="position: absolute; top: 1rem; right: 1.1rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(--text-secondary); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: all 0.2s;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+          stroke-linecap="round" stroke-linejoin="round" style="display: block;">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
 
       <div style="text-align: center; margin-bottom: 0.8rem;">
-        <div style="display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; background: rgba(62, 207, 142, 0.15); border: 1px solid rgba(62, 207, 142, 0.35); color: #3ECF8E; margin-bottom: 0.4rem;">
+        <div
+          style="display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; background: rgba(62, 207, 142, 0.15); border: 1px solid rgba(62, 207, 142, 0.35); color: #3ECF8E; margin-bottom: 0.4rem;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
           </svg>
         </div>
         <h4 style="font-size: 1.25rem; font-weight: 700; color: #ffffff;">Connexion Base de Données Supabase</h4>
@@ -1166,37 +1246,50 @@
         </p>
       </div>
 
-      <div id="supabase-status-banner" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; margin-bottom: 0.9rem; display: flex; align-items: center; gap: 0.6rem;">
+      <div id="supabase-status-banner"
+        style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-sm); padding: 0.6rem 0.8rem; margin-bottom: 0.9rem; display: flex; align-items: center; gap: 0.6rem;">
         <span class="db-status-dot" id="modal-db-dot"></span>
-        <span id="modal-db-status-text" style="font-size: 0.8rem; color: #fbbf24; font-weight: 600;">Mode Local actif (Saisissez vos identifiants ci-dessous)</span>
+        <span id="modal-db-status-text" style="font-size: 0.8rem; color: #fbbf24; font-weight: 600;">Mode Local actif
+          (Saisissez vos identifiants ci-dessous)</span>
       </div>
 
       <form id="supabase-settings-form" style="display: flex; flex-direction: column; gap: 0.75rem; text-align: left;">
         <div class="form-field">
-          <label class="form-label" for="input-supabase-url" style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em;">
+          <label class="form-label" for="input-supabase-url"
+            style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em;">
             Project URL Supabase :
           </label>
-          <input type="url" id="input-supabase-url" class="form-input" placeholder="https://xyzabcdefghijk.supabase.co" style="font-family: var(--font-tech); font-size: 0.86rem; padding: 0.5rem 0.8rem;" required>
-          <small style="color: var(--text-muted); font-size: 0.7rem; margin-top: 0.2rem; display: block;">Console Supabase > Project Settings > API > Project URL</small>
+          <input type="url" id="input-supabase-url" class="form-input" placeholder="https://xyzabcdefghijk.supabase.co"
+            style="font-family: var(--font-tech); font-size: 0.86rem; padding: 0.5rem 0.8rem;" required>
+          <small style="color: var(--text-muted); font-size: 0.7rem; margin-top: 0.2rem; display: block;">Console
+            Supabase > Project Settings > API > Project URL</small>
         </div>
 
         <div class="form-field">
-          <label class="form-label" for="input-supabase-key" style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em;">
+          <label class="form-label" for="input-supabase-key"
+            style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em;">
             Clé API Publique (anon key) :
           </label>
-          <input type="text" id="input-supabase-key" class="form-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="font-family: var(--font-tech); font-size: 0.86rem; padding: 0.5rem 0.8rem;" required>
-          <small style="color: var(--text-muted); font-size: 0.7rem; margin-top: 0.2rem; display: block;">Clé publique 'anon' (sans risque d'exposition)</small>
+          <input type="text" id="input-supabase-key" class="form-input"
+            placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            style="font-family: var(--font-tech); font-size: 0.86rem; padding: 0.5rem 0.8rem;" required>
+          <small style="color: var(--text-muted); font-size: 0.7rem; margin-top: 0.2rem; display: block;">Clé publique
+            'anon' (sans risque d'exposition)</small>
         </div>
 
-        <div style="background: rgba(201, 168, 76, 0.06); border: 1px solid rgba(201, 168, 76, 0.2); border-radius: var(--radius-sm); padding: 0.6rem 0.75rem; font-size: 0.74rem; color: var(--text-secondary); line-height: 1.4;">
-          💡 <strong>N'oubliez pas :</strong> Exécutez le script <strong>supabase-schema.sql</strong> dans le SQL Editor de Supabase pour créer vos tables en 1 clic.
+        <div
+          style="background: rgba(201, 168, 76, 0.06); border: 1px solid rgba(201, 168, 76, 0.2); border-radius: var(--radius-sm); padding: 0.6rem 0.75rem; font-size: 0.74rem; color: var(--text-secondary); line-height: 1.4;">
+          💡 <strong>N'oubliez pas :</strong> Exécutez le script <strong>supabase-schema.sql</strong> dans le SQL Editor
+          de Supabase pour créer vos tables en 1 clic.
         </div>
 
         <div style="display: flex; gap: 0.55rem; margin-top: 0.3rem;">
-          <button type="submit" class="btn btn-primary" style="flex: 2; padding: 0.65rem; font-weight: 700; font-size: 0.85rem; justify-content: center;">
+          <button type="submit" class="btn btn-primary"
+            style="flex: 2; padding: 0.65rem; font-weight: 700; font-size: 0.85rem; justify-content: center;">
             <span>Enregistrer & Connecter</span>
           </button>
-          <button type="button" class="btn btn-secondary" id="btn-cancel-supabase-modal" style="flex: 1; padding: 0.65rem; font-size: 0.8rem; justify-content: center;">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-supabase-modal"
+            style="flex: 1; padding: 0.65rem; font-size: 0.8rem; justify-content: center;">
             <span>Fermer</span>
           </button>
         </div>
@@ -1212,39 +1305,51 @@
       <!-- Bouton fermeture croix -->
       <button type="button" id="btn-close-message-modal" aria-label="Fermer"
         style="position: absolute; top: 1rem; right: 1.1rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(--text-secondary); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: all 0.2s;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+          stroke-linecap="round" stroke-linejoin="round" style="display: block;">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
 
       <!-- En-tête du message -->
-      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.9rem; padding-right: 3.2rem;">
-        <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(201, 168, 76, 0.12); border: 1px solid var(--border-gold); display: flex; align-items: center; justify-content: center; color: var(--gold-light); font-size: 1.2rem; flex-shrink: 0;">
+      <div
+        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.9rem; padding-right: 3.2rem;">
+        <div
+          style="width: 44px; height: 44px; border-radius: 50%; background: rgba(201, 168, 76, 0.12); border: 1px solid var(--border-gold); display: flex; align-items: center; justify-content: center; color: var(--gold-light); font-size: 1.2rem; flex-shrink: 0;">
           ✉️
         </div>
         <div style="flex: 1; min-width: 0;">
           <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
-            <h4 style="font-size: 1.15rem; font-weight: 700; color: #ffffff; margin: 0;" id="msg-modal-sender">Expéditeur</h4>
+            <h4 style="font-size: 1.15rem; font-weight: 700; color: #ffffff; margin: 0;" id="msg-modal-sender">
+              Expéditeur</h4>
             <span class="status-tag status-paid" id="msg-modal-status-badge">Lu</span>
           </div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; margin-bottom: 0;" id="msg-modal-meta">
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; margin-bottom: 0;"
+            id="msg-modal-meta">
             Réf: MSG-101 • 05 Septembre 2026
           </p>
         </div>
       </div>
 
       <!-- Coordonnées Expéditeur -->
-      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.75rem 0.9rem; margin-bottom: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+      <div
+        style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.75rem 0.9rem; margin-bottom: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
         <div>
-          <span style="display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Téléphone / WhatsApp</span>
-          <a href="#" id="msg-modal-phone-link" style="color: var(--gold-light); font-weight: 600; font-size: 0.88rem; text-decoration: none; display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem;">
+          <span
+            style="display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Téléphone
+            / WhatsApp</span>
+          <a href="#" id="msg-modal-phone-link"
+            style="color: var(--gold-light); font-weight: 600; font-size: 0.88rem; text-decoration: none; display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem;">
             <span>📞</span> <span id="msg-modal-phone">+221 77 000 00 00</span>
           </a>
         </div>
         <div>
-          <span style="display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Adresse Email</span>
-          <a href="#" id="msg-modal-email-link" style="color: var(--gold-light); font-weight: 600; font-size: 0.88rem; text-decoration: none; display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem;">
+          <span
+            style="display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Adresse
+            Email</span>
+          <a href="#" id="msg-modal-email-link"
+            style="color: var(--gold-light); font-weight: 600; font-size: 0.88rem; text-decoration: none; display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem;">
             <span>✉️</span> <span id="msg-modal-email">client@email.com</span>
           </a>
         </div>
@@ -1252,32 +1357,41 @@
 
       <!-- Objet -->
       <div style="margin-bottom: 0.75rem;">
-        <span style="display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem;">Objet du message</span>
+        <span
+          style="display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem;">Objet
+          du message</span>
         <div style="font-size: 0.98rem; font-weight: 600; color: #ffffff;" id="msg-modal-subject">Objet</div>
       </div>
 
       <!-- Contenu complet du message -->
-      <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-sm); padding: 1rem 1.1rem; margin-bottom: 1.15rem; max-height: 200px; overflow-y: auto;">
-        <p style="font-size: 0.9rem; color: var(--text-primary); line-height: 1.65; white-space: pre-wrap; margin: 0;" id="msg-modal-body">
+      <div
+        style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-sm); padding: 1rem 1.1rem; margin-bottom: 1.15rem; max-height: 200px; overflow-y: auto;">
+        <p style="font-size: 0.9rem; color: var(--text-primary); line-height: 1.65; white-space: pre-wrap; margin: 0;"
+          id="msg-modal-body">
           Contenu du message...
         </p>
       </div>
 
       <!-- Actions de Réponse & Statut -->
       <div style="display: flex; flex-wrap: wrap; gap: 0.55rem;">
-        <a href="#" target="_blank" class="btn btn-primary" id="btn-msg-reply-whatsapp" style="flex: 1; padding: 0.6rem 0.9rem; font-size: 0.82rem; justify-content: center; text-decoration: none;">
+        <a href="#" target="_blank" class="btn btn-primary" id="btn-msg-reply-whatsapp"
+          style="flex: 1; padding: 0.6rem 0.9rem; font-size: 0.82rem; justify-content: center; text-decoration: none;">
           <span>💬 Répondre sur WhatsApp</span>
         </a>
-        <a href="#" class="btn btn-secondary" id="btn-msg-reply-email" style="flex: 1; padding: 0.6rem 0.9rem; font-size: 0.82rem; justify-content: center; text-decoration: none;">
+        <a href="#" class="btn btn-secondary" id="btn-msg-reply-email"
+          style="flex: 1; padding: 0.6rem 0.9rem; font-size: 0.82rem; justify-content: center; text-decoration: none;">
           <span>✉️ Répondre par Email</span>
         </a>
       </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.9rem; padding-top: 0.8rem; border-top: 1px solid var(--border-subtle);">
-        <button type="button" class="btn btn-secondary" id="btn-msg-toggle-status" style="font-size: 0.78rem; padding: 0.45rem 0.85rem;">
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.9rem; padding-top: 0.8rem; border-top: 1px solid var(--border-subtle);">
+        <button type="button" class="btn btn-secondary" id="btn-msg-toggle-status"
+          style="font-size: 0.78rem; padding: 0.45rem 0.85rem;">
           <span id="btn-msg-toggle-status-label">Marquer comme Non Lu</span>
         </button>
-        <button type="button" class="btn btn-secondary" id="btn-msg-close" style="font-size: 0.78rem; padding: 0.45rem 0.95rem;">
+        <button type="button" class="btn btn-secondary" id="btn-msg-close"
+          style="font-size: 0.78rem; padding: 0.45rem 0.95rem;">
           <span>Fermer</span>
         </button>
       </div>
@@ -1292,56 +1406,76 @@
       <!-- Bouton fermeture croix -->
       <button type="button" id="btn-close-brief-modal" aria-label="Fermer"
         style="position: absolute; top: 1rem; right: 1.1rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(--text-secondary); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: all 0.2s;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+          stroke-linecap="round" stroke-linejoin="round" style="display: block;">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
 
       <!-- En-tête du Brief -->
-      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.9rem; padding-right: 3.2rem;">
-        <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(201, 168, 76, 0.15); border: 1px solid var(--border-gold); display: flex; align-items: center; justify-content: center; color: var(--gold-light); font-size: 1.25rem; flex-shrink: 0;">
+      <div
+        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.9rem; padding-right: 3.2rem;">
+        <div
+          style="width: 44px; height: 44px; border-radius: 50%; background: rgba(201, 168, 76, 0.15); border: 1px solid var(--border-gold); display: flex; align-items: center; justify-content: center; color: var(--gold-light); font-size: 1.25rem; flex-shrink: 0;">
           📋
         </div>
         <div style="flex: 1; min-width: 0;">
           <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
-            <h4 style="font-size: 1.15rem; font-weight: 700; color: #ffffff; margin: 0;" id="brief-modal-title">Cahier des Charges</h4>
+            <h4 style="font-size: 1.15rem; font-weight: 700; color: #ffffff; margin: 0;" id="brief-modal-title">Cahier
+              des Charges</h4>
             <span class="status-tag status-new" id="brief-modal-status-badge">Nouveau</span>
           </div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; margin-bottom: 0;" id="brief-modal-service">
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; margin-bottom: 0;"
+            id="brief-modal-service">
             Créer un site web — Site vitrine sur-mesure
           </p>
         </div>
       </div>
 
       <!-- Informations Client & Devis -->
-      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.8rem;">
+      <div
+        style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.8rem;">
         <div>
-          <span style="display: block; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Client & Entreprise</span>
-          <strong style="color: #ffffff; font-size: 0.88rem; display: block; margin-top: 0.15rem;" id="brief-modal-client">Moussa Diop</strong>
+          <span
+            style="display: block; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Client
+            & Entreprise</span>
+          <strong style="color: #ffffff; font-size: 0.88rem; display: block; margin-top: 0.15rem;"
+            id="brief-modal-client">Moussa Diop</strong>
           <small style="color: var(--gold-light); font-size: 0.76rem;" id="brief-modal-company">Teranga Group</small>
         </div>
         <div>
-          <span style="display: block; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Contact Direct</span>
-          <a href="#" id="brief-modal-phone-link" style="color: var(--gold-light); font-size: 0.82rem; text-decoration: none; display: block; margin-top: 0.15rem;">
+          <span
+            style="display: block; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Contact
+            Direct</span>
+          <a href="#" id="brief-modal-phone-link"
+            style="color: var(--gold-light); font-size: 0.82rem; text-decoration: none; display: block; margin-top: 0.15rem;">
             📞 <span id="brief-modal-phone">+221 77 000 00 00</span>
           </a>
-          <a href="#" id="brief-modal-email-link" style="color: var(--text-secondary); font-size: 0.76rem; text-decoration: none; display: block;">
+          <a href="#" id="brief-modal-email-link"
+            style="color: var(--text-secondary); font-size: 0.76rem; text-decoration: none; display: block;">
             ✉️ <span id="brief-modal-email">client@email.com</span>
           </a>
         </div>
         <div>
-          <span style="display: block; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Budget & Délai</span>
-          <span style="color: #34D399; font-weight: 600; font-size: 0.84rem; display: block; margin-top: 0.15rem;" id="brief-modal-budget">1.5M - 3M FCFA</span>
+          <span
+            style="display: block; font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Budget
+            & Délai</span>
+          <span style="color: #34D399; font-weight: 600; font-size: 0.84rem; display: block; margin-top: 0.15rem;"
+            id="brief-modal-budget">1.5M - 3M FCFA</span>
           <small style="color: var(--text-muted); font-size: 0.76rem;" id="brief-modal-timeline">Délai : 1 mois</small>
         </div>
       </div>
 
       <!-- Cahier des charges complet -->
       <div style="margin-bottom: 1.15rem;">
-        <span style="display: block; font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">Description détaillée du projet (Brief) :</span>
-        <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-sm); padding: 1.1rem; max-height: 220px; overflow-y: auto;">
-          <p style="font-size: 0.92rem; color: var(--text-primary); line-height: 1.7; white-space: pre-wrap; margin: 0;" id="brief-modal-description">
+        <span
+          style="display: block; font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">Description
+          détaillée du projet (Brief) :</span>
+        <div
+          style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--radius-sm); padding: 1.1rem; max-height: 220px; overflow-y: auto;">
+          <p style="font-size: 0.92rem; color: var(--text-primary); line-height: 1.7; white-space: pre-wrap; margin: 0;"
+            id="brief-modal-description">
             Description intégrale du projet...
           </p>
         </div>
@@ -1349,19 +1483,24 @@
 
       <!-- Actions Rapides -->
       <div style="display: flex; flex-wrap: wrap; gap: 0.55rem;">
-        <a href="#" target="_blank" class="btn btn-primary" id="btn-brief-whatsapp" style="flex: 2; padding: 0.6rem 0.9rem; font-size: 0.82rem; justify-content: center; text-decoration: none;">
+        <a href="#" target="_blank" class="btn btn-primary" id="btn-brief-whatsapp"
+          style="flex: 2; padding: 0.6rem 0.9rem; font-size: 0.82rem; justify-content: center; text-decoration: none;">
           <span>💬 Échanger sur WhatsApp</span>
         </a>
-        <button type="button" class="btn btn-secondary" id="btn-brief-open-pay" style="flex: 1.5; padding: 0.6rem 0.9rem; font-size: 0.82rem; justify-content: center; border-color: var(--border-gold); color: var(--gold-light);">
+        <button type="button" class="btn btn-secondary" id="btn-brief-open-pay"
+          style="flex: 1.5; padding: 0.6rem 0.9rem; font-size: 0.82rem; justify-content: center; border-color: var(--border-gold); color: var(--gold-light);">
           <span>⚡ Encaisser</span>
         </button>
-        <button type="button" class="btn btn-secondary" id="btn-brief-open-invoice" style="flex: 1; padding: 0.6rem 0.9rem; font-size: 0.82rem; justify-content: center;">
+        <button type="button" class="btn btn-secondary" id="btn-brief-open-invoice"
+          style="flex: 1; padding: 0.6rem 0.9rem; font-size: 0.82rem; justify-content: center;">
           <span>📄 Facture</span>
         </button>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; margin-top: 0.9rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle);">
-        <button type="button" class="btn btn-secondary" id="btn-brief-close" style="font-size: 0.78rem; padding: 0.45rem 1rem;">
+      <div
+        style="display: flex; justify-content: flex-end; margin-top: 0.9rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle);">
+        <button type="button" class="btn btn-secondary" id="btn-brief-close"
+          style="font-size: 0.78rem; padding: 0.45rem 1rem;">
           <span>Fermer</span>
         </button>
       </div>
@@ -1381,7 +1520,8 @@
         </div>
         <div class="invoice-actions-right">
           <button type="button" class="btn-invoice-close" id="btn-close-project-modal" aria-label="Fermer le modal">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -1390,24 +1530,32 @@
       </div>
 
       <!-- Corps du formulaire -->
-      <div class="invoice-modal-body" style="padding: 1.8rem;">
+      <div class="invoice-modal-body" style="padding: 1.8rem 2.2rem 2.8rem 2.2rem; background: #0B0B13;">
         <form id="form-portfolio-project" style="display: flex; flex-direction: column; gap: 1.1rem;">
           <input type="hidden" id="proj-form-id" value="">
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
             <div>
-              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Titre de la création *</label>
-              <input type="text" id="proj-form-title" class="form-input proj-modal-input" placeholder="Ex: Plateforme E-commerce & Mobile" required>
+              <label
+                style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Titre
+                de la création *</label>
+              <input type="text" id="proj-form-title" class="form-input proj-modal-input"
+                placeholder="Ex: Plateforme E-commerce & Mobile" required>
             </div>
             <div>
-              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Client & Ville *</label>
-              <input type="text" id="proj-form-client" class="form-input proj-modal-input" placeholder="Ex: Maison Baobab • Dakar" required>
+              <label
+                style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Client
+                & Ville *</label>
+              <input type="text" id="proj-form-client" class="form-input proj-modal-input"
+                placeholder="Ex: Maison Baobab • Dakar" required>
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
             <div>
-              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Catégorie *</label>
+              <label
+                style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Catégorie
+                *</label>
               <select id="proj-form-category" class="form-input proj-modal-input" required>
                 <option value="web">Sites Web & Mobile</option>
                 <option value="logos">Logos & Branding</option>
@@ -1416,39 +1564,59 @@
               </select>
             </div>
             <div>
-              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Mots-clés / Tags</label>
-              <input type="text" id="proj-form-tags" class="form-input proj-modal-input" placeholder="Ex: UI/UX, Wave, Luxe (séparés par des virgules)">
+              <label
+                style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Mots-clés
+                / Tags</label>
+              <input type="text" id="proj-form-tags" class="form-input proj-modal-input"
+                placeholder="Ex: UI/UX, Wave, Luxe (séparés par des virgules)">
             </div>
           </div>
 
           <!-- Section Image / Visuel -->
-          <div style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 1.1rem;">
-            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.5rem; letter-spacing: 0.04em;">Visuel du projet (Image ou Capture)</label>
+          <div
+            style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 1.1rem;">
+            <label
+              style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.5rem; letter-spacing: 0.04em;">Visuel
+              du projet (Image ou Capture)</label>
             <div style="display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap;">
-              <div id="proj-preview-box" style="width: 140px; height: 90px; background: #07070B; border: 1px solid var(--border-gold); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
-                <span id="proj-preview-placeholder" style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 0.4rem;">Aperçu</span>
-                <img id="proj-preview-img" src="" alt="Aperçu" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+              <div id="proj-preview-box"
+                style="width: 140px; height: 90px; background: #07070B; border: 1px solid var(--border-gold); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                <span id="proj-preview-placeholder"
+                  style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 0.4rem;">Aperçu</span>
+                <img id="proj-preview-img" src="" alt="Aperçu"
+                  style="width: 100%; height: 100%; object-fit: cover; display: none;">
               </div>
               <div style="flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 0.5rem;">
                 <input type="file" id="proj-form-file" accept="image/*">
-                <input type="text" id="proj-form-image-url" class="form-input proj-modal-input" placeholder="Ou collez un lien d'image web (https://...)">
+                <input type="text" id="proj-form-image-url" class="form-input proj-modal-input"
+                  placeholder="Ou collez un lien d'image web (https://...)">
               </div>
             </div>
           </div>
 
           <div>
-            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Description du projet *</label>
-            <textarea id="proj-form-desc" class="form-input proj-modal-input" rows="3" placeholder="Présentez le challenge, la solution apportée et la valeur créée pour le client..." required style="resize: vertical;"></textarea>
+            <label
+              style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Description
+              du projet *</label>
+            <textarea id="proj-form-desc" class="form-input proj-modal-input" rows="3"
+              placeholder="Présentez le challenge, la solution apportée et la valeur créée pour le client..." required
+              style="resize: vertical;"></textarea>
           </div>
 
           <div>
-            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Lien externe vers le site (optionnel)</label>
-            <input type="url" id="proj-form-url" class="form-input proj-modal-input" placeholder="Ex: https://client-website.sn">
+            <label
+              style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Lien
+              externe vers le site (optionnel)</label>
+            <input type="url" id="proj-form-url" class="form-input proj-modal-input"
+              placeholder="Ex: https://client-website.sn">
           </div>
 
-          <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 0.8rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
-            <button type="button" class="btn btn-secondary" id="btn-cancel-project" style="padding: 0.6rem 1.2rem; font-size: 0.84rem;">Annuler</button>
-            <button type="submit" class="btn btn-primary" id="btn-save-project" style="padding: 0.6rem 1.4rem; font-size: 0.84rem;">Enregistrer la création ✦</button>
+          <div class="proj-modal-footer-actions"
+            style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 1.6rem; padding-top: 1.2rem; margin-bottom: 1.8rem; border-top: 1px solid var(--border-subtle);">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-project"
+              style="padding: 0.65rem 1.3rem; font-size: 0.85rem;">Annuler</button>
+            <button type="submit" class="btn btn-primary" id="btn-save-project"
+              style="padding: 0.65rem 1.5rem; font-size: 0.85rem;">Enregistrer la création ✦</button>
           </div>
         </form>
       </div>
@@ -2660,7 +2828,7 @@
         } else {
           try {
             projects = JSON.parse(localStorage.getItem('nano_portfolio') || '[]');
-          } catch(e) { projects = []; }
+          } catch (e) { projects = []; }
         }
 
         if (countFilterAll) countFilterAll.textContent = projects.length;
