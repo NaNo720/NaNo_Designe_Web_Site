@@ -50,11 +50,26 @@ CREATE TABLE IF NOT EXISTS public.site_visits (
     is_conversion BOOLEAN DEFAULT false
 );
 
+-- 4. Table du Portfolio / Réalisations Studio
+CREATE TABLE IF NOT EXISTS public.portfolio_projects (
+    id TEXT PRIMARY KEY,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    title TEXT NOT NULL,
+    client TEXT NOT NULL,
+    category TEXT NOT NULL,
+    category_label TEXT,
+    description TEXT,
+    tags TEXT,
+    image_url TEXT,
+    project_url TEXT
+);
+
 -- Index pour accélérer les recherches fréquentes
 CREATE INDEX IF NOT EXISTS idx_quotes_created_at ON public.quotes(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_quotes_payment_status ON public.quotes(payment_status);
 CREATE INDEX IF NOT EXISTS idx_messages_created_at ON public.messages(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_site_visits_created_at ON public.site_visits(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_projects_created_at ON public.portfolio_projects(created_at DESC);
 
 -- 4. Activation du Temps Réel (Supabase Realtime)
 -- Permet à l'admin de voir les devis et paiements en direct sans recharger la page
@@ -80,12 +95,42 @@ BEGIN
   ) THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.site_visits;
   END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND tablename = 'portfolio_projects'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.portfolio_projects;
+  END IF;
 END $$;
 
 -- 5. Sécurité & Droits d'accès (Row Level Security - RLS)
 ALTER TABLE public.quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_visits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.portfolio_projects ENABLE ROW LEVEL SECURITY;
+
+-- Politiques pour la table "portfolio_projects"
+DROP POLICY IF EXISTS "Permettre la lecture publique du portfolio" ON public.portfolio_projects;
+CREATE POLICY "Permettre la lecture publique du portfolio"
+ON public.portfolio_projects FOR SELECT
+USING (true);
+
+DROP POLICY IF EXISTS "Permettre l'ajout de projet portfolio" ON public.portfolio_projects;
+CREATE POLICY "Permettre l'ajout de projet portfolio"
+ON public.portfolio_projects FOR INSERT
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Permettre la modification de projet portfolio" ON public.portfolio_projects;
+CREATE POLICY "Permettre la modification de projet portfolio"
+ON public.portfolio_projects FOR UPDATE
+USING (true)
+WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Permettre la suppression de projet portfolio" ON public.portfolio_projects;
+CREATE POLICY "Permettre la suppression de projet portfolio"
+ON public.portfolio_projects FOR DELETE
+USING (true);
 
 -- Politiques pour la table "quotes"
 DROP POLICY IF EXISTS "Permettre l'insertion publique des devis" ON public.quotes;

@@ -379,8 +379,215 @@
       } catch (err) {
         return null;
       }
+    },
+
+    // ========================================================================
+    // GESTION DU PORTFOLIO / RÉALISATIONS
+    // ========================================================================
+    async getProjects() {
+      const cli = this.getClient();
+      if (cli) {
+        try {
+          const { data, error } = await cli
+            .from('portfolio_projects')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+          if (!error && Array.isArray(data) && data.length > 0) {
+            const mapped = data.map(dbToProject);
+            localStorage.setItem('nano_portfolio', JSON.stringify(mapped));
+            return mapped;
+          }
+        } catch (e) { }
+      }
+
+      try {
+        const stored = localStorage.getItem('nano_portfolio');
+        if (stored) return JSON.parse(stored);
+        localStorage.setItem('nano_portfolio', JSON.stringify(defaultProjects));
+        return defaultProjects;
+      } catch (err) {
+        return defaultProjects;
+      }
+    },
+
+    async saveProject(projObj) {
+      if (!projObj.id) {
+        projObj.id = `PROJ-${Date.now().toString(36).toUpperCase()}`;
+      }
+      if (!projObj.createdAt) {
+        projObj.createdAt = new Date().toISOString();
+      }
+
+      // 1. Sauvegarde locale immédiate
+      try {
+        const stored = localStorage.getItem('nano_portfolio');
+        const existing = stored ? JSON.parse(stored) : [...defaultProjects];
+        const idx = existing.findIndex(p => p.id === projObj.id);
+        if (idx >= 0) existing[idx] = projObj;
+        else existing.unshift(projObj);
+        localStorage.setItem('nano_portfolio', JSON.stringify(existing));
+      } catch (e) { }
+
+      // 2. Envoi Supabase
+      const cli = this.getClient();
+      if (cli) {
+        try {
+          await cli.from('portfolio_projects').upsert({
+            id: projObj.id,
+            title: projObj.title,
+            client: projObj.client,
+            category: projObj.category,
+            category_label: projObj.categoryLabel || projObj.category,
+            description: projObj.description,
+            tags: Array.isArray(projObj.tags) ? projObj.tags.join(', ') : (projObj.tags || ''),
+            image_url: projObj.imageUrl || null,
+            project_url: projObj.projectUrl || null,
+            created_at: projObj.createdAt
+          }, { onConflict: 'id' });
+          console.log('[NanoDB] Projet portfolio synchronisé sur Supabase:', projObj.id);
+        } catch (e) {
+          console.warn('[NanoDB] Erreur saveProject Supabase:', e);
+        }
+      }
+
+      window.dispatchEvent(new CustomEvent('nanoProjectSaved', { detail: projObj }));
+      return projObj;
+    },
+
+    async deleteProject(projId) {
+      try {
+        const stored = localStorage.getItem('nano_portfolio');
+        const existing = stored ? JSON.parse(stored) : [...defaultProjects];
+        const filtered = existing.filter(p => p.id !== projId);
+        localStorage.setItem('nano_portfolio', JSON.stringify(filtered));
+      } catch (e) { }
+
+      const cli = this.getClient();
+      if (cli) {
+        try {
+          await cli.from('portfolio_projects').delete().eq('id', projId);
+        } catch (e) { }
+      }
+
+      window.dispatchEvent(new CustomEvent('nanoProjectDeleted', { detail: { id: projId } }));
+      return true;
+    },
+
+    subscribeProjects(callback) {
+      const cli = this.getClient();
+      if (!cli) return null;
+
+      try {
+        return cli
+          .channel('nano_projects_channel')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'portfolio_projects' }, (payload) => {
+            console.log('[NanoDB Realtime] Changement détecté sur le portfolio:', payload.eventType);
+            if (typeof callback === 'function') {
+              callback(payload);
+            }
+          })
+          .subscribe();
+      } catch (err) {
+        return null;
+      }
     }
   };
+
+  // Données initiales du portfolio studio
+  const defaultProjects = [
+    {
+      id: 'PROJ-01',
+      title: 'Plateforme Web Hôtelière & Réservation',
+      client: 'TERANGA LUXURY RESORT • ALMADIES',
+      category: 'web',
+      categoryLabel: 'Site Web',
+      description: 'Refonte complète de l\'expérience digitale d\'un palace dakarois : moteur de réservation en direct, interface dark chic et paiement Wave/CB intégré.',
+      tags: ['UI/UX', 'E-Commerce', 'Wave'],
+      imageUrl: '',
+      projectUrl: '',
+      createdAt: '2026-08-15T10:00:00Z'
+    },
+    {
+      id: 'PROJ-02',
+      title: 'Identité Visuelle & Charte de Marque',
+      client: 'MAISON BAOBAB BIO • DAKAR / PARIS',
+      category: 'logos',
+      categoryLabel: 'Logo & Branding',
+      description: 'Création de la marque mère, monogramme vectoriel intemporel, guide chromatique et packaging prestige pour soins naturels exportés à l\'international.',
+      tags: ['Branding', 'Livre de Marque', 'Packaging'],
+      imageUrl: '',
+      projectUrl: '',
+      createdAt: '2026-08-20T11:30:00Z'
+    },
+    {
+      id: 'PROJ-03',
+      title: 'Signalétique Intérieure en Laiton Brossé',
+      client: 'SÉNÉGAL TECH HUB • DIAMNIADIO',
+      category: 'supports',
+      categoryLabel: 'Signalétique',
+      description: 'Conception et supervision de pose de la signalétique directionnelle, totems d\'orientation et lettres géantes découpées en laiton avec rétro-éclairage LED.',
+      tags: ['Laiton Brossé', 'Habillage', '3D'],
+      imageUrl: '',
+      projectUrl: '',
+      createdAt: '2026-08-25T14:00:00Z'
+    },
+    {
+      id: 'PROJ-04',
+      title: 'Galerie Digitale & Plateforme Mobile',
+      client: 'DAKAR CONTEMPORARY ART',
+      category: 'web',
+      categoryLabel: 'Site Web',
+      description: 'Application web immersive présentant les artistes contemporains du Sénégal et de la diaspora, avec visite virtuelle et vente d\'œuvres sécurisée.',
+      tags: ['Mobile First', 'Galerie', 'Art'],
+      imageUrl: '',
+      projectUrl: '',
+      createdAt: '2026-08-28T09:15:00Z'
+    },
+    {
+      id: 'PROJ-05',
+      title: 'Logo Emblématique & Papeterie Luxe',
+      client: 'ALMADIES CAPITAL PARTNERS',
+      category: 'logos',
+      categoryLabel: 'Logo & Branding',
+      description: 'Création de la signature visuelle d\'un fonds d\'investissement privé à Dakar : logo doré gaufré, cartes de visite thermogravées et présentation investisseurs.',
+      tags: ['Logo', 'Finance', 'Papeterie'],
+      imageUrl: '',
+      projectUrl: '',
+      createdAt: '2026-08-30T16:45:00Z'
+    },
+    {
+      id: 'PROJ-06',
+      title: 'Habillage Mural & Décoration Murale Premium',
+      client: 'VILLA TERANGA RESIDENCES • NGOR',
+      category: 'supports',
+      categoryLabel: 'Supports & Print',
+      description: 'Conception d\'une fresque murale graphique monumentale gravée sur panneaux composites en laiton patiné et chêne teinté.',
+      tags: ['Habillage Mural', 'Luxe', 'Décoration'],
+      imageUrl: '',
+      projectUrl: '',
+      createdAt: '2026-09-01T15:20:00Z'
+    }
+  ];
+
+  function dbToProject(row) {
+    let tagsArr = [];
+    if (Array.isArray(row.tags)) tagsArr = row.tags;
+    else if (typeof row.tags === 'string') tagsArr = row.tags.split(',').map(t => t.trim()).filter(Boolean);
+
+    return {
+      id: row.id,
+      title: row.title || 'Projet Studio',
+      client: row.client || 'Client Privé',
+      category: row.category || 'web',
+      categoryLabel: row.category_label || (row.category === 'logos' ? 'Logo & Branding' : row.category === 'web' ? 'Site Web' : 'Signalétique'),
+      description: row.description || '',
+      tags: tagsArr,
+      imageUrl: row.image_url || '',
+      projectUrl: row.project_url || '',
+      createdAt: row.created_at || new Date().toISOString()
+    };
+  }
 
   // Exposition globale
   window.nanoDB = NanoDB;

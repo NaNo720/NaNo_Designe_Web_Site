@@ -186,36 +186,207 @@
   });
 
   // ==========================================================================
-  // 4. Filtrage dynamique du Portfolio
+  // 4. Gestion Dynamique & Filtrage du Portfolio Studio
   // ==========================================================================
   const filterBtns = document.querySelectorAll('.filter-btn');
-  const projectCards = document.querySelectorAll('.project-card');
+  let activePublicFilter = 'all';
+
+  // SVGs vectoriels haute fidélité pour les réalisations initiales ou fallback
+  function getProjectThumbnailHtml(project) {
+    if (project.imageUrl && project.imageUrl.trim()) {
+      return `<img src="${project.imageUrl}" alt="${project.title}" class="project-thumb-img" loading="lazy">`;
+    }
+
+    switch (project.id) {
+      case 'PROJ-01':
+        return `
+          <svg class="project-thumb-svg" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#0C0C14"/>
+            <rect x="25" y="25" width="350" height="200" rx="8" fill="#131320" stroke="rgba(201, 168, 76, 0.3)" stroke-width="1.5"/>
+            <circle cx="50" cy="45" r="4" fill="#E63946"/>
+            <circle cx="62" cy="45" r="4" fill="#FBBF24"/>
+            <circle cx="74" cy="45" r="4" fill="#34D399"/>
+            <rect x="100" y="40" width="120" height="10" rx="5" fill="rgba(255,255,255,0.1)"/>
+            <rect x="45" y="75" width="180" height="24" rx="4" fill="url(#pGoldGrad)"/>
+            <rect x="45" y="112" width="220" height="10" rx="5" fill="rgba(255,255,255,0.2)"/>
+            <rect x="45" y="130" width="160" height="10" rx="5" fill="rgba(255,255,255,0.15)"/>
+            <rect x="45" y="160" width="110" height="28" rx="14" fill="#C9A84C"/>
+            <rect x="250" y="75" width="105" height="113" rx="8" fill="#1A1A2A" stroke="rgba(201,168,76,0.2)"/>
+            <path d="M275 130L295 105L315 135L335 120L345 145H265Z" fill="rgba(201,168,76,0.4)"/>
+          </svg>
+        `;
+      case 'PROJ-02':
+        return `
+          <svg class="project-thumb-svg" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#0A0A0F"/>
+            <circle cx="200" cy="125" r="70" stroke="rgba(201,168,76,0.2)" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <circle cx="200" cy="125" r="50" stroke="#C9A84C" stroke-width="1.8"/>
+            <path d="M200 85 C190 105 180 115 160 125 C180 135 190 145 200 165 C210 145 220 135 240 125 C220 115 210 105 200 85 Z" fill="url(#pGoldGrad)" opacity="0.9"/>
+            <text x="200" y="210" font-family="'Playfair Display', serif" font-size="16" fill="#F4F4F8" text-anchor="middle" letter-spacing="4">MAISON BAOBAB</text>
+            <text x="200" y="225" font-family="'Space Grotesk', monospace" font-size="8" fill="#C9A84C" text-anchor="middle" letter-spacing="3">COSMÉTIQUES BIO DAKAR</text>
+          </svg>
+        `;
+      case 'PROJ-03':
+        return `
+          <svg class="project-thumb-svg" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#0E0E16"/>
+            <rect x="30" y="30" width="340" height="190" fill="#141420" stroke="rgba(255,255,255,0.06)"/>
+            <line x1="30" y1="90" x2="370" y2="90" stroke="rgba(255,255,255,0.04)"/>
+            <line x1="30" y1="150" x2="370" y2="150" stroke="rgba(255,255,255,0.04)"/>
+            <rect x="90" y="65" width="220" height="120" rx="4" fill="#191928" stroke="#C9A84C" stroke-width="2"/>
+            <circle cx="105" cy="80" r="3" fill="#C9A84C"/>
+            <circle cx="295" cy="80" r="3" fill="#C9A84C"/>
+            <circle cx="105" cy="170" r="3" fill="#C9A84C"/>
+            <circle cx="295" cy="170" r="3" fill="#C9A84C"/>
+            <text x="200" y="125" font-family="'Syne', sans-serif" font-weight="700" font-size="20" fill="url(#pGoldGrad)" text-anchor="middle" letter-spacing="3">SÉNÉGAL TECH</text>
+            <text x="200" y="148" font-family="'Space Grotesk', monospace" font-size="10" fill="#9E9EB2" text-anchor="middle" letter-spacing="2">TOUR DIAMNIADIO • ÉTAGE 08</text>
+          </svg>
+        `;
+      case 'PROJ-04':
+        return `
+          <svg class="project-thumb-svg" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#09090E"/>
+            <rect x="70" y="30" width="115" height="190" rx="14" fill="#13131E" stroke="#C9A84C" stroke-width="1.2"/>
+            <rect x="85" y="45" width="85" height="15" rx="3" fill="rgba(201,168,76,0.3)"/>
+            <circle cx="127" cy="105" r="28" fill="rgba(255,255,255,0.06)"/>
+            <rect x="85" y="145" width="85" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+            <rect x="85" y="160" width="60" height="8" rx="4" fill="rgba(255,255,255,0.1)"/>
+            <rect x="215" y="45" width="115" height="175" rx="14" fill="#171725" stroke="rgba(255,255,255,0.1)" stroke-width="1.2"/>
+            <rect x="230" y="65" width="85" height="50" rx="6" fill="url(#pGoldGrad)" opacity="0.4"/>
+            <rect x="230" y="125" width="85" height="10" rx="4" fill="#C9A84C"/>
+            <rect x="230" y="145" width="50" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+          </svg>
+        `;
+      case 'PROJ-05':
+        return `
+          <svg class="project-thumb-svg" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#0D0D15"/>
+            <polygon points="200,60 255,155 145,155" stroke="#C9A84C" stroke-width="2" fill="none"/>
+            <polygon points="200,85 235,145 165,145" fill="rgba(201,168,76,0.15)"/>
+            <circle cx="200" cy="120" r="12" fill="#E5C875"/>
+            <text x="200" y="195" font-family="'Syne', sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">ALMADIES CAPITAL</text>
+            <text x="200" y="212" font-family="'Space Grotesk', monospace" font-size="8" fill="#9E9EB2" text-anchor="middle" letter-spacing="2">INVESTISSEMENT & CONSEIL</text>
+          </svg>
+        `;
+      case 'PROJ-06':
+        return `
+          <svg class="project-thumb-svg" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#0A0A10"/>
+            <path d="M40 210 L140 70 L240 210 Z" fill="rgba(201,168,76,0.2)"/>
+            <path d="M160 210 L260 70 L360 210 Z" fill="rgba(201,168,76,0.1)"/>
+            <rect x="70" y="110" width="260" height="80" rx="6" fill="#12121E" stroke="#C9A84C" stroke-width="1.5"/>
+            <text x="200" y="155" font-family="'Playfair Display', serif" font-size="22" font-style="italic" fill="url(#pGoldGrad)" text-anchor="middle">Café des Arts</text>
+            <text x="200" y="175" font-family="'Space Grotesk', monospace" font-size="8" fill="#C9A84C" text-anchor="middle" letter-spacing="3">HABILLAGE FAÇADE • NGOR DAKAR</text>
+          </svg>
+        `;
+      default:
+        return `
+          <svg class="project-thumb-svg" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#0C0C15"/>
+            <circle cx="200" cy="115" r="60" stroke="rgba(201,168,76,0.2)" stroke-width="1.5"/>
+            <circle cx="200" cy="115" r="45" stroke="#C9A84C" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <text x="200" y="123" font-family="'Syne', sans-serif" font-weight="700" font-size="20" fill="url(#pGoldGrad)" text-anchor="middle">NANO</text>
+            <text x="200" y="195" font-family="'Space Grotesk', monospace" font-size="9" fill="#9E9EB2" text-anchor="middle" letter-spacing="3">${(project.client || 'STUDIO CRÉATIF').toUpperCase()}</text>
+          </svg>
+        `;
+    }
+  }
+
+  async function loadAndRenderPortfolio() {
+    const grid = document.getElementById('portfolio-grid-container') || document.querySelector('.portfolio-grid');
+    if (!grid) return;
+
+    let projects = [];
+    if (window.nanoDB && typeof window.nanoDB.getProjects === 'function') {
+      projects = await window.nanoDB.getProjects();
+    } else {
+      try {
+        const stored = localStorage.getItem('nano_portfolio');
+        if (stored) projects = JSON.parse(stored);
+      } catch (e) { }
+    }
+
+    if (!projects || projects.length === 0) return;
+
+    grid.innerHTML = '';
+
+    projects.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'project-card';
+      card.setAttribute('data-category', p.category || 'web');
+
+      const tags = Array.isArray(p.tags) ? p.tags : (typeof p.tags === 'string' ? p.tags.split(',') : []);
+      const tagsHtml = tags.map(t => `<span class="tech-tag">${t.trim()}</span>`).join('');
+
+      const overlayAction = p.projectUrl && p.projectUrl.trim()
+        ? `<a href="${p.projectUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-gold btn-sm">Visiter le site ↗</a>`
+        : `<a href="#contact" class="btn btn-outline-gold btn-sm">Détail du projet</a>`;
+
+      card.innerHTML = `
+        <div class="project-thumb-wrapper">
+          <span class="project-badge-cat">${p.categoryLabel || p.category}</span>
+          ${getProjectThumbnailHtml(p)}
+          <div class="project-overlay-link">
+            ${overlayAction}
+          </div>
+        </div>
+        <div class="project-info">
+          <span class="project-client-name">${p.client}</span>
+          <h4 class="project-title">${p.title}</h4>
+          <p class="project-summary">${p.description}</p>
+          <div class="project-footer-row">
+            <div class="project-tech-tags">
+              ${tagsHtml}
+            </div>
+            <a href="#devis" class="link-more">Devis similaire →</a>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    });
+
+    applyPublicPortfolioFilter(activePublicFilter);
+  }
+
+  function applyPublicPortfolioFilter(filterValue) {
+    activePublicFilter = filterValue;
+    const cards = document.querySelectorAll('.portfolio-grid .project-card');
+    cards.forEach(card => {
+      const cardCategory = card.getAttribute('data-category');
+      if (filterValue === 'all' || cardCategory === filterValue) {
+        card.style.display = 'flex';
+        setTimeout(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 50);
+      } else {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(15px)';
+        setTimeout(() => {
+          card.style.display = 'none';
+        }, 250);
+      }
+    });
+  }
 
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
-      const filterValue = btn.getAttribute('data-filter');
-
-      projectCards.forEach(card => {
-        const cardCategory = card.getAttribute('data-category');
-        if (filterValue === 'all' || cardCategory === filterValue) {
-          card.style.display = 'flex';
-          setTimeout(() => {
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-          }, 50);
-        } else {
-          card.style.opacity = '0';
-          card.style.transform = 'translateY(15px)';
-          setTimeout(() => {
-            card.style.display = 'none';
-          }, 250);
-        }
-      });
+      const filterValue = btn.getAttribute('data-filter') || 'all';
+      applyPublicPortfolioFilter(filterValue);
     });
   });
+
+  // Initialisation et écouteurs d'événements
+  loadAndRenderPortfolio();
+
+  window.addEventListener('nanoProjectSaved', () => loadAndRenderPortfolio());
+  window.addEventListener('nanoProjectDeleted', () => loadAndRenderPortfolio());
+  if (window.nanoDB && typeof window.nanoDB.subscribeProjects === 'function') {
+    window.nanoDB.subscribeProjects(() => loadAndRenderPortfolio());
+  }
 
   // ==========================================================================
   // 5. Accordéon FAQ Interactif

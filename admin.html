@@ -336,6 +336,106 @@
     .dash-pane.is-active {
       display: block;
     }
+
+    /* Styles pour la gestion du portfolio admin */
+    .portfolio-admin-filter {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 0.45rem 1.1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+    }
+
+    .portfolio-admin-filter:hover {
+      border-color: var(--border-gold);
+      color: var(--text-primary);
+    }
+
+    .portfolio-admin-filter.active {
+      background: rgba(201, 168, 76, 0.15);
+      border-color: var(--gold-primary);
+      color: var(--gold-light);
+      font-weight: 700;
+    }
+
+    .admin-project-card {
+      background: #111119;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all var(--transition-normal);
+    }
+
+    .admin-project-card:hover {
+      border-color: var(--border-gold);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    .admin-project-thumb {
+      height: 175px;
+      width: 100%;
+      background: #09090E;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-project-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .admin-project-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .admin-project-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .admin-project-client {
+      font-size: 0.78rem;
+      color: var(--gold-light);
+      font-family: var(--font-tech);
+      margin-bottom: 0.6rem;
+    }
+
+    .admin-project-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .admin-project-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 0.8rem;
+      border-top: 1px solid var(--border-subtle);
+    }
   </style>
 </head>
 
@@ -454,6 +554,10 @@
           <span>Messages Contact</span>
           <span class="dash-counter" id="dash-messages-counter" title="Total des messages">2</span>
           <span class="dash-counter-alert is-unread" id="dash-messages-alert" style="display: none;" title="Messages non lus">0</span>
+        </button>
+        <button class="dash-tab-btn" data-dash-target="pane-dash-portfolio" id="tab-btn-portfolio" title="Gérer les créations affichées sur le site public">
+          <span>Portfolio Studio</span>
+          <span class="dash-counter" id="dash-portfolio-counter">6</span>
         </button>
         <button class="dash-tab-btn" data-dash-target="pane-dash-payments" id="tab-btn-payments" title="Paiements Wave, Orange Money et Statistiques">
           <span>Paiements & Stats</span>
@@ -591,6 +695,33 @@
           <div id="analytics-sections-breakdown" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.8rem;">
             <!-- Rempli dynamiquement par JS avec les vraies vues -->
           </div>
+        </div>
+      </div>
+
+      <!-- ================= PANNEAU 4 : GESTION DU PORTFOLIO ================= -->
+      <div class="dash-pane" id="pane-dash-portfolio">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="font-size: 1.35rem; color: var(--text-primary); margin-bottom: 0.35rem;">Catalogue des Réalisations du Studio</h3>
+            <p style="color: var(--text-secondary); font-size: 0.88rem;">Ajoutez, modifiez ou retirez des projets affichés sur le site public de Nano Design sans toucher au code.</p>
+          </div>
+          <button type="button" class="btn btn-primary" id="btn-add-portfolio-proj" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.3rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ Ajouter une réalisation</span>
+          </button>
+        </div>
+
+        <!-- Filtres par Catégorie du Portfolio Admin -->
+        <div style="display: flex; gap: 0.6rem; margin-bottom: 1.5rem; flex-wrap: wrap;" id="portfolio-admin-filter-bar">
+          <button class="portfolio-admin-filter active" data-admin-filter="all">Tous les projets (<span id="count-filter-all">0</span>)</button>
+          <button class="portfolio-admin-filter" data-admin-filter="logos">Logos & Branding (<span id="count-filter-logos">0</span>)</button>
+          <button class="portfolio-admin-filter" data-admin-filter="web">Sites Web & Mobile (<span id="count-filter-web">0</span>)</button>
+          <button class="portfolio-admin-filter" data-admin-filter="supports">Signalétique & Supports (<span id="count-filter-supports">0</span>)</button>
+        </div>
+
+        <!-- Grille des Cartes Réalisations Admin -->
+        <div class="admin-portfolio-grid" id="admin-portfolio-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+          <!-- Injecté dynamiquement par JS -->
         </div>
       </div>
     </main>
@@ -1151,6 +1282,93 @@
     </div>
   </div>
 
+  <!-- ==========================================================================
+       MODAL AJOUT / MODIFICATION DE RÉALISATION (PORTFOLIO STUDIO)
+       ========================================================================== -->
+  <div class="invoice-modal-overlay" id="dash-project-modal">
+    <div class="invoice-modal-container" style="max-width: 680px; width: 95%;">
+      <!-- Barre d'actions supérieure -->
+      <div class="invoice-actions-bar">
+        <div class="invoice-actions-left">
+          <span class="invoice-num-tag" id="proj-modal-top-id">NOUVELLE RÉALISATION</span>
+          <span class="inv-badge-status inv-badge-pending" id="proj-modal-mode-badge">Création</span>
+        </div>
+        <div class="invoice-actions-right">
+          <button type="button" class="btn-invoice-close" id="btn-close-project-modal" aria-label="Fermer le modal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Corps du formulaire -->
+      <div class="invoice-modal-body" style="padding: 1.8rem;">
+        <form id="form-portfolio-project" style="display: flex; flex-direction: column; gap: 1.1rem;">
+          <input type="hidden" id="proj-form-id" value="">
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Titre de la création *</label>
+              <input type="text" id="proj-form-title" class="auth-input" placeholder="Ex: Plateforme E-commerce & Mobile" required style="width: 100%; border-radius: var(--radius-sm);">
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Client & Ville *</label>
+              <input type="text" id="proj-form-client" class="auth-input" placeholder="Ex: Maison Baobab • Dakar" required style="width: 100%; border-radius: var(--radius-sm);">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Catégorie *</label>
+              <select id="proj-form-category" class="auth-input" required style="width: 100%; border-radius: var(--radius-sm); background: #0E0E16; color: #FFF;">
+                <option value="web">Sites Web & Mobile</option>
+                <option value="logos">Logos & Branding</option>
+                <option value="supports">Signalétique & Supports Muraux</option>
+                <option value="marketing">Marketing Digital & Contenu</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Mots-clés / Tags</label>
+              <input type="text" id="proj-form-tags" class="auth-input" placeholder="Ex: UI/UX, Wave, Luxe (séparés par des virgules)" style="width: 100%; border-radius: var(--radius-sm);">
+            </div>
+          </div>
+
+          <!-- Section Image / Visuel -->
+          <div style="background: rgba(255,255,255,0.02); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); padding: 1rem;">
+            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem;">Visuel du projet (Image ou Capture)</label>
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+              <div id="proj-preview-box" style="width: 130px; height: 85px; background: #09090E; border: 1px solid var(--border-gold); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                <span id="proj-preview-placeholder" style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 0.4rem;">Aperçu</span>
+                <img id="proj-preview-img" src="" alt="Aperçu" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+              </div>
+              <div style="flex: 1; min-width: 200px;">
+                <input type="file" id="proj-form-file" accept="image/*" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; display: block;">
+                <input type="text" id="proj-form-image-url" class="auth-input" placeholder="Ou collez un lien d'image web (https://...)" style="width: 100%; font-size: 0.8rem; border-radius: var(--radius-sm);">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Description du projet *</label>
+            <textarea id="proj-form-desc" class="auth-input" rows="3" placeholder="Présentez le challenge, la solution apportée et la valeur créée pour le client..." required style="width: 100%; border-radius: var(--radius-sm); resize: vertical;"></textarea>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.35rem;">Lien externe vers le site (optionnel)</label>
+            <input type="url" id="proj-form-url" class="auth-input" placeholder="Ex: https://client-website.sn" style="width: 100%; border-radius: var(--radius-sm);">
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--border-subtle);">
+            <button type="button" class="btn btn-secondary" id="btn-cancel-project" style="padding: 0.55rem 1.1rem; font-size: 0.84rem;">Annuler</button>
+            <button type="submit" class="btn btn-primary" id="btn-save-project" style="padding: 0.55rem 1.3rem; font-size: 0.84rem;">Enregistrer la création ✦</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Flottant -->
   <div class="toast-notification" id="admin-toast">
     <div class="toast-icon">✦</div>
@@ -1347,8 +1565,10 @@
       const quotesAlert = document.getElementById('dash-quotes-alert');
       const messagesCounter = document.getElementById('dash-messages-counter');
       const messagesAlert = document.getElementById('dash-messages-alert');
+      const portfolioCounter = document.getElementById('dash-portfolio-counter');
       const tabBtnQuotes = document.getElementById('tab-btn-quotes');
       const tabBtnMessages = document.getElementById('tab-btn-messages');
+      const tabBtnPortfolio = document.getElementById('tab-btn-portfolio');
       const statQuotesNum = document.getElementById('stat-quotes-num');
       const statPaidAmount = document.getElementById('stat-paid-amount');
 
@@ -1424,6 +1644,17 @@
 
         if (tabBtnMessages) {
           tabBtnMessages.title = `${messages.length} message${messages.length > 1 ? 's' : ''} au total (${unreadMessagesCount} non lu${unreadMessagesCount > 1 ? 's' : ''})`;
+        }
+
+        // Rafraîchissement du compteur portfolio
+        if (portfolioCounter) {
+          const projs = await (window.nanoDB && typeof window.nanoDB.getProjects === 'function' ? window.nanoDB.getProjects() : []);
+          portfolioCounter.textContent = formatBadgeCount(projs.length);
+          portfolioCounter.title = `${projs.length} réalisation(s) au portfolio`;
+        }
+
+        if (typeof renderPortfolioAdmin === 'function') {
+          await renderPortfolioAdmin(currentAdminFilter);
         }
 
         // Rafraîchissement du titre de l'onglet navigateur
@@ -2191,6 +2422,293 @@
       }
 
       // ==========================================================================
+      // GESTION DU PORTFOLIO STUDIO (CRÉATIONS & RÉALISATIONS)
+      // ==========================================================================
+      let currentAdminFilter = 'all';
+      let currentEditingProjId = null;
+      let currentUploadedImageDataUrl = '';
+
+      const projModal = document.getElementById('dash-project-modal');
+      const btnAddProj = document.getElementById('btn-add-portfolio-proj');
+      const btnCloseProjModal = document.getElementById('btn-close-project-modal');
+      const btnCancelProj = document.getElementById('btn-cancel-project');
+      const formProj = document.getElementById('form-portfolio-project');
+      const projFileInput = document.getElementById('proj-form-file');
+      const projImageUrlInput = document.getElementById('proj-form-image-url');
+      const projPreviewImg = document.getElementById('proj-preview-img');
+      const projPreviewPlaceholder = document.getElementById('proj-preview-placeholder');
+
+      const adminPortfolioGrid = document.getElementById('admin-portfolio-grid');
+      const adminFilterBtns = document.querySelectorAll('#portfolio-admin-filter-bar .portfolio-admin-filter');
+
+      const countFilterAll = document.getElementById('count-filter-all');
+      const countFilterLogos = document.getElementById('count-filter-logos');
+      const countFilterWeb = document.getElementById('count-filter-web');
+      const countFilterSupports = document.getElementById('count-filter-supports');
+
+      function setProjPreview(url) {
+        if (url && url.trim()) {
+          projPreviewImg.src = url;
+          projPreviewImg.style.display = 'block';
+          projPreviewPlaceholder.style.display = 'none';
+        } else {
+          projPreviewImg.src = '';
+          projPreviewImg.style.display = 'none';
+          projPreviewPlaceholder.style.display = 'block';
+        }
+      }
+
+      if (projFileInput) {
+        projFileInput.addEventListener('change', (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+
+          if (!file.type.startsWith('image/')) {
+            showToast('Veuillez sélectionner un fichier image valide.');
+            return;
+          }
+
+          if (file.size > 5 * 1024 * 1024) {
+            showToast('Attention : image volumineuse (> 5 Mo). Privilégiez une image optimisée.');
+          }
+
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            currentUploadedImageDataUrl = evt.target.result;
+            setProjPreview(currentUploadedImageDataUrl);
+            if (projImageUrlInput) projImageUrlInput.value = '';
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      if (projImageUrlInput) {
+        projImageUrlInput.addEventListener('input', () => {
+          const url = projImageUrlInput.value.trim();
+          if (url) {
+            currentUploadedImageDataUrl = '';
+            setProjPreview(url);
+          } else if (!currentUploadedImageDataUrl) {
+            setProjPreview('');
+          }
+        });
+      }
+
+      adminFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          adminFilterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentAdminFilter = btn.getAttribute('data-admin-filter') || 'all';
+          renderPortfolioAdmin(currentAdminFilter);
+        });
+      });
+
+      if (btnAddProj) {
+        btnAddProj.addEventListener('click', () => {
+          currentEditingProjId = null;
+          currentUploadedImageDataUrl = '';
+          formProj.reset();
+          document.getElementById('proj-form-id').value = '';
+          document.getElementById('proj-modal-top-id').textContent = 'NOUVELLE RÉALISATION';
+          document.getElementById('proj-modal-mode-badge').textContent = 'Création';
+          document.getElementById('proj-modal-mode-badge').className = 'inv-badge-status inv-badge-pending';
+          document.getElementById('btn-save-project').textContent = 'Enregistrer la création ✦';
+          setProjPreview('');
+          projModal.classList.add('is-open');
+        });
+      }
+
+      if (btnCloseProjModal) btnCloseProjModal.addEventListener('click', () => projModal.classList.remove('is-open'));
+      if (btnCancelProj) btnCancelProj.addEventListener('click', () => projModal.classList.remove('is-open'));
+
+      if (formProj) {
+        formProj.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const title = document.getElementById('proj-form-title').value.trim();
+          const client = document.getElementById('proj-form-client').value.trim();
+          const category = document.getElementById('proj-form-category').value;
+          const tagsRaw = document.getElementById('proj-form-tags').value;
+          const desc = document.getElementById('proj-form-desc').value.trim();
+          const projectUrl = document.getElementById('proj-form-url').value.trim();
+          const imageUrlInput = (projImageUrlInput ? projImageUrlInput.value.trim() : '');
+
+          const finalImageUrl = currentUploadedImageDataUrl || imageUrlInput;
+
+          const categoryLabels = {
+            'logos': 'Logo & Branding',
+            'web': 'Site Web & Mobile',
+            'supports': 'Signalétique & Supports',
+            'marketing': 'Marketing Digital'
+          };
+
+          const projObj = {
+            id: currentEditingProjId || `PROJ-${Date.now().toString(36).toUpperCase()}`,
+            title,
+            client,
+            category,
+            categoryLabel: categoryLabels[category] || 'Création Studio',
+            description: desc,
+            tags: tagsRaw.split(',').map(t => t.trim()).filter(Boolean),
+            imageUrl: finalImageUrl,
+            projectUrl: projectUrl,
+            createdAt: new Date().toISOString()
+          };
+
+          if (window.nanoDB && typeof window.nanoDB.saveProject === 'function') {
+            await window.nanoDB.saveProject(projObj);
+          }
+
+          projModal.classList.remove('is-open');
+          showToast(`✦ Réalisation "${title}" enregistrée avec succès !`);
+          await renderDashboard();
+        });
+      }
+
+      async function renderPortfolioAdmin(filter = 'all') {
+        if (!adminPortfolioGrid) return;
+
+        let projects = [];
+        if (window.nanoDB && typeof window.nanoDB.getProjects === 'function') {
+          projects = await window.nanoDB.getProjects();
+        } else {
+          try {
+            projects = JSON.parse(localStorage.getItem('nano_portfolio') || '[]');
+          } catch(e) { projects = []; }
+        }
+
+        if (countFilterAll) countFilterAll.textContent = projects.length;
+        if (countFilterLogos) countFilterLogos.textContent = projects.filter(p => p.category === 'logos').length;
+        if (countFilterWeb) countFilterWeb.textContent = projects.filter(p => p.category === 'web').length;
+        if (countFilterSupports) countFilterSupports.textContent = projects.filter(p => p.category === 'supports').length;
+        if (portfolioCounter) portfolioCounter.textContent = formatBadgeCount(projects.length);
+
+        const filtered = filter === 'all' ? projects : projects.filter(p => p.category === filter);
+
+        adminPortfolioGrid.innerHTML = '';
+
+        if (filtered.length === 0) {
+          adminPortfolioGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1.5rem; background: rgba(255,255,255,0.02); border: 1px dashed var(--border-subtle); border-radius: var(--radius-md);">
+              <div style="font-size: 2rem; margin-bottom: 0.8rem; opacity: 0.6;">✦</div>
+              <h4 style="font-size: 1.1rem; color: var(--gold-light); margin-bottom: 0.4rem;">Aucune réalisation dans cette catégorie</h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); max-width: 420px; margin: 0 auto 1.2rem;">Ajoutez dès maintenant une nouvelle création pour enrichir votre portfolio studio visible par vos clients.</p>
+              <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('btn-add-portfolio-proj').click()">
+                + Ajouter une réalisation
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        filtered.forEach(p => {
+          const card = document.createElement('div');
+          card.className = 'admin-project-card';
+          card.style.cssText = 'background: #0E0E17; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; transition: all 0.25s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.4);';
+
+          const tags = Array.isArray(p.tags) ? p.tags : (typeof p.tags === 'string' ? p.tags.split(',') : []);
+          const tagsHtml = tags.map(t => `<span style="display:inline-block; font-size:0.68rem; padding:0.15rem 0.5rem; border-radius:var(--radius-full); background:rgba(255,255,255,0.05); color:var(--text-secondary); border:1px solid rgba(255,255,255,0.06);">${t.trim()}</span>`).join(' ');
+
+          const hasImg = Boolean(p.imageUrl && p.imageUrl.trim());
+          const thumbHtml = hasImg
+            ? `<img src="${p.imageUrl}" alt="${p.title}" style="width: 100%; height: 180px; object-fit: cover; border-bottom: 1px solid var(--border-subtle);">`
+            : `<div style="width: 100%; height: 180px; background: linear-gradient(135deg, #12121D 0%, #09090F 100%); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--border-subtle); position: relative;">
+                <span style="font-family: var(--font-tech); font-size: 0.75rem; color: var(--gold-light); letter-spacing: 0.1em; text-transform: uppercase;">✦ Visuel Studio</span>
+               </div>`;
+
+          card.innerHTML = `
+            <div style="position: relative;">
+              ${thumbHtml}
+              <span style="position: absolute; top: 12px; left: 12px; background: rgba(8,8,12,0.85); backdrop-filter: blur(8px); border: 1px solid var(--border-gold); color: var(--gold-light); font-size: 0.68rem; font-family: var(--font-tech); text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: var(--radius-full);">
+                ${p.categoryLabel || p.category}
+              </span>
+              <span style="position: absolute; top: 12px; right: 12px; font-family: var(--font-tech); font-size: 0.68rem; color: var(--text-muted); background: rgba(0,0,0,0.6); padding: 0.2rem 0.5rem; border-radius: var(--radius-sm);">
+                ${p.id}
+              </span>
+            </div>
+            <div style="padding: 1.2rem; display: flex; flex-direction: column; flex: 1;">
+              <div style="font-size: 0.72rem; color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 0.25rem;">
+                ${p.client}
+              </div>
+              <h4 style="font-size: 1rem; font-weight: 700; color: #FFF; margin-bottom: 0.5rem; line-height: 1.35;">
+                ${p.title}
+              </h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1;">
+                ${p.description}
+              </p>
+              <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                ${tagsHtml}
+              </div>
+              <div style="display: flex; gap: 0.5rem; padding-top: 0.8rem; border-top: 1px solid var(--border-subtle); align-items: center; justify-content: space-between;">
+                <div style="display: flex; gap: 0.4rem;">
+                  <button type="button" class="btn-row-action btn-edit-proj" data-proj-id="${p.id}" title="Modifier cette réalisation">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    <span>Modifier</span>
+                  </button>
+                  <button type="button" class="btn-row-action btn-delete-proj" data-proj-id="${p.id}" data-proj-title="${p.title.replace(/"/g, '&quot;')}" title="Supprimer cette réalisation" style="color: #F87171;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <span>Supprimer</span>
+                  </button>
+                </div>
+                ${p.projectUrl ? `<a href="${p.projectUrl}" target="_blank" rel="noopener noreferrer" style="font-size: 0.74rem; color: var(--gold-light); display: inline-flex; align-items: center; gap: 0.2rem; text-decoration: none;">Voir le site ↗</a>` : ''}
+              </div>
+            </div>
+          `;
+
+          adminPortfolioGrid.appendChild(card);
+        });
+
+        // Écouteurs Modifier
+        adminPortfolioGrid.querySelectorAll('.btn-edit-proj').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const pId = btn.getAttribute('data-proj-id');
+            const target = filtered.find(item => item.id === pId);
+            if (!target) return;
+
+            currentEditingProjId = target.id;
+            currentUploadedImageDataUrl = target.imageUrl || '';
+
+            document.getElementById('proj-form-id').value = target.id;
+            document.getElementById('proj-modal-top-id').textContent = target.id;
+            document.getElementById('proj-modal-mode-badge').textContent = 'Modification';
+            document.getElementById('proj-modal-mode-badge').className = 'inv-badge-status inv-badge-valid';
+            document.getElementById('btn-save-project').textContent = 'Mettre à jour ✦';
+
+            document.getElementById('proj-form-title').value = target.title || '';
+            document.getElementById('proj-form-client').value = target.client || '';
+            document.getElementById('proj-form-category').value = target.category || 'web';
+            document.getElementById('proj-form-tags').value = Array.isArray(target.tags) ? target.tags.join(', ') : (target.tags || '');
+            document.getElementById('proj-form-desc').value = target.description || '';
+            document.getElementById('proj-form-url').value = target.projectUrl || '';
+
+            if (target.imageUrl && target.imageUrl.startsWith('http')) {
+              if (projImageUrlInput) projImageUrlInput.value = target.imageUrl;
+            } else {
+              if (projImageUrlInput) projImageUrlInput.value = '';
+            }
+
+            setProjPreview(target.imageUrl || '');
+            projModal.classList.add('is-open');
+          });
+        });
+
+        // Écouteurs Supprimer
+        adminPortfolioGrid.querySelectorAll('.btn-delete-proj').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const pId = btn.getAttribute('data-proj-id');
+            const pTitle = btn.getAttribute('data-proj-title');
+            if (confirm(`Confirmez-vous la suppression de la réalisation "${pTitle}" (${pId}) ? Cette action est irréversible.`)) {
+              if (window.nanoDB && typeof window.nanoDB.deleteProject === 'function') {
+                await window.nanoDB.deleteProject(pId);
+              }
+              showToast(`Réalisation "${pTitle}" supprimée.`);
+              await renderDashboard();
+            }
+          });
+        });
+      }
+
+      // ==========================================================================
       // GESTION DES NOTIFICATIONS & ALERTES EN DIRECT (SON + PUSH)
       // ==========================================================================
       const btnToggleAlerts = document.getElementById('btn-toggle-alerts');
@@ -2267,7 +2785,17 @@
             showToast('Nouveau message reçu en direct !');
           }
         });
+
+        if (typeof window.nanoDB.subscribeProjects === 'function') {
+          window.nanoDB.subscribeProjects(() => {
+            renderDashboard();
+            showToast('✦ Portfolio studio mis à jour en direct !');
+          });
+        }
       }
+
+      window.addEventListener('nanoProjectSaved', () => renderDashboard());
+      window.addEventListener('nanoProjectDeleted', () => renderDashboard());
 
       updateDbStatusUi();
 
