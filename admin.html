@@ -560,6 +560,71 @@
       padding-bottom: 1.8rem;
       border-top: 1px solid var(--border-subtle);
     }
+
+    /* Cartes Réalisations Studio : Boutons Modifier & Supprimer */
+    .btn-edit-proj {
+      background: rgba(201, 168, 76, 0.12) !important;
+      border: 1px solid rgba(201, 168, 76, 0.45) !important;
+      color: #E5C875 !important;
+      font-weight: 600 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.4rem !important;
+      padding: 0.45rem 0.85rem !important;
+      border-radius: var(--radius-sm) !important;
+      font-size: 0.78rem !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-edit-proj svg {
+      stroke: #E5C875 !important;
+      transition: stroke 0.2s ease !important;
+    }
+
+    .btn-edit-proj:hover {
+      background: linear-gradient(135deg, #E5C875, #C9A84C) !important;
+      color: #07070B !important;
+      border-color: #E5C875 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(201, 168, 76, 0.35);
+    }
+
+    .btn-edit-proj:hover svg {
+      stroke: #07070B !important;
+    }
+
+    .btn-delete-proj {
+      background: rgba(239, 68, 68, 0.10) !important;
+      border: 1px solid rgba(239, 68, 68, 0.35) !important;
+      color: #F87171 !important;
+      font-weight: 600 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.4rem !important;
+      padding: 0.45rem 0.85rem !important;
+      border-radius: var(--radius-sm) !important;
+      font-size: 0.78rem !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    }
+
+    .btn-delete-proj svg {
+      stroke: #F87171 !important;
+      transition: stroke 0.2s ease !important;
+    }
+
+    .btn-delete-proj:hover {
+      background: #EF4444 !important;
+      color: #FFFFFF !important;
+      border-color: #DC2626 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-delete-proj:hover svg {
+      stroke: #FFFFFF !important;
+    }
   </style>
 </head>
 
@@ -2899,7 +2964,7 @@
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     <span>Modifier</span>
                   </button>
-                  <button type="button" class="btn-row-action btn-delete-proj" data-proj-id="${p.id}" data-proj-title="${p.title.replace(/"/g, '&quot;')}" title="Supprimer cette réalisation" style="color: #F87171;">
+                  <button type="button" class="btn-row-action btn-delete-proj" data-proj-id="${p.id}" data-proj-title="${p.title.replace(/"/g, '&quot;')}" title="Supprimer cette réalisation">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     <span>Supprimer</span>
                   </button>
