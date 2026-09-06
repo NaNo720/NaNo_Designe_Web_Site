@@ -67,6 +67,7 @@
   const devisForm = document.getElementById('devis-step2-form');
   const budgetChips = document.querySelectorAll('.budget-chip');
   const timelineChips = document.querySelectorAll('.timeline-chip');
+  let devisStep2ShownAt = 0;
 
   // Mise à jour de l'affichage du récapitulatif
   function updateSummaryText() {
@@ -99,6 +100,7 @@
     if (stepNumber === 2) {
       updateSummaryText();
       paneStep2.classList.add('is-active');
+      devisStep2ShownAt = Date.now();
     }
     if (stepNumber === 3) paneStep3.classList.add('is-active');
 
@@ -213,6 +215,15 @@
     devisForm.addEventListener('submit', function (e) {
       e.preventDefault();
 
+      const antiBot = window.StudioSecurity ? window.StudioSecurity.antiBot : null;
+      const honeypotEl = document.getElementById('devis-website');
+      const honeypotValue = honeypotEl ? honeypotEl.value : '';
+      if (antiBot && (antiBot.isHoneypotTriggered(honeypotValue) || antiBot.isLikelyBotBrowser() || antiBot.isSubmittedTooFast(devisStep2ShownAt))) {
+        // Soumission silencieusement ignorée : signaux de bot détectés
+        devisForm.reset();
+        return;
+      }
+
       const name = document.getElementById('devis-name').value.trim();
       const company = document.getElementById('devis-company').value.trim();
       const email = document.getElementById('devis-email').value.trim();
@@ -227,6 +238,21 @@
       const sec = window.StudioSecurity ? window.StudioSecurity.sanitize : null;
       if (sec && !sec.isValidEmail(email)) {
         alert('Veuillez saisir une adresse email valide.');
+        return;
+      }
+
+      if (sec && sec.isFakeEmail(email)) {
+        alert('Merci d\'indiquer une adresse email valide et joignable : nous en avons besoin pour vous transmettre votre devis.');
+        return;
+      }
+
+      if (sec && !sec.isValidPhone(phone)) {
+        alert('Veuillez saisir un numéro de téléphone joignable (ex: 77 123 45 67 ou +221 77 123 45 67).');
+        return;
+      }
+
+      if (sec && !sec.isValidBrief(desc, 20)) {
+        alert('Pour que nous puissions évaluer votre projet avec précision, merci de décrire votre besoin en au moins deux phrases (au moins 20 caractères).');
         return;
       }
 

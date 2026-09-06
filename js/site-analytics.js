@@ -81,6 +81,11 @@
   const NanoAnalytics = {
     // Initialisation au chargement d'une page
     init() {
+      // 0. Filtrage des bots/robots pour ne pas fausser les statistiques réelles
+      if (window.StudioSecurity && window.StudioSecurity.antiBot.isLikelyBotBrowser()) {
+        return;
+      }
+
       // 1. Visiteur Unique (persistant)
       let visitorId = localStorage.getItem(VISITOR_KEY);
       const isNewVisitor = !visitorId;

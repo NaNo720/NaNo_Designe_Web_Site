@@ -450,9 +450,19 @@
   // 6. Formulaire de Contact Direct
   // ==========================================================================
   const contactForm = document.getElementById('direct-contact-form');
+  const contactFormShownAt = Date.now();
   if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
+
+      const antiBot = window.StudioSecurity ? window.StudioSecurity.antiBot : null;
+      const honeypotEl = document.getElementById('contact-website');
+      const honeypotValue = honeypotEl ? honeypotEl.value : '';
+      if (antiBot && (antiBot.isHoneypotTriggered(honeypotValue) || antiBot.isLikelyBotBrowser() || antiBot.isSubmittedTooFast(contactFormShownAt))) {
+        // Soumission silencieusement ignorée : signaux de bot détectés
+        contactForm.reset();
+        return;
+      }
 
       const name = document.getElementById('contact-name').value.trim();
       const email = document.getElementById('contact-email').value.trim();
@@ -468,6 +478,21 @@
       const sec = window.StudioSecurity ? window.StudioSecurity.sanitize : null;
       if (sec && !sec.isValidEmail(email)) {
         alert('Veuillez saisir une adresse email valide.');
+        return;
+      }
+
+      if (sec && sec.isFakeEmail(email)) {
+        alert('Merci d\'indiquer une adresse email valide et joignable pour que nous puissions vous recontacter.');
+        return;
+      }
+
+      if (phone && sec && !sec.isValidPhone(phone)) {
+        alert('Veuillez renseigner un numéro de téléphone joignable (ex: 77 123 45 67 ou +221 77 123 45 67).');
+        return;
+      }
+
+      if (sec && !sec.isValidBrief(message, 15)) {
+        alert('Veuillez préciser votre message en au moins quelques mots (au moins 15 caractères).');
         return;
       }
 

@@ -75,11 +75,72 @@
         return emailRegex.test(email.trim()) && email.length <= 254;
       },
 
-      // Validation du numéro de téléphone (Sénégal & International)
+      // Validation du numéro de téléphone (Privilégie les numéros valides Sénégal 70/75/76/77/78 ou International)
       isValidPhone(phone) {
-        if (!phone) return true; // Optionnel
-        const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]{6,16}$/;
-        return phoneRegex.test(phone.trim());
+        if (!phone || typeof phone !== 'string') return false;
+        const cleaned = phone.replace(/[\s./()-]/g, '');
+        // Format sénégalais (ex: 77 123 45 67 ou +221 77... ou 00221 77...)
+        const snRegex = /^(?:\+221|00221)?(7[05678][0-9]{7})$/;
+        if (snRegex.test(cleaned)) return true;
+        // Format international général (au moins 8 chiffres et max 15 chiffres)
+        const intlRegex = /^\+?[1-9][0-9]{7,14}$/;
+        return intlRegex.test(cleaned);
+      },
+
+      // Validation qualitative du cahier des charges (anti-curieux : exige au moins 20 caractères réels)
+      isValidBrief(desc, minLength = 20) {
+        if (!desc || typeof desc !== 'string') return false;
+        const cleaned = desc.trim().replace(/\s+/g, ' ');
+        if (cleaned.length < minLength) return false;
+        // Écarte les frappes répétitives au clavier (ex: "aaaaaaaaaaaa", "asdfasdfasdf")
+        if (/^(.)\1{5,}$/.test(cleaned)) return false;
+        return true;
+      },
+
+      // Domaines d'emails jetables/temporaires connus (services d'email à usage unique)
+      disposableEmailDomains: new Set([
+        'mailinator.com', 'guerrillamail.com', 'guerrillamail.info', 'guerrillamail.biz',
+        'guerrillamail.de', 'guerrillamail.org', 'sharklasers.com', 'yopmail.com', 'yopmail.fr',
+        'yopmail.net', 'tempmail.com', 'temp-mail.org', 'temp-mail.io', '10minutemail.com',
+        '10minutemail.net', 'throwawaymail.com', 'trashmail.com', 'trashmail.net', 'getnada.com',
+        'mailnesia.com', 'mailcatch.com', 'dispostable.com', 'fakeinbox.com', 'spamgourmet.com',
+        'mytemp.email', 'moakt.com', 'emailondeck.com', 'mohmal.com', 'tempinbox.com',
+        'maildrop.cc', 'mintemail.com', 'discard.email', 'discardmail.com', 'spam4.me',
+        'tempr.email', 'mailtemp.info', 'inboxbear.com', 'burnermail.io', 'nada.email',
+        '33mail.com', 'jetable.org', 'einrot.com', 'trbvm.com', 'mailna.co'
+      ]),
+
+      // Domaines/adresses manifestement factices utilisés pour "tester" un formulaire
+      fakeEmailDomains: new Set([
+        'test.com', 'test.fr', 'example.com', 'example.org', 'example.net', 'exemple.com',
+        'exemple.fr', 'exemple.sn', 'domain.com', 'yourdomain.com', 'email.com', 'none.com',
+        'nomail.com', 'fake.com', 'sample.com', 'abc.com', 'asdf.com', 'demo.com'
+      ]),
+
+      // Détecte les parties locales manifestement bidons (test@, asdf@, aaaa@, 1234@...)
+      isFakeLocalPart(localPart) {
+        if (!localPart) return true;
+        const lower = localPart.toLowerCase();
+        // Répétition d'un seul caractère (aaaa, xxxx, 1111...)
+        if (/^(.)\1{2,}$/.test(lower)) return true;
+        const fakeWords = [
+          'test', 'testing', 'admin', 'asdf', 'asdfasdf', 'qwerty', 'azerty', 'abc123',
+          'foo', 'foobar', 'sample', 'exemple', 'example', 'nom', 'prenom', 'email',
+          'user', 'noemail', 'aucun', 'none', 'demo', 'fake', 'blah', 'nawak'
+        ];
+        return fakeWords.includes(lower);
+      },
+
+      // Détection combinée d'un email jetable ou manifestement inventé (pour test de formulaire)
+      isFakeEmail(email) {
+        if (!this.isValidEmail(email)) return true;
+        const parts = email.trim().toLowerCase().split('@');
+        if (parts.length !== 2) return true;
+        const [localPart, domain] = parts;
+        if (this.disposableEmailDomains.has(domain)) return true;
+        if (this.fakeEmailDomains.has(domain)) return true;
+        if (this.isFakeLocalPart(localPart)) return true;
+        return false;
       },
 
       // Blocage des URLs dangereuses (ex: javascript:alert(1), data:text/html)
@@ -90,6 +151,38 @@
           return false;
         }
         return true;
+      }
+    },
+
+    // ==========================================================================
+    // 2bis. PROTECTION ANTI-BOT (HONEYPOT & DÉTECTION D'AUTOMATISATION)
+    // ==========================================================================
+    antiBot: {
+      // Un champ honeypot rempli = un bot (un visiteur humain ne le voit jamais)
+      isHoneypotTriggered(value) {
+        return !!(value && String(value).trim().length > 0);
+      },
+
+      // Un formulaire soumis trop vite après son affichage est presque toujours un script automatisé
+      isSubmittedTooFast(formShownAt, minDelayMs = 1500) {
+        if (!formShownAt) return false;
+        return (Date.now() - formShownAt) < minDelayMs;
+      },
+
+      // Signaux de navigation automatisée (Selenium/Puppeteer/Playwright/crawlers)
+      isLikelyBotBrowser() {
+        try {
+          if (navigator.webdriver) return true;
+          const ua = (navigator.userAgent || '').toLowerCase();
+          const botSignatures = [
+            'bot', 'crawler', 'spider', 'headlesschrome', 'phantomjs', 'slimerjs',
+            'curl/', 'wget/', 'python-requests', 'python-urllib', 'scrapy', 'httpclient',
+            'go-http-client', 'axios/', 'node-fetch'
+          ];
+          return botSignatures.some(sig => ua.includes(sig));
+        } catch (e) {
+          return false;
+        }
       }
     },
 
