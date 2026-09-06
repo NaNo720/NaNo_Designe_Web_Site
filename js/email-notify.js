@@ -13,12 +13,12 @@
   // Email officiel du studio par défaut
   const STUDIO_EMAIL = 'contact@nanodesign.sn';
 
-  // Clé d'accès API Web3Forms (optionnelle, configurable dans localStorage ou window.SUPABASE_CONFIG)
+  // Clé d'accès API Web3Forms (configurable dans localStorage ou window.SUPABASE_CONFIG)
   function getAccessKey() {
     return (
       (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.emailKey) ||
       localStorage.getItem('nano_web3forms_key') ||
-      ''
+      '0619d3e7-cf84-49b4-8ec6-05b9d9c6245f'
     );
   }
 
@@ -100,10 +100,12 @@ Création de Marques • Sites Web & Mobile • Signalétique
       const accessKey = getAccessKey();
 
       const payload = {
+        access_key: accessKey,
         subject: `[Nouveau Devis Studio] ${quote.id} — ${client.name || 'Client'} (${quote.serviceLabel || 'Projet'})`,
         from_name: `${client.name || 'Client'} via Nano Design`,
-        to_email: STUDIO_EMAIL,
-        replyto: client.email || STUDIO_EMAIL,
+        name: client.name || 'Client',
+        email: client.email || 'contact@nanodesign.sn',
+        phone: client.phone || 'Non renseigné',
         message: `
 NOUVELLE DEMANDE DE DEVIS ENREGISTRÉE SUR LE SITE NANO DESIGN DAKAR
 ==================================================================
@@ -223,10 +225,12 @@ https://nanodesign.sn
       const accessKey = getAccessKey();
 
       const payload = {
-        subject: `[Nouveau Message Contact] ${msg.subject || 'Message'} — ${msg.name}`,
-        from_name: `${msg.name} via Nano Design`,
-        to_email: STUDIO_EMAIL,
-        replyto: msg.email || STUDIO_EMAIL,
+        access_key: accessKey,
+        subject: `[Contact Nano Design] ${msg.subject || 'Message'} — ${msg.name}`,
+        from_name: `${msg.name} (Contact Nano Design)`,
+        name: msg.name,
+        email: msg.email,
+        phone: msg.phone || 'Non renseigné',
         message: `
 NOUVEAU MESSAGE REÇU DEPUIS LA PAGE CONTACT NANO DESIGN
 ======================================================

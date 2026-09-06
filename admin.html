@@ -1350,6 +1350,17 @@
             'anon' (sans risque d'exposition)</small>
         </div>
 
+        <div class="form-field">
+          <label class="form-label" for="input-web3forms-key"
+            style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            Clé d'envoi Email (Web3Forms Access Key) :
+          </label>
+          <input type="text" id="input-web3forms-key" class="form-input"
+            placeholder="0619d3e7-cf84-49b4-8ec6-05b9d9c6245f"
+            style="font-family: var(--font-tech); font-size: 0.86rem; padding: 0.5rem 0.8rem;">
+          <small style="color: var(--text-muted); font-size: 0.7rem; margin-top: 0.2rem; display: block;">Permet la distribution réelle des alertes de devis et accusés de réception par email.</small>
+        </div>
+
         <div
           style="background: rgba(201, 168, 76, 0.06); border: 1px solid rgba(201, 168, 76, 0.2); border-radius: var(--radius-sm); padding: 0.6rem 0.75rem; font-size: 0.74rem; color: var(--text-secondary); line-height: 1.4;">
           💡 <strong>N'oubliez pas :</strong> Exécutez le script <strong>supabase-schema.sql</strong> dans le SQL Editor
@@ -2762,6 +2773,7 @@
       const formSupabase = document.getElementById('supabase-settings-form');
       const inputSupabaseUrl = document.getElementById('input-supabase-url');
       const inputSupabaseKey = document.getElementById('input-supabase-key');
+      const inputWeb3FormsKey = document.getElementById('input-web3forms-key');
       const dbDot = document.getElementById('db-status-dot');
       const dbLabel = document.getElementById('db-status-label');
       const modalDbDot = document.getElementById('modal-db-dot');
@@ -2793,6 +2805,7 @@
           const cfg = window.SUPABASE_CONFIG || {};
           if (inputSupabaseUrl) inputSupabaseUrl.value = cfg.url || localStorage.getItem('nano_supabase_url') || '';
           if (inputSupabaseKey) inputSupabaseKey.value = cfg.anonKey || localStorage.getItem('nano_supabase_key') || '';
+          if (inputWeb3FormsKey) inputWeb3FormsKey.value = localStorage.getItem('nano_web3forms_key') || cfg.emailKey || '0619d3e7-cf84-49b4-8ec6-05b9d9c6245f';
           updateDbStatusUi();
           modalSupabase.classList.add('is-open');
         });
@@ -2810,12 +2823,18 @@
           e.preventDefault();
           const url = inputSupabaseUrl.value.trim();
           const key = inputSupabaseKey.value.trim();
+          const emailK = inputWeb3FormsKey ? inputWeb3FormsKey.value.trim() : '';
+
+          if (emailK) {
+            localStorage.setItem('nano_web3forms_key', emailK);
+            if (window.SUPABASE_CONFIG) window.SUPABASE_CONFIG.emailKey = emailK;
+          }
 
           if (window.nanoDB) {
             window.nanoDB.setCredentials(url, key);
             updateDbStatusUi();
             modalSupabase.classList.remove('is-open');
-            showToast('Identifiants Supabase enregistrés ! Synchronisation...');
+            showToast('Paramètres Supabase & Email enregistrés avec succès !');
             await renderDashboard();
           }
         });

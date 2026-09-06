@@ -18,8 +18,11 @@
     storedKey = 'sb_publishable_m77_5YvDdFHy0vbiKcc2sQ_8zZ0LDzf';
   }
 
+  const storedEmailKey = localStorage.getItem('nano_web3forms_key') || '0619d3e7-cf84-49b4-8ec6-05b9d9c6245f';
+
   window.SUPABASE_CONFIG = {
     url: storedUrl,
-    anonKey: storedKey
+    anonKey: storedKey,
+    emailKey: storedEmailKey
   };
 })();
