@@ -128,9 +128,23 @@ Le projet est déjà configuré pour se connecter à Supabase. Si vous déployez
    ```javascript
    window.SUPABASE_CONFIG = {
      url: 'https://votre-projet.supabase.co',
-     anonKey: 'votre-cle-publique-anon'
+     anonKey: 'votre-cle-publique-anon',
+     emailKey: 'votre-cle-web3forms-studio',
+     emailJs: {
+       serviceId: 'service_...',
+       templateId: 'template_...',
+       publicKey: '...'
+     }
    };
    ```
+
+---
+
+## 📧 Système d'Emails & Notifications Automatiques
+
+* **Alerte Studio (Nano Design)** : Acheminée via **Web3Forms** dès la soumission d'un devis ou message, avec en-tête `Reply-To` pointant directement vers le client pour répondre en 1 clic.
+* **Accusé de Réception Client** : Envoyé automatiquement via **EmailJS** directement depuis l'adresse officielle `Nano Design Studio (nanodesign221@gmail.com)` avec référence unique `ND-2026-XXXX`, récapitulatif du projet et contact direct WhatsApp.
+
 
 ---
 
