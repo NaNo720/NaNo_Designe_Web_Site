@@ -21,11 +21,36 @@
     );
   }
 
+  // Configuration EmailJS pour l'envoi d'accusé de réception direct au client
+  function getEmailJsConfig() {
+    const defaultCfg = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.emailJs) || {};
+    return {
+      serviceId: localStorage.getItem('nano_emailjs_service') || defaultCfg.serviceId || 'service_0raoojt',
+      templateId: localStorage.getItem('nano_emailjs_template') || defaultCfg.templateId || 'template_40mfxpr',
+      publicKey: localStorage.getItem('nano_emailjs_public_key') || defaultCfg.publicKey || '0vkvmlxtl6c0kAPls'
+    };
+  }
+
   const NanoNotify = {
     // --------------------------------------------------------------------------
-    // 1. ENVOI DE L'ALERTE DEVIS AU STUDIO
+    // 1. GESTION DES NOTIFICATIONS DEVIS (STUDIO + CLIENT)
     // --------------------------------------------------------------------------
     async sendQuoteEmail(quote) {
+      // 1.1 Alerte complète envoyée au studio Nano Design
+      const studioPromise = this.sendStudioQuoteAlert(quote);
+
+      // 1.2 Accusé de réception officiel envoyé directement dans la boîte mail du client
+      const clientPromise = this.sendClientQuoteReceipt(quote);
+
+      const [studioRes, clientRes] = await Promise.allSettled([studioPromise, clientPromise]);
+      return {
+        studio: studioRes.status === 'fulfilled' ? studioRes.value : null,
+        client: clientRes.status === 'fulfilled' ? clientRes.value : null
+      };
+    },
+
+    // 1.1 Alerte détaillée au studio via Web3Forms
+    async sendStudioQuoteAlert(quote) {
       const client = quote.client || {};
       const accessKey = getAccessKey();
 
@@ -85,6 +110,59 @@ https://nanodesign.sn/admin.html
 
       console.log('[NanoNotify] Devis enregistré dans la base et alerte préparée pour le studio.');
       return { success: true, localOnly: true };
+    },
+
+    // 1.2 Accusé de réception envoyé directement à l'adresse du client via EmailJS
+    async sendClientQuoteReceipt(quote) {
+      const client = quote.client || {};
+      if (!client.email) {
+        console.log('[NanoNotify] Aucun email client renseigné pour l\'accusé de réception.');
+        return { success: false, reason: 'no_email' };
+      }
+
+      const emailJs = getEmailJsConfig();
+      if (!emailJs.serviceId || !emailJs.templateId || !emailJs.publicKey) {
+        console.warn('[NanoNotify] Configuration EmailJS incomplète.');
+        return { success: false, reason: 'missing_config' };
+      }
+
+      const payload = {
+        service_id: emailJs.serviceId,
+        template_id: emailJs.templateId,
+        user_id: emailJs.publicKey,
+        template_params: {
+          to_name: client.name || 'Client',
+          to_email: client.email,
+          quote_id: quote.id,
+          service_label: quote.serviceLabel || 'Projet de Design',
+          budget: client.budget || 'Non spécifié',
+          timeline: client.timeline || 'Non spécifié',
+          description: client.description || 'Projet confié à l\'équipe Nano Design.'
+        }
+      };
+
+      try {
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          console.log('[NanoNotify] Accusé de réception devis transmis au client via EmailJS avec succès.');
+          return { success: true };
+        } else {
+          const errData = await response.text();
+          console.warn('[NanoNotify] Réponse EmailJS client:', response.status, errData);
+          return { success: false, status: response.status, error: errData };
+        }
+      } catch (err) {
+        console.warn('[NanoNotify] Erreur communication EmailJS:', err);
+        return { success: false, error: err.message };
+      }
     },
 
     // --------------------------------------------------------------------------
