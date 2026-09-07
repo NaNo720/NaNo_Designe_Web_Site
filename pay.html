@@ -427,13 +427,16 @@
               <strong style="color: #1BA9E9; font-size: 1.05rem; font-family: var(--font-tech);">+221 78 380 03 69</strong> (Nano Design)
             </p>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 0.8rem;">
-              <a href="wave://" class="btn btn-secondary btn-sm" id="btn-open-wave" style="background: #1BA9E9; color: #ffffff; border: none; font-weight: 700; padding: 0.5rem 1rem;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-open-wave" style="background: #1BA9E9; color: #ffffff; border: none; font-weight: 700; padding: 0.5rem 1rem; cursor: pointer;">
                 <span>📱 Ouvrir l'application Wave</span>
-              </a>
-              <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-wave" style="border-color: rgba(27, 169, 233, 0.4); color: #1BA9E9; padding: 0.5rem 1rem;">
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-wave" style="border-color: rgba(27, 169, 233, 0.4); color: #1BA9E9; padding: 0.5rem 1rem; cursor: pointer;">
                 <span>📋 Copier le numéro</span>
               </button>
             </div>
+            <p id="wave-copy-hint" style="font-size: 0.8rem; color: #1BA9E9; margin: 0.6rem 0 0; text-align: center; display: none; background: rgba(27, 169, 233, 0.1); padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid rgba(27, 169, 233, 0.25);">
+              ✓ <strong>Numéro copié (+221 78 380 03 69)</strong>. Collez-le dans Wave pour effectuer le transfert.
+            </p>
           </div>
         </div>
 
@@ -794,6 +797,50 @@
       }
       if (btnCopyOm) {
         btnCopyOm.addEventListener('click', () => copyTextWithFeedback(btnCopyOm, studioNum, '📋 Copier le numéro'));
+      }
+
+      // Gestionnaire intelligent d'ouverture de l'application Wave sur mobile
+      const btnOpenWave = document.getElementById('btn-open-wave');
+      const waveHint = document.getElementById('wave-copy-hint');
+
+      if (btnOpenWave) {
+        btnOpenWave.addEventListener('click', (e) => {
+          e.preventDefault();
+
+          // 1. Copie automatique du numéro studio
+          try {
+            navigator.clipboard.writeText(studioNum);
+          } catch (err) {}
+
+          if (waveHint) {
+            waveHint.style.display = 'block';
+          }
+          btnOpenWave.innerHTML = `<span>✓ Numéro copié ! Lancement...</span>`;
+          setTimeout(() => {
+            btnOpenWave.innerHTML = `<span>📱 Ouvrir l'application Wave</span>`;
+          }, 3500);
+
+          const ua = navigator.userAgent || '';
+          const isAndroid = /android/i.test(ua);
+          const isIOS = /iphone|ipad|ipod/i.test(ua);
+
+          if (isAndroid) {
+            // Android Intent officiel pour l'application Wave (com.wave.personal)
+            window.location.href = 'intent:#Intent;package=com.wave.personal;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.wave.personal;end';
+          } else if (isIOS) {
+            // iOS : Essai du schéma universel ou redirection App Store
+            const start = Date.now();
+            window.location.href = 'wave://';
+            setTimeout(() => {
+              if (Date.now() - start < 1800) {
+                window.location.href = 'https://apps.apple.com/app/wave-money/id1453531102';
+              }
+            }, 1200);
+          } else {
+            // Sur Desktop / PC
+            alert(`Numéro marchand Wave Nano Design copié : +221 78 380 03 69.\n\nOuvrez l'application Wave sur votre smartphone et collez le numéro pour effectuer le transfert de ${agreedAmount}.`);
+          }
+        });
       }
 
       // 4. Gestion des onglets de paiement (Wave, OM, Carte)

@@ -10,7 +10,7 @@
   'use strict';
 
   // Email officiel du studio par défaut
-  const STUDIO_EMAIL = 'contact@nanodesign.sn';
+  const STUDIO_EMAIL = 'nanodesign221@gmail.com';
 
   // Clé d'accès API Web3Forms (configurable dans localStorage ou window.SUPABASE_CONFIG)
   function getAccessKey() {
@@ -132,7 +132,13 @@ https://nanodesign.sn/admin.html
         user_id: emailJs.publicKey,
         template_params: {
           to_name: client.name || 'Client',
+          name: client.name || 'Client',
           to_email: client.email,
+          email: client.email,
+          client_email: client.email,
+          user_email: client.email,
+          reply_to: STUDIO_EMAIL,
+          from_name: 'Nano Design Studio Dakar',
           quote_id: quote.id,
           service_label: quote.serviceLabel || 'Projet de Design',
           budget: client.budget || 'Non spécifié',
