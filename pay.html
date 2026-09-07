@@ -426,6 +426,14 @@
               Scannez ce QR Code avec votre application <strong>Wave</strong> ou validez le transfert vers le compte marchand officiel :<br>
               <strong style="color: #1BA9E9; font-size: 1.05rem; font-family: var(--font-tech);">+221 78 380 03 69</strong> (Nano Design)
             </p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 0.8rem;">
+              <a href="wave://" class="btn btn-secondary btn-sm" id="btn-open-wave" style="background: #1BA9E9; color: #ffffff; border: none; font-weight: 700; padding: 0.5rem 1rem;">
+                <span>📱 Ouvrir l'application Wave</span>
+              </a>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-wave" style="border-color: rgba(27, 169, 233, 0.4); color: #1BA9E9; padding: 0.5rem 1rem;">
+                <span>📋 Copier le numéro</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -439,6 +447,14 @@
             <div style="font-family: var(--font-tech); font-size: 1.4rem; font-weight: 700; color: #ffffff; margin-top: 0.2rem;" id="om-ussd-code">
               #144#391*100000#
             </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 0.6rem;">
+            <a href="tel:*144*391*100000%23" class="btn btn-secondary btn-sm" id="btn-dial-om" style="background: #FF6600; color: #ffffff; border: none; font-weight: 700; padding: 0.5rem 1rem;">
+              <span>📞 Lancer l'USSD (#144#)</span>
+            </a>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-om" style="border-color: rgba(255, 102, 0, 0.4); color: #FF6600; padding: 0.5rem 1rem;">
+              <span>📋 Copier le numéro</span>
+            </button>
           </div>
           <small style="color: var(--text-muted); font-size: 0.78rem; display: block; text-align: center;">
             Numéro de dépôt studio : +221 78 380 03 69
@@ -699,6 +715,10 @@
       const urlParams = new URLSearchParams(window.location.search);
       const quoteRef = urlParams.get('ref') || urlParams.get('id') || 'ND-2026-4821';
       const customAmountParam = urlParams.get('amount');
+      const clientNameParam = urlParams.get('client') || urlParams.get('name');
+      const serviceParam = urlParams.get('service');
+      const phoneParam = urlParams.get('phone');
+      const companyParam = urlParams.get('company');
 
       // 2. Recherche du devis dans Supabase (avec repli automatique sur le localStorage)
       let quote = null;
@@ -711,11 +731,11 @@
         quote = {
           id: quoteRef,
           date: 'Aujourd’hui',
-          serviceLabel: 'Prestation Créative — Sur-mesure',
+          serviceLabel: serviceParam ? decodeURIComponent(serviceParam) : 'Prestation Créative — Sur-mesure',
           client: {
-            name: 'Client Nano Design',
-            company: 'Entreprise Partenaire',
-            phone: '+221 77 000 00 00',
+            name: clientNameParam ? decodeURIComponent(clientNameParam) : 'Client Nano Design',
+            company: companyParam ? decodeURIComponent(companyParam) : 'Entreprise Partenaire',
+            phone: phoneParam ? decodeURIComponent(phoneParam) : '+221 77 000 00 00',
             email: 'client@nanodesign.sn',
             description: 'Création graphique et design validé avec la direction artistique.'
           },
@@ -723,6 +743,11 @@
           status: 'En attente',
           paymentStatus: 'En attente'
         };
+      } else {
+        if (clientNameParam) quote.client.name = decodeURIComponent(clientNameParam);
+        if (serviceParam) quote.serviceLabel = decodeURIComponent(serviceParam);
+        if (phoneParam) quote.client.phone = decodeURIComponent(phoneParam);
+        if (companyParam) quote.client.company = decodeURIComponent(companyParam);
       }
 
       // Si un montant personnalisé est passé en paramètre URL, l'appliquer
@@ -742,8 +767,33 @@
 
       const rawNumeric = agreedAmount.replace(/[^0-9]/g, '');
       const omCodeEl = document.getElementById('om-ussd-code');
+      const btnDialOm = document.getElementById('btn-dial-om');
       if (omCodeEl) {
         omCodeEl.textContent = `#144#391*${rawNumeric || '100000'}#`;
+      }
+      if (btnDialOm) {
+        btnDialOm.href = `tel:*144*391*${rawNumeric || '100000'}%23`;
+      }
+
+      // Gestionnaires des boutons Copier
+      const btnCopyWave = document.getElementById('btn-copy-wave');
+      const btnCopyOm = document.getElementById('btn-copy-om');
+      const studioNum = '+221783800369';
+
+      function copyTextWithFeedback(btn, text, defaultLabel) {
+        navigator.clipboard.writeText(text).then(() => {
+          btn.innerHTML = `<span>✓ Numéro copié !</span>`;
+          setTimeout(() => { btn.innerHTML = `<span>${defaultLabel}</span>`; }, 2000);
+        }).catch(() => {
+          alert(`Numéro studio : ${text}`);
+        });
+      }
+
+      if (btnCopyWave) {
+        btnCopyWave.addEventListener('click', () => copyTextWithFeedback(btnCopyWave, studioNum, '📋 Copier le numéro'));
+      }
+      if (btnCopyOm) {
+        btnCopyOm.addEventListener('click', () => copyTextWithFeedback(btnCopyOm, studioNum, '📋 Copier le numéro'));
       }
 
       // 4. Gestion des onglets de paiement (Wave, OM, Carte)

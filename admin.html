@@ -2658,10 +2658,19 @@
         const origin = window.location.origin;
         const pathname = window.location.pathname;
         const basePath = pathname.substring(0, pathname.lastIndexOf('/') + 1);
-        const payUrl = `${origin}${basePath}pay.html?ref=${encodeURIComponent(currentPayQuote.id)}&amount=${encodeURIComponent(numOnly)}`;
+        const clientNameEnc = encodeURIComponent(currentPayQuote.client?.name || '');
+        const serviceEnc = encodeURIComponent(currentPayQuote.serviceLabel || '');
+        const clientPhoneEnc = encodeURIComponent(currentPayQuote.client?.phone || '');
+        const payUrl = `${origin}${basePath}pay.html?ref=${encodeURIComponent(currentPayQuote.id)}&amount=${encodeURIComponent(numOnly)}&client=${clientNameEnc}&service=${serviceEnc}&phone=${clientPhoneEnc}`;
 
         // Message WhatsApp pré-rempli pour le client
-        const cleanPhone = (currentPayQuote.client.phone || '').replace(/[^0-9]/g, '');
+        let cleanPhone = (currentPayQuote.client?.phone || '').replace(/[^0-9]/g, '');
+        if (cleanPhone.length === 9 && (cleanPhone.startsWith('7') || cleanPhone.startsWith('3'))) {
+          cleanPhone = '221' + cleanPhone;
+        } else if (cleanPhone.startsWith('00221')) {
+          cleanPhone = cleanPhone.substring(2);
+        }
+
         const waMsg = `Bonjour ${currentPayQuote.client.name},\n\nSuite à notre échange concernant votre projet « ${currentPayQuote.serviceLabel} », voici votre lien sécurisé pour régler le montant convenu de ${enteredAmount} :\n\n👉 ${payUrl}\n\nMoyens de règlement acceptés : Wave, Orange Money ou Carte Bancaire.\nDès validation en ligne, votre Facture Acquittée officielle sera émise instantanément.\n\nRestant à votre entière disposition au studio,\nL'équipe Nano Design Dakar | +221 78 380 03 69`;
 
         if (btnSendPayWa) {
