@@ -81,6 +81,8 @@ nano-design/
     ├── site-analytics.js   # Moteur de tracking d'audience et de conversion en direct
     ├── admin-notifications.js # Alertes sonores Web Audio & notifications de bureau
     ├── admin-dashboard.js  # Fonctions utilitaires et données de secours
+    ├── paydunya-service.js # Passerelle de paiement PayDunya (Wave, OM, CB)
+    ├── security.js         # Protection XSS, rate limiting et assainissement
     └── email-notify.js     # Dispatcheur de notifications email
 ```
 
