@@ -26,10 +26,19 @@
     publicKey: localStorage.getItem('nano_emailjs_public_key') || 'N9a3cGbbjXljXvnW_'
   };
 
+  const storedPayDunya = {
+    masterKey: localStorage.getItem('nano_paydunya_master_key') || 'test_master_nano2026',
+    privateKey: localStorage.getItem('nano_paydunya_private_key') || 'test_private_nano2026',
+    publicKey: localStorage.getItem('nano_paydunya_public_key') || 'test_public_nano2026',
+    token: localStorage.getItem('nano_paydunya_token') || 'test_token_nano2026',
+    mode: localStorage.getItem('nano_paydunya_mode') || 'sandbox' // 'sandbox' ou 'live'
+  };
+
   window.SUPABASE_CONFIG = {
     url: storedUrl,
     anonKey: storedKey,
     emailKey: storedEmailKey,
-    emailJs: storedEmailJs
+    emailJs: storedEmailJs,
+    paydunya: storedPayDunya
   };
 })();

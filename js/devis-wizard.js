@@ -324,7 +324,7 @@
       const btnWhatsApp = document.getElementById('btn-quote-whatsapp');
       if (btnWhatsApp) {
         const waMessage = `Bonjour Nano Design ! Je viens de configurer un devis sur votre site :\n\n• Réf : ${quoteId}\n• Prestation : ${state.serviceLabel}\n• Client : ${state.client.name} (${state.client.company})\n• Contact : ${state.client.phone} / ${state.client.email}\n• Budget : ${state.client.budget}\n• Délai : ${state.client.timeline}\n• Projet : ${state.client.description}\n\nPouvons-nous en discuter ?`;
-        btnWhatsApp.href = `https://wa.me/221778901234?text=${encodeURIComponent(waMessage)}`;
+        btnWhatsApp.href = `https://wa.me/221783800369?text=${encodeURIComponent(waMessage)}`;
       }
 
       // Aller à l'étape 3

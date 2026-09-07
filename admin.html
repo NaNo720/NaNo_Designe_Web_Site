@@ -1031,7 +1031,7 @@
                 <strong>NANO DESIGN DAKAR</strong><br>
                 Studio de Création Numérique, Branding & Signalétique<br>
                 Rue de la Plage, Les Almadies • Dakar, Sénégal<br>
-                Tél / WhatsApp : +221 77 000 00 00 • contact@nanodesign.sn<br>
+                Tél / WhatsApp : +221 78 380 03 69 • nanodesign221@gmail.com<br>
                 <small style="color: var(--text-muted);">NINEA : 009842103 2P2 • RCCM : SN.DKR.2024.B.14820</small>
               </div>
             </div>
@@ -1146,7 +1146,7 @@
             <div class="inv-payment-mode-box">
               <strong>Instructions & Coordonnées Studio :</strong><br>
               • Règlement Mobile Money : <strong>Wave / Orange Money</strong> au <span
-                style="color: var(--gold-light);">+221 77 000 00 00</span><br>
+                style="color: var(--gold-light);">+221 78 380 03 69</span><br>
               • Compte Bancaire : CBAO Groupe Attijariwafa Bank Dakar • Code Banque : SN012<br>
               • Propriété intellectuelle : Droits cédés intégralement à la livraison définitive.
             </div>
@@ -1359,6 +1359,27 @@
             placeholder="0619d3e7-cf84-49b4-8ec6-05b9d9c6245f"
             style="font-family: var(--font-tech); font-size: 0.86rem; padding: 0.5rem 0.8rem;">
           <small style="color: var(--text-muted); font-size: 0.7rem; margin-top: 0.2rem; display: block;">Permet la distribution réelle des alertes de devis et accusés de réception par email.</small>
+        </div>
+
+        <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem; margin-top: 0.2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.78rem; font-weight: 700; color: #34D399; text-transform: uppercase;">Passerelle PayDunya (Wave / OM / CB)</span>
+            <select id="select-paydunya-mode" style="background: #141420; border: 1px solid var(--border-gold); color: var(--gold-light); font-size: 0.72rem; padding: 0.2rem 0.5rem; border-radius: var(--radius-sm);">
+              <option value="sandbox">Mode Test (Sandbox)</option>
+              <option value="live">Mode Réel (Production)</option>
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+            <div class="form-field">
+              <label class="form-label" for="input-paydunya-master" style="font-size: 0.7rem;">Master Key :</label>
+              <input type="text" id="input-paydunya-master" class="form-input" placeholder="test_master_..." style="font-family: var(--font-tech); font-size: 0.8rem; padding: 0.45rem 0.6rem;">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="input-paydunya-token" style="font-size: 0.7rem;">Token API :</label>
+              <input type="text" id="input-paydunya-token" class="form-input" placeholder="test_token_..." style="font-family: var(--font-tech); font-size: 0.8rem; padding: 0.45rem 0.6rem;">
+            </div>
+          </div>
+          <small style="color: var(--text-muted); font-size: 0.68rem; margin-top: 0.25rem; display: block;">Laissez en mode Test pour simuler immédiatement les règlements Wave / Orange Money.</small>
         </div>
 
         <div
@@ -2347,7 +2368,7 @@
 
         // Bouton Email pré-rempli
         const emailSubject = `Re: ${m.subject} — Nano Design Studio Dakar`;
-        const emailBody = `Bonjour ${m.name},\n\nMerci pour votre message concernant « ${m.subject} ».\n\n[Votre réponse ici]\n\nBien cordialement,\nL'équipe Nano Design Studio Dakar\nRue de la Plage, Les Almadies • Dakar, Sénégal\n+221 77 000 00 00 | contact@nanodesign.sn`;
+        const emailBody = `Bonjour ${m.name},\n\nMerci pour votre message concernant « ${m.subject} ».\n\n[Votre réponse ici]\n\nBien cordialement,\nL'équipe Nano Design Studio Dakar\nDakar, Sénégal\n+221 78 380 03 69 | nanodesign221@gmail.com`;
         btnMsgReplyEmail.href = `mailto:${m.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
         // Bouton bascule de statut
@@ -2565,7 +2586,7 @@
 
         // Préparation de l'e-mail officiel
         const emailSubject = `Facture Officielle N° ${invNumber} — Nano Design Studio Dakar`;
-        const emailBody = `Bonjour ${q.client.name},\n\nVeuillez trouver ci-dessous le récapitulatif de votre facture officielle N° ${invNumber} émise par le studio Nano Design Dakar.\n\nProjet : ${q.serviceLabel}\nMontant Net : ${amountDisplay}\nStatut : ${statusWording}\nRéférence devis : ${q.id}\nDate : ${q.date || '05 Septembre 2026'}\n\nCoordonnées de règlement studio :\n• Wave / Orange Money : +221 77 000 00 00\n• CBAO Groupe Attijariwafa Bank Dakar\n\nRestant à votre écoute au studio pour la concrétisation de vos créations.\n\nCordialement,\nNano Design Studio Dakar\nRue de la Plage, Les Almadies • Dakar, Sénégal\n+221 77 000 00 00 | contact@nanodesign.sn`;
+        const emailBody = `Bonjour ${q.client.name},\n\nVeuillez trouver ci-dessous le récapitulatif de votre facture officielle N° ${invNumber} émise par le studio Nano Design Dakar.\n\nProjet : ${q.serviceLabel}\nMontant Net : ${amountDisplay}\nStatut : ${statusWording}\nRéférence devis : ${q.id}\nDate : ${q.date || '05 Septembre 2026'}\n\nCoordonnées de règlement studio :\n• Wave / Orange Money : +221 78 380 03 69\n• CBAO Groupe Attijariwafa Bank Dakar\n\nRestant à votre écoute au studio pour la concrétisation de vos créations.\n\nCordialement,\nNano Design Studio Dakar\nDakar, Sénégal\n+221 78 380 03 69 | nanodesign221@gmail.com`;
 
         btnInvEmail.href = `mailto:${q.client.email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
@@ -2641,7 +2662,7 @@
 
         // Message WhatsApp pré-rempli pour le client
         const cleanPhone = (currentPayQuote.client.phone || '').replace(/[^0-9]/g, '');
-        const waMsg = `Bonjour ${currentPayQuote.client.name},\n\nSuite à notre échange concernant votre projet « ${currentPayQuote.serviceLabel} », voici votre lien sécurisé pour régler le montant convenu de ${enteredAmount} :\n\n👉 ${payUrl}\n\nMoyens de règlement acceptés : Wave, Orange Money ou Carte Bancaire.\nDès validation en ligne, votre Facture Acquittée officielle sera émise instantanément.\n\nRestant à votre entière disposition au studio,\nL'équipe Nano Design Dakar | +221 77 000 00 00`;
+        const waMsg = `Bonjour ${currentPayQuote.client.name},\n\nSuite à notre échange concernant votre projet « ${currentPayQuote.serviceLabel} », voici votre lien sécurisé pour régler le montant convenu de ${enteredAmount} :\n\n👉 ${payUrl}\n\nMoyens de règlement acceptés : Wave, Orange Money ou Carte Bancaire.\nDès validation en ligne, votre Facture Acquittée officielle sera émise instantanément.\n\nRestant à votre entière disposition au studio,\nL'équipe Nano Design Dakar | +221 78 380 03 69`;
 
         if (btnSendPayWa) {
           btnSendPayWa.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`;
@@ -2650,7 +2671,7 @@
         // Email mailto pré-rempli pour le client
         if (btnSendPayEmail) {
           const emailSub = `Lien de règlement sécurisé — Dossier ${currentPayQuote.id} — Nano Design Dakar`;
-          const emailBody = `Bonjour ${currentPayQuote.client.name},\n\nSuite à notre échange, vous trouverez ci-dessous le lien sécurisé pour effectuer le règlement convenu de ${enteredAmount} pour votre projet « ${currentPayQuote.serviceLabel} » :\n\n${payUrl}\n\nMoyens de règlement disponibles : Wave, Orange Money ou Carte Bancaire.\nVotre facture acquittée officielle sera émise immédiatement après validation.\n\nCordialement,\nNano Design Studio Dakar\nRue de la Plage, Les Almadies • Dakar\n+221 77 000 00 00 | contact@nanodesign.sn`;
+          const emailBody = `Bonjour ${currentPayQuote.client.name},\n\nSuite à notre échange, vous trouverez ci-dessous le lien sécurisé pour effectuer le règlement convenu de ${enteredAmount} pour votre projet « ${currentPayQuote.serviceLabel} » :\n\n${payUrl}\n\nMoyens de règlement disponibles : Wave, Orange Money ou Carte Bancaire.\nVotre facture acquittée officielle sera émise immédiatement après validation.\n\nCordialement,\nNano Design Studio Dakar\nDakar, Sénégal\n+221 78 380 03 69 | nanodesign221@gmail.com`;
           btnSendPayEmail.href = `mailto:${currentPayQuote.client.email}?subject=${encodeURIComponent(emailSub)}&body=${encodeURIComponent(emailBody)}`;
         }
 
@@ -2806,6 +2827,13 @@
           if (inputSupabaseUrl) inputSupabaseUrl.value = cfg.url || localStorage.getItem('nano_supabase_url') || '';
           if (inputSupabaseKey) inputSupabaseKey.value = cfg.anonKey || localStorage.getItem('nano_supabase_key') || '';
           if (inputWeb3FormsKey) inputWeb3FormsKey.value = localStorage.getItem('nano_web3forms_key') || cfg.emailKey || '0619d3e7-cf84-49b4-8ec6-05b9d9c6245f';
+          const inputPdMaster = document.getElementById('input-paydunya-master');
+          const inputPdToken = document.getElementById('input-paydunya-token');
+          const selectPdMode = document.getElementById('select-paydunya-mode');
+          if (inputPdMaster) inputPdMaster.value = localStorage.getItem('nano_paydunya_master_key') || '';
+          if (inputPdToken) inputPdToken.value = localStorage.getItem('nano_paydunya_token') || '';
+          if (selectPdMode) selectPdMode.value = localStorage.getItem('nano_paydunya_mode') || 'sandbox';
+
           updateDbStatusUi();
           modalSupabase.classList.add('is-open');
         });
@@ -2830,11 +2858,19 @@
             if (window.SUPABASE_CONFIG) window.SUPABASE_CONFIG.emailKey = emailK;
           }
 
+          // Enregistrement des clés PayDunya
+          const pdMaster = document.getElementById('input-paydunya-master');
+          const pdToken = document.getElementById('input-paydunya-token');
+          const pdMode = document.getElementById('select-paydunya-mode');
+          if (pdMaster && pdMaster.value.trim()) localStorage.setItem('nano_paydunya_master_key', pdMaster.value.trim());
+          if (pdToken && pdToken.value.trim()) localStorage.setItem('nano_paydunya_token', pdToken.value.trim());
+          if (pdMode) localStorage.setItem('nano_paydunya_mode', pdMode.value);
+
           if (window.nanoDB) {
             window.nanoDB.setCredentials(url, key);
             updateDbStatusUi();
             modalSupabase.classList.remove('is-open');
-            showToast('Paramètres Supabase & Email enregistrés avec succès !');
+            showToast('Paramètres Supabase, Email & PayDunya enregistrés !');
             await renderDashboard();
           }
         });

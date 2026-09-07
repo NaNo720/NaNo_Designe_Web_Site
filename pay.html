@@ -349,9 +349,32 @@
           <div class="pay-amount-val" id="pay-total-amount">100 000 FCFA</div>
         </div>
 
-        <!-- Sélection du Moyen de Paiement -->
+        <!-- PASSERELLE UNIFIÉE PAYDUNYA (WAVE, ORANGE MONEY, FREE MONEY, CARTE) -->
+        <div style="background: rgba(0, 135, 90, 0.08); border: 1px solid rgba(0, 135, 90, 0.35); border-radius: var(--radius-md); padding: 1.2rem; margin-bottom: 1.8rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="background: #00875A; color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 4px; text-transform: uppercase;">Passerelle PayDunya</span>
+              <span style="font-size: 0.78rem; color: #34D399;">● Mode Sécurisé Actif</span>
+            </div>
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Agréé Banque Centrale UEMOA</span>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 1rem 0;">
+            Encaissement immédiat avec redirection automatique vers votre compte <strong>Wave</strong>, <strong>Orange Money</strong> ou <strong>Carte Bancaire</strong>.
+          </p>
+          <button type="button" class="btn btn-primary" id="btn-paydunya-direct" style="width: 100%; background: linear-gradient(135deg, #00875A 0%, #00B074 100%); border: none; font-weight: 600; padding: 0.9rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span id="btn-paydunya-text">Payer instantanément avec PayDunya</span>
+          </button>
+        </div>
+
+        <div style="position: relative; text-align: center; margin: 1.5rem 0;">
+          <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+          <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #0E0E18; padding: 0 1rem; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">ou coordonnées directes du studio</span>
+        </div>
+
+        <!-- Sélection du Moyen de Paiement Direct -->
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.7rem; font-weight: 600;">
-          Choisissez votre moyen de paiement au Sénégal :
+          Règlement direct par numéro studio :
         </p>
 
         <div class="pay-tabs">
@@ -401,7 +424,7 @@
             </div>
             <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0;">
               Scannez ce QR Code avec votre application <strong>Wave</strong> ou validez le transfert vers le compte marchand officiel :<br>
-              <strong style="color: #1BA9E9; font-size: 1.05rem; font-family: var(--font-tech);">+221 77 000 00 00</strong> (Nano Design)
+              <strong style="color: #1BA9E9; font-size: 1.05rem; font-family: var(--font-tech);">+221 78 380 03 69</strong> (Nano Design)
             </p>
           </div>
         </div>
@@ -418,7 +441,7 @@
             </div>
           </div>
           <small style="color: var(--text-muted); font-size: 0.78rem; display: block; text-align: center;">
-            Numéro de dépôt studio : +221 77 000 00 00
+            Numéro de dépôt studio : +221 78 380 03 69
           </small>
         </div>
 
@@ -541,8 +564,8 @@
               <div class="inv-studio-meta">
                 <strong>NANO DESIGN DAKAR</strong><br>
                 Studio de Création Numérique, Branding & Signalétique<br>
-                Rue de la Plage, Les Almadies • Dakar, Sénégal<br>
-                Tél / WhatsApp : +221 77 000 00 00 • contact@nanodesign.sn<br>
+                Dakar, Sénégal<br>
+                Tél / WhatsApp : +221 78 380 03 69 • nanodesign221@gmail.com<br>
                 <small style="color: var(--text-muted);">NINEA : 009842103 2P2 • RCCM : SN.DKR.2024.B.14820</small>
               </div>
             </div>
@@ -658,13 +681,14 @@
   </div>
 
   <footer class="pay-footer">
-    © 2026 Nano Design Studio Dakar. Tous droits réservés. • Rue de la Plage, Les Almadies, Dakar, Sénégal • +221 77 000 00 00
+    © 2026 Nano Design Studio Dakar. Tous droits réservés. • Dakar, Sénégal • +221 78 380 03 69 • <a href="mentions-legales.html" style="color: inherit; text-decoration: underline;">Mentions Légales</a> • <a href="confidentialite.html" style="color: inherit; text-decoration: underline;">Confidentialité</a>
   </footer>
 
   <!-- Supabase Client & Base de Données Temps Réel -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/supabase-client.js"></script>
+  <script src="js/paydunya-service.js"></script>
 
   <!-- Script de logique de paiement client -->
   <script>
@@ -749,8 +773,47 @@
 
       // 5. Validation du paiement par le client
       const btnSubmit = document.getElementById('btn-submit-payment');
+      const btnPayDunya = document.getElementById('btn-paydunya-direct');
       const checkoutSec = document.getElementById('pay-checkout-section');
       const successSec = document.getElementById('pay-success-section');
+
+      // 5.1 Déclencheur Paiement Express PayDunya (Wave, OM, Free, Carte)
+      if (btnPayDunya) {
+        btnPayDunya.addEventListener('click', async () => {
+          btnPayDunya.disabled = true;
+          btnPayDunya.innerHTML = `<span>Initialisation sécurisée PayDunya...</span>`;
+
+          const numericAmount = agreedAmount.replace(/[^0-9]/g, '') || '100000';
+          const invRes = await window.NanoPayDunya.createInvoice(quote, numericAmount);
+
+          if (invRes && invRes.redirectUrl) {
+            // Redirection vers le guichet officiel PayDunya Live
+            window.location.href = invRes.redirectUrl;
+          } else {
+            // Mode Sandbox / Simulation de guichet instantané
+            setTimeout(async () => {
+              const confirmRes = await window.NanoPayDunya.confirmPayment(quote.id, {
+                provider: 'PayDunya (Wave / Orange Money)',
+                amount: agreedAmount,
+                txn: `PAYDUNYA-SN-2026-${Math.floor(100000 + Math.random() * 900000)}`
+              });
+
+              // Mise à jour de l'écran de succès
+              document.getElementById('success-paid-amount').textContent = agreedAmount;
+              document.getElementById('success-paid-provider').textContent = 'PayDunya (Wave / Orange Money / CB)';
+              document.getElementById('success-txn-ref').textContent = confirmRes.txn;
+              document.getElementById('success-paid-date').textContent = confirmRes.paidDate;
+
+              const whatsappStudioText = `Bonjour l'équipe Nano Design Dakar,\n\nJe viens de régler le montant de ${agreedAmount} pour mon projet « ${quote.serviceLabel} » (Réf : ${quote.id}) via la passerelle PayDunya.\nTransaction : ${confirmRes.txn}\n\nMerci de me confirmer la bonne réception pour le lancement de mon projet !`;
+              document.getElementById('btn-client-notify-whatsapp').href = `https://wa.me/221783800369?text=${encodeURIComponent(whatsappStudioText)}`;
+
+              checkoutSec.style.display = 'none';
+              successSec.style.display = 'block';
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 900);
+          }
+        });
+      }
 
       btnSubmit.addEventListener('click', () => {
         // Animation du bouton
@@ -794,7 +857,7 @@
 
           // Mise à jour du lien WhatsApp studio
           const whatsappStudioText = `Bonjour l'équipe Nano Design Dakar,\n\nJe viens de régler le montant de ${agreedAmount} pour mon projet « ${quote.serviceLabel} » (Réf : ${quote.id}).\nTransaction : ${txnHash}\nMode : ${providerLabel}.\n\nMerci de me confirmer la bonne réception pour le lancement de mon projet !`;
-          document.getElementById('btn-client-notify-whatsapp').href = `https://wa.me/221770000000?text=${encodeURIComponent(whatsappStudioText)}`;
+          document.getElementById('btn-client-notify-whatsapp').href = `https://wa.me/221783800369?text=${encodeURIComponent(whatsappStudioText)}`;
 
           // Afficher l'écran de succès
           checkoutSec.style.display = 'none';

@@ -21,6 +21,14 @@
     {
       "source": "/paiement",
       "destination": "/pay.html"
+    },
+    {
+      "source": "/mentions-legales",
+      "destination": "/mentions-legales.html"
+    },
+    {
+      "source": "/confidentialite",
+      "destination": "/confidentialite.html"
     }
   ],
   "headers": [
