@@ -21,9 +21,9 @@
   const storedEmailKey = localStorage.getItem('nano_web3forms_key') || '0619d3e7-cf84-49b4-8ec6-05b9d9c6245f';
 
   const storedEmailJs = {
-    serviceId: localStorage.getItem('nano_emailjs_service') || 'service_0raoojt',
-    templateId: localStorage.getItem('nano_emailjs_template') || 'template_40mfxpr',
-    publicKey: localStorage.getItem('nano_emailjs_public_key') || '0vkvmlxtl6c0kAPls'
+    serviceId: localStorage.getItem('nano_emailjs_service') || 'service_yz4recq',
+    templateId: localStorage.getItem('nano_emailjs_template') || 'template_so07v9n',
+    publicKey: localStorage.getItem('nano_emailjs_public_key') || 'N9a3cGbbjXljXvnW_'
   };
 
   window.SUPABASE_CONFIG = {

@@ -25,9 +25,9 @@
   function getEmailJsConfig() {
     const defaultCfg = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.emailJs) || {};
     return {
-      serviceId: localStorage.getItem('nano_emailjs_service') || defaultCfg.serviceId || 'service_0raoojt',
-      templateId: localStorage.getItem('nano_emailjs_template') || defaultCfg.templateId || 'template_40mfxpr',
-      publicKey: localStorage.getItem('nano_emailjs_public_key') || defaultCfg.publicKey || '0vkvmlxtl6c0kAPls'
+      serviceId: localStorage.getItem('nano_emailjs_service') || defaultCfg.serviceId || 'service_yz4recq',
+      templateId: localStorage.getItem('nano_emailjs_template') || defaultCfg.templateId || 'template_so07v9n',
+      publicKey: localStorage.getItem('nano_emailjs_public_key') || defaultCfg.publicKey || 'N9a3cGbbjXljXvnW_'
     };
   }
 
