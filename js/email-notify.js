@@ -17,7 +17,7 @@
     return (
       (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.emailKey) ||
       localStorage.getItem('nano_web3forms_key') ||
-      '0619d3e7-cf84-49b4-8ec6-05b9d9c6245f'
+      '0777b34c-a98d-4e14-8bad-7ef0b12646f4'
     );
   }
 
