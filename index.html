@@ -1087,18 +1087,31 @@
             </div>
           </div>
 
-          <!-- Carte de Localisation Intégrée (Google Maps Dakar) -->
+          <!-- Carte de Localisation Intégrée (Dakar - Almadies) -->
           <div class="map-embed-wrapper">
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15432.840263640206!2d-17.525543128913926!3d14.75013098319696!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xec112ee744747c3%3A0x6a0f7ca623b05481!2sLes%20Almadies%2C%20Dakar%2C%20Senegal!5e0!3m2!1sfr!2s!4v1709500000000!5m2!1sfr!2s" 
+              src="https://www.openstreetmap.org/export/embed.html?bbox=-17.5380%2C14.7380%2C-17.5120%2C14.7620&amp;layer=mapnik&amp;marker=14.7501%2C-17.5255" 
               width="100%" 
-              height="240" 
+              height="260" 
               style="border:0;" 
-              allowfullscreen="" 
               loading="lazy" 
-              referrerpolicy="no-referrer-when-downgrade"
-              title="Localisation de Nano Design aux Almadies Dakar">
+              title="Carte de localisation de Nano Design aux Almadies Dakar">
             </iframe>
+
+            <!-- Bouton Direct Google Maps GPS -->
+            <a href="https://maps.google.com/?q=Les+Almadies,+Dakar,+Senegal" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="map-gps-btn" 
+               title="Ouvrir dans Google Maps">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              <span>Itinéraire GPS ↗</span>
+            </a>
+
             <div class="map-badge-dakar">
               <span class="status-indicator"></span>
               <span>Studio Nano Design • Almadies Dakar</span>
