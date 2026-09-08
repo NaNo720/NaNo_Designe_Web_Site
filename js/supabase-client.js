@@ -384,6 +384,30 @@
     // ========================================================================
     // GESTION DU PORTFOLIO / RÉALISATIONS
     // ========================================================================
+    async checkPortfolioStatus() {
+      const cli = this.getClient();
+      if (!cli) return { connected: false, tableExists: false, error: 'Supabase non configuré' };
+
+      try {
+        const { data, error } = await cli
+          .from('portfolio_projects')
+          .select('id')
+          .limit(1);
+
+        if (error) {
+          const isTableMissing = error.code === 'PGRST205' || (error.message && error.message.includes('not find the table'));
+          return {
+            connected: true,
+            tableExists: !isTableMissing,
+            error: error.message || error.code || 'Erreur d’accès'
+          };
+        }
+        return { connected: true, tableExists: true, error: null };
+      } catch (err) {
+        return { connected: false, tableExists: false, error: err.message };
+      }
+    },
+
     async getProjects() {
       const cli = this.getClient();
       if (cli) {
@@ -393,14 +417,36 @@
             .select('*')
             .order('created_at', { ascending: false });
 
-          if (!error && Array.isArray(data) && data.length > 0) {
-            const mapped = data.map(dbToProject);
-            localStorage.setItem('nano_portfolio', JSON.stringify(mapped));
-            return mapped;
+          if (!error && Array.isArray(data)) {
+            if (data.length > 0) {
+              const mapped = data.map(dbToProject);
+              try {
+                localStorage.setItem('nano_portfolio', JSON.stringify(mapped));
+              } catch (e) {
+                console.warn('[NanoDB] Quota localStorage dépassé lors de la mise en cache:', e);
+              }
+              return mapped;
+            } else {
+              // Table existante mais vide : vérifier si des projets locaux existent
+              const stored = localStorage.getItem('nano_portfolio');
+              if (stored) {
+                try {
+                  const localList = JSON.parse(stored);
+                  if (Array.isArray(localList) && localList.length > 0) return localList;
+                } catch (e) { }
+              }
+              return defaultProjects;
+            }
           }
-        } catch (e) { }
+          if (error) {
+            console.warn('[NanoDB] Table portfolio_projects inaccessible sur Supabase (code: ' + (error.code || '') + ') - Repli local:', error.message);
+          }
+        } catch (e) {
+          console.warn('[NanoDB] Exception Supabase getProjects:', e);
+        }
       }
 
+      // Repli sur le stockage local ou projets par défaut
       try {
         const stored = localStorage.getItem('nano_portfolio');
         if (stored) return JSON.parse(stored);
@@ -419,7 +465,8 @@
         projObj.createdAt = new Date().toISOString();
       }
 
-      // 1. Sauvegarde locale immédiate
+      // 1. Sauvegarde locale immédiate (avec fallback safe)
+      let localSaved = false;
       try {
         const stored = localStorage.getItem('nano_portfolio');
         const existing = stored ? JSON.parse(stored) : [...defaultProjects];
@@ -427,13 +474,19 @@
         if (idx >= 0) existing[idx] = projObj;
         else existing.unshift(projObj);
         localStorage.setItem('nano_portfolio', JSON.stringify(existing));
-      } catch (e) { }
+        localSaved = true;
+      } catch (e) {
+        console.warn('[NanoDB] Erreur stockage local (quota):', e);
+      }
 
-      // 2. Envoi Supabase
+      // 2. Envoi Supabase (Base de données Cloud partagée Mobile + Desktop)
       const cli = this.getClient();
+      let cloudSaved = false;
+      let cloudError = null;
+
       if (cli) {
         try {
-          await cli.from('portfolio_projects').upsert({
+          const { data, error } = await cli.from('portfolio_projects').upsert({
             id: projObj.id,
             title: projObj.title,
             client: projObj.client,
@@ -445,14 +498,30 @@
             project_url: projObj.projectUrl || null,
             created_at: projObj.createdAt
           }, { onConflict: 'id' });
-          console.log('[NanoDB] Projet portfolio synchronisé sur Supabase:', projObj.id);
+
+          if (error) {
+            cloudError = error.message || error.code || 'Erreur Supabase';
+            console.warn('[NanoDB] Échec synchronisation Supabase saveProject:', cloudError);
+          } else {
+            console.log('[NanoDB] Projet portfolio synchronisé sur Supabase (Cloud):', projObj.id);
+            cloudSaved = true;
+          }
         } catch (e) {
-          console.warn('[NanoDB] Erreur saveProject Supabase:', e);
+          cloudError = e.message || 'Exception réseau Supabase';
+          console.warn('[NanoDB] Exception saveProject Supabase:', e);
         }
+      } else {
+        cloudError = 'Client Supabase non initialisé';
       }
 
-      window.dispatchEvent(new CustomEvent('nanoProjectSaved', { detail: projObj }));
-      return projObj;
+      window.dispatchEvent(new CustomEvent('nanoProjectSaved', { detail: { project: projObj, cloudSaved, cloudError } }));
+      return {
+        success: cloudSaved,
+        localSaved,
+        cloudSaved,
+        error: cloudError,
+        project: projObj
+      };
     },
 
     async deleteProject(projId) {
@@ -464,14 +533,54 @@
       } catch (e) { }
 
       const cli = this.getClient();
+      let cloudDeleted = false;
       if (cli) {
         try {
-          await cli.from('portfolio_projects').delete().eq('id', projId);
+          const { error } = await cli.from('portfolio_projects').delete().eq('id', projId);
+          if (!error) cloudDeleted = true;
         } catch (e) { }
       }
 
-      window.dispatchEvent(new CustomEvent('nanoProjectDeleted', { detail: { id: projId } }));
+      window.dispatchEvent(new CustomEvent('nanoProjectDeleted', { detail: { id: projId, cloudDeleted } }));
       return true;
+    },
+
+    async syncAllLocalProjectsToCloud() {
+      const cli = this.getClient();
+      if (!cli) return { success: false, error: 'Client Supabase non configuré' };
+
+      let localList = [];
+      try {
+        const stored = localStorage.getItem('nano_portfolio');
+        if (stored) localList = JSON.parse(stored);
+      } catch (e) { }
+
+      if (!localList || localList.length === 0) {
+        localList = defaultProjects;
+      }
+
+      const rows = localList.map(p => ({
+        id: p.id,
+        title: p.title,
+        client: p.client,
+        category: p.category,
+        category_label: p.categoryLabel || p.category,
+        description: p.description,
+        tags: Array.isArray(p.tags) ? p.tags.join(', ') : (p.tags || ''),
+        image_url: p.imageUrl || null,
+        project_url: p.projectUrl || null,
+        created_at: p.createdAt || new Date().toISOString()
+      }));
+
+      try {
+        const { data, error } = await cli.from('portfolio_projects').upsert(rows, { onConflict: 'id' });
+        if (error) {
+          return { success: false, error: error.message || error.code };
+        }
+        return { success: true, count: rows.length };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
     },
 
     subscribeProjects(callback) {

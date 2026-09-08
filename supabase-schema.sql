@@ -147,22 +147,15 @@ CREATE POLICY "Permettre la lecture publique du portfolio"
 ON public.portfolio_projects FOR SELECT
 USING (true);
 
--- Modifications/Suppressions : Réservées aux administrateurs
+-- Modifications/Suppressions/Créations : Permises pour l'espace Studio
 DROP POLICY IF EXISTS "Permettre l'ajout de projet portfolio" ON public.portfolio_projects;
-CREATE POLICY "Permettre l'ajout de projet portfolio"
-ON public.portfolio_projects FOR INSERT
-WITH CHECK (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
-
 DROP POLICY IF EXISTS "Permettre la modification de projet portfolio" ON public.portfolio_projects;
-CREATE POLICY "Permettre la modification de projet portfolio"
-ON public.portfolio_projects FOR UPDATE
-USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated')
-WITH CHECK (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
-
 DROP POLICY IF EXISTS "Permettre la suppression de projet portfolio" ON public.portfolio_projects;
-CREATE POLICY "Permettre la suppression de projet portfolio"
-ON public.portfolio_projects FOR DELETE
-USING (auth.role() = 'authenticated' OR auth.jwt() IS NOT NULL OR current_user = 'authenticated');
+DROP POLICY IF EXISTS "Permettre gestion du portfolio" ON public.portfolio_projects;
+CREATE POLICY "Permettre gestion du portfolio"
+ON public.portfolio_projects FOR ALL
+USING (true)
+WITH CHECK (true);
 
 -- ------------------------------------------------------------------------------
 -- B. Politiques pour la table "quotes" (Dossiers Devis Privés)
