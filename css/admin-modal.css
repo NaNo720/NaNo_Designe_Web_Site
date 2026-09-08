@@ -176,6 +176,14 @@
 @media (max-width: 900px) {
   .admin-stats-overview {
     grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-stats-overview {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
   }
 }
 
@@ -1106,6 +1114,134 @@
 .db-status-dot.is-connected {
   background: #10b981;
   box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN MODALES & FACTURE (MOBILE)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .admin-window {
+    height: 92vh;
+    border-radius: var(--radius-md);
+  }
+
+  .admin-top-bar {
+    padding: 0.8rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .admin-content-area {
+    padding: 1rem 0.8rem;
+  }
+
+  .payment-simulation-modal,
+  .invoice-modal-overlay {
+    padding: 0.6rem 0.5rem !important;
+  }
+
+  .payment-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 1.2rem 1rem !important;
+    margin: 0.5rem auto !important;
+  }
+
+  .invoice-modal-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0.5rem auto !important;
+  }
+
+  .invoice-actions-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 0.85rem 1rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .invoice-actions-left {
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+
+  .invoice-actions-right {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+  }
+
+  .invoice-actions-right .btn-invoice-close {
+    grid-column: span 2;
+    width: 100% !important;
+    border-radius: var(--radius-sm) !important;
+    height: 38px !important;
+    background: rgba(230, 57, 70, 0.15) !important;
+    color: #FF6B7A !important;
+    border: 1px solid rgba(230, 57, 70, 0.3) !important;
+    margin-left: 0 !important;
+  }
+
+  .btn-invoice-action {
+    padding: 0.45rem 0.65rem !important;
+    font-size: 0.75rem !important;
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .invoice-modal-body {
+    padding: 0.9rem 0.7rem !important;
+  }
+
+  .invoice-paper {
+    padding: 1.4rem 1rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  .inv-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1.2rem !important;
+    padding-bottom: 1.2rem !important;
+    margin-bottom: 1.4rem !important;
+  }
+
+  .inv-doc-col {
+    text-align: left !important;
+    align-items: flex-start !important;
+  }
+
+  .inv-grid-two-cols {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .inv-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .inv-table {
+    min-width: 480px;
+  }
+
+  .inv-totals-wrap {
+    justify-content: stretch !important;
+  }
+
+  .inv-totals-box {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .inv-signature-zone {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 1.4rem !important;
+  }
 }
 
 /* ==========================================================================
