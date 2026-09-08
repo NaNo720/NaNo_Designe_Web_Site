@@ -290,6 +290,43 @@
       font-size: 0.8rem;
       color: var(--text-muted);
     }
+
+    @media (max-width: 640px) {
+      .pay-header {
+        padding: 1rem 1.2rem;
+      }
+      .pay-logo-wrap img {
+        height: 52px;
+      }
+      .pay-security-badge {
+        font-size: 0.72rem;
+        padding: 0.35rem 0.65rem;
+      }
+      .pay-security-badge span {
+        display: none;
+      }
+      .pay-security-badge::after {
+        content: "Sécurisé";
+      }
+      .pay-main-container {
+        padding: 1.5rem 1rem;
+      }
+      .pay-card {
+        padding: 1.8rem 1.2rem;
+        border-radius: var(--radius-md);
+      }
+      .pay-amount-val {
+        font-size: 1.85rem;
+      }
+      .pay-tabs {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.4rem;
+      }
+      .pay-tab-pill {
+        padding: 0.65rem 0.3rem;
+        font-size: 0.75rem;
+      }
+    }
   </style>
 </head>
 <body class="pay-page">

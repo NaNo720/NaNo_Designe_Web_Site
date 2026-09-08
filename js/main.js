@@ -61,7 +61,8 @@
       navMenu.classList.toggle('is-open');
     });
 
-    navLinks.forEach(link => {
+    // Fermer le menu lors du clic sur n'importe quel lien du menu (y compris le bouton Devis)
+    navMenu.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
         navMenu.classList.remove('is-open');
       });
