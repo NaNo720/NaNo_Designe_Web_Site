@@ -195,8 +195,7 @@
   // SVGs vectoriels haute fidélité pour les réalisations initiales ou fallback
   function getProjectThumbnailHtml(project) {
     if (project.imageUrl && project.imageUrl.trim()) {
-      const isLogo = project.category === 'logos' || project.category === 'logo';
-      return `<img src="${project.imageUrl}" alt="${project.title}" class="project-thumb-img ${isLogo ? 'thumb-logo' : ''}" loading="lazy">`;
+      return `<img src="${project.imageUrl}" alt="${project.title}" class="project-thumb-img" loading="lazy">`;
     }
 
     switch (project.id) {

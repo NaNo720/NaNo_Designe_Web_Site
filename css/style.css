@@ -954,30 +954,24 @@ button, input, textarea, select {
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Présentation spécifique Logos & Branding pour une netteté absolue sans étirement ni pixellisation */
+/* Remplissage bord à bord harmonisé pour toutes les réalisations (Sites, Logos, Signalétique) */
 .project-card[data-category="logos"] .project-thumb-wrapper,
 .project-card[data-category="logo"] .project-thumb-wrapper {
-  background: radial-gradient(circle at 50% 50%, #171726 0%, #07070B 100%);
-  padding: 1.5rem;
+  padding: 0;
 }
 
 .project-card[data-category="logos"] .project-thumb-img,
 .project-card[data-category="logo"] .project-thumb-img,
 .project-thumb-img.thumb-logo {
-  object-fit: contain !important;
-  max-width: 82% !important;
-  max-height: 82% !important;
-  width: auto !important;
-  height: auto !important;
-  margin: auto !important;
-  image-rendering: -webkit-optimize-contrast;
-  border-radius: var(--radius-sm);
-  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.5));
-}
-
-.project-card[data-category="logos"]:hover .project-thumb-img,
-.project-card[data-category="logo"]:hover .project-thumb-img {
-  transform: scale(1.03);
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  filter: none !important;
 }
 
 .project-card:hover .project-thumb-svg,
