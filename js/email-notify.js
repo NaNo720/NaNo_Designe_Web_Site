@@ -126,28 +126,38 @@ https://nanodesign.sn/admin.html
         return { success: false, reason: 'missing_config' };
       }
 
-      const payload = {
-        service_id: emailJs.serviceId,
-        template_id: emailJs.templateId,
-        user_id: emailJs.publicKey,
-        template_params: {
-          to_name: client.name || 'Client',
-          name: client.name || 'Client',
-          to_email: client.email,
-          email: client.email,
-          client_email: client.email,
-          user_email: client.email,
-          reply_to: STUDIO_EMAIL,
-          from_name: 'Nano Design Studio Dakar',
-          quote_id: quote.id,
-          service_label: quote.serviceLabel || 'Projet de Design',
-          budget: client.budget || 'Non spécifié',
-          timeline: client.timeline || 'Non spécifié',
-          description: client.description || 'Projet confié à l\'équipe Nano Design.'
-        }
+      const templateParams = {
+        to_name: client.name || 'Client',
+        name: client.name || 'Client',
+        to_email: client.email,
+        email: client.email,
+        client_email: client.email,
+        user_email: client.email,
+        reply_to: STUDIO_EMAIL,
+        from_name: 'Nano Design Studio Dakar',
+        quote_id: quote.id,
+        service_label: quote.serviceLabel || 'Projet de Design',
+        budget: client.budget || 'Non spécifié',
+        timeline: client.timeline || 'Non spécifié',
+        description: client.description || 'Projet confié à l\'équipe Nano Design.'
       };
 
       try {
+        // Priorité 1 : Utiliser le SDK officiel EmailJS chargé dans la page
+        if (window.emailjs && typeof window.emailjs.send === 'function') {
+          const res = await window.emailjs.send(emailJs.serviceId, emailJs.templateId, templateParams, emailJs.publicKey);
+          console.log('[NanoNotify] Accusé de réception client envoyé via EmailJS SDK:', res);
+          return { success: true, sdk: true };
+        }
+
+        // Priorité 2 : Fallback via l'API REST EmailJS
+        const payload = {
+          service_id: emailJs.serviceId,
+          template_id: emailJs.templateId,
+          user_id: emailJs.publicKey,
+          template_params: templateParams
+        };
+
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
           method: 'POST',
           headers: {
@@ -158,7 +168,7 @@ https://nanodesign.sn/admin.html
         });
 
         if (response.ok) {
-          console.log('[NanoNotify] Accusé de réception devis transmis au client via EmailJS avec succès.');
+          console.log('[NanoNotify] Accusé de réception devis transmis au client via EmailJS REST avec succès.');
           return { success: true };
         } else {
           const errData = await response.text();
