@@ -91,6 +91,15 @@
       }
     });
 
+    // Maj des lignes de liaison
+    document.querySelectorAll('.wizard-step-line').forEach((line, idx) => {
+      if (stepNumber > idx + 1) {
+        line.classList.add('completed');
+      } else {
+        line.classList.remove('completed');
+      }
+    });
+
     // Maj des panneaux
     paneStep1.classList.remove('is-active');
     paneStep2.classList.remove('is-active');

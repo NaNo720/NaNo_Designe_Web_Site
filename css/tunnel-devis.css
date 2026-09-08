@@ -29,21 +29,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-@media (max-width: 640px) {
-  .wizard-progress-bar-container {
-    padding: 1.2rem;
-  }
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .wizard-steps-indicator {
   display: flex;
   align-items: center;
-  gap: 2rem;
   width: 100%;
   justify-content: space-between;
   position: relative;
+  box-sizing: border-box;
 }
 
 .wizard-step-node {
@@ -53,6 +49,43 @@
   position: relative;
   z-index: 2;
   cursor: default;
+  flex-shrink: 0;
+}
+
+.wizard-step-line {
+  flex-grow: 1;
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 0 1.2rem;
+  transition: all var(--transition-normal);
+}
+
+.wizard-step-line.completed {
+  background: var(--gold-primary);
+  box-shadow: 0 0 10px rgba(201, 168, 76, 0.4);
+}
+
+@media (max-width: 640px) {
+  .wizard-progress-bar-container {
+    padding: 1rem 1.15rem;
+  }
+  .wizard-steps-indicator {
+    gap: 0;
+    width: 100%;
+  }
+  .wizard-step-node {
+    gap: 0;
+    flex-shrink: 0;
+  }
+  .node-number {
+    width: 34px;
+    height: 34px;
+    font-size: 0.8rem;
+  }
+  .wizard-step-line {
+    margin: 0 0.5rem;
+    min-width: 18px;
+  }
 }
 
 .node-number {
