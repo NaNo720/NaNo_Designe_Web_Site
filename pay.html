@@ -291,6 +291,41 @@
       color: var(--text-muted);
     }
 
+    /* Séparateur Flex fluide (anti-chevauchement de texte) */
+    .pay-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 1.8rem 0 1.2rem;
+      gap: 0.8rem;
+    }
+
+    .pay-divider::before,
+    .pay-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .pay-divider-text {
+      font-family: var(--font-tech);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .pay-direct-title {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
     @media (max-width: 640px) {
       .pay-header {
         padding: 1rem 1.2rem;
@@ -325,6 +360,18 @@
       .pay-tab-pill {
         padding: 0.65rem 0.3rem;
         font-size: 0.75rem;
+      }
+      .pay-divider {
+        margin: 1.4rem 0 1rem;
+        gap: 0.5rem;
+      }
+      .pay-divider-text {
+        font-size: 0.68rem;
+        letter-spacing: 0.05em;
+      }
+      .pay-direct-title {
+        font-size: 0.8rem;
+        margin-bottom: 0.65rem;
       }
     }
   </style>
@@ -404,14 +451,13 @@
           </button>
         </div>
 
-        <div style="position: relative; text-align: center; margin: 1.5rem 0;">
-          <hr style="border: 0; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-          <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #0E0E18; padding: 0 1rem; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">ou coordonnées directes du studio</span>
+        <div class="pay-divider">
+          <span class="pay-divider-text">Ou règlement manuel direct</span>
         </div>
 
         <!-- Sélection du Moyen de Paiement Direct -->
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.7rem; font-weight: 600;">
-          Règlement direct par numéro studio :
+        <p class="pay-direct-title">
+          Coordonnées directes des comptes Nano Design :
         </p>
 
         <div class="pay-tabs">
