@@ -115,7 +115,7 @@ Le projet a été conçu en **Vanilla HTML/CSS/JavaScript moderne**, sans build 
    * Ou depuis `index.html` : appuyer sur le raccourci secret `Ctrl + Shift + A`
    * **Identifiants par défaut** :
      * **Identifiant** : `admin`
-     * **Mot de passe** : `nano2026`
+     * **Mot de passe** : `nano2026#`
 
 ---
 

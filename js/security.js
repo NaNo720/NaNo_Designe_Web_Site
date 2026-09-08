@@ -15,11 +15,11 @@
       lockoutDurationMs: 5 * 60 * 1000, // 5 minutes de blocage en cas de brute-force
       salt: 'nano_studio_dakar_salt_2026_x89a',
       // Empreinte SHA-256 pré-calculée du mot de passe studio maître avec le sel ci-dessus
-      // Mot de passe initial sécurisé : "nano2026"
+      // Mot de passe initial sécurisé : "nano2026#"
       // Aucun mot de passe en clair n'est présent dans le code source
       adminUserHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918',   // SHA-256 de 'admin'
       contactUserHash: '90c32477dadc86d0412cc4bd34b11ef3d9586855dccac0490d6e9bfe9c607305', // SHA-256 de 'contact@nanodesign.sn'
-      masterHash: 'ba7022e0b53206e748c33ce9e7553cff5cace9ff5ae29834da17c88bb3f8de40'        // SHA-256 de 'nano2026' + salt
+      masterHash: 'e5c5fe575071b01ce12243a3fac957e2131e51a72011cda5d04994206bfc5a8c'        // SHA-256 de 'nano2026#' + salt
     },
 
     // ==========================================================================
