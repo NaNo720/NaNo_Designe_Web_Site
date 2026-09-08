@@ -1272,8 +1272,8 @@ button, input, textarea, select {
 }
 
 .faq-icon-cross {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
@@ -1283,12 +1283,26 @@ button, input, textarea, select {
   color: var(--gold-light);
   flex-shrink: 0;
   transition: all var(--transition-normal);
+  padding: 0;
+}
+
+.faq-icon-cross svg {
+  width: 12px;
+  height: 12px;
+  display: block;
+  transform-origin: 6px 6px;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .faq-item.active .faq-icon-cross {
-  transform: rotate(45deg);
   background: var(--gold-primary);
+  border-color: var(--gold-primary);
   color: #08080C;
+  box-shadow: 0 0 16px rgba(201, 168, 76, 0.35);
+}
+
+.faq-item.active .faq-icon-cross svg {
+  transform: rotate(45deg);
 }
 
 .faq-answer-pane {
@@ -1304,6 +1318,24 @@ button, input, textarea, select {
   line-height: 1.65;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
   padding-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .faq-question-btn {
+    padding: 1.25rem 1.25rem;
+    gap: 1rem;
+  }
+  .faq-question-text {
+    font-size: 1.02rem;
+  }
+  .faq-icon-cross {
+    width: 30px;
+    height: 30px;
+  }
+  .faq-answer-inner {
+    padding: 0 1.25rem 1.4rem 1.25rem;
+    font-size: 0.92rem;
+  }
 }
 
 .faq-more-footer {
