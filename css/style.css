@@ -90,19 +90,35 @@ body {
   color: var(--bg-primary);
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* Custom Scrollbar (Desktop uniquement) */
+@media (min-width: 769px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(201, 168, 76, 0.25);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--gold-primary);
+  }
 }
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(201, 168, 76, 0.3);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--gold-primary);
+
+/* Masquer les scrollbars sur mobile pour une navigation tactile 100% fluide et épurée */
+@media (max-width: 768px) {
+  html, body, div, section, main, article, aside, ul, ol {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  ::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
 }
 
 /* Typographie Utilitaires */
@@ -1630,6 +1646,8 @@ button, input, textarea, select {
   max-width: 720px;
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / Edge */
   background: var(--bg-card);
   border: 1px solid var(--border-gold);
   border-radius: var(--radius-lg);
@@ -1638,6 +1656,20 @@ button, input, textarea, select {
   position: relative;
   transform: translateY(30px) scale(0.97);
   transition: transform var(--transition-normal);
+}
+
+.studio-modal-window::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+@media (max-width: 640px) {
+  .studio-modal-window {
+    padding: 2.2rem 1.3rem 1.6rem;
+    max-height: 86vh;
+    border-radius: var(--radius-md);
+  }
 }
 
 .studio-modal-backdrop.is-open .studio-modal-window {
