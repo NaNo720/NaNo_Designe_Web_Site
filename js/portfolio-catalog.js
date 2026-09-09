@@ -127,6 +127,29 @@
       } catch (err) { }
     }
 
+    // Normalisation intelligente : tout projet avec un PDF Brand Book ou mentionnant 'charte' est lié à 'avec-charte'
+    allProjects = (allProjects || []).map(p => {
+      const hasPdf = Boolean(p.brandbookPdf && p.brandbookPdf.trim());
+      const hasSlides = Array.isArray(p.brandbookSlides) && p.brandbookSlides.length > 0;
+      const textMentionsCharte = `${p.title || ''} ${p.description || ''} ${p.variantLabel || ''}`.toLowerCase().includes('charte');
+
+      let variant = p.variant || 'standard';
+      let variantLabel = p.variantLabel || '';
+
+      if (hasPdf || hasSlides || textMentionsCharte) {
+        if (!variant || variant === 'standard' || variant === 'logos' || variant === 'avec-charte') {
+          variant = 'avec-charte';
+          variantLabel = 'Avec charte graphique';
+        }
+      }
+
+      return {
+        ...p,
+        variant,
+        variantLabel: variantLabel || (variant === 'avec-charte' ? 'Avec charte graphique' : '')
+      };
+    });
+
     updateDomainCounters();
   }
 
@@ -266,17 +289,37 @@
         const projVariant = (project.variant || '').toLowerCase();
         const projVariantLabel = (project.variantLabel || '').toLowerCase();
         const searchVariant = currentVariant.toLowerCase();
+        const hasPdf = Boolean(project.brandbookPdf && project.brandbookPdf.trim());
+        const hasSlides = Array.isArray(project.brandbookSlides) && project.brandbookSlides.length > 0;
+        const textMentionsCharte = `${project.title || ''} ${project.description || ''}`.toLowerCase().includes('charte');
 
-        // Correspondance directe ou par libellé
-        const matchDirect = projVariant === searchVariant;
-        const matchLabel = projVariantLabel.includes(searchVariant.replace('-', ' '));
+        if (searchVariant === 'avec-charte') {
+          // Si le sous-filtre est 'Avec charte graphique', inclure :
+          // 1. projVariant === 'avec-charte'
+          // 2. Un Brand Book PDF est attaché
+          // 3. Des planches de charte sont définies
+          // 4. Le libellé ou titre mentionne 'charte'
+          const matchesCharte = projVariant === 'avec-charte' || 
+                                hasPdf || 
+                                hasSlides || 
+                                projVariantLabel.includes('charte') || 
+                                textMentionsCharte;
+          if (!matchesCharte) return false;
+        } else if (searchVariant === 'sans-charte') {
+          // Sans charte : ne doit PAS avoir de PDF ni de slides ni mentionner la charte
+          const isWithoutCharte = (projVariant === 'sans-charte' || projVariantLabel.includes('sans charte')) &&
+                                  !hasPdf && !hasSlides && !textMentionsCharte;
+          if (!isWithoutCharte) return false;
+        } else {
+          // Autres variantes
+          const matchDirect = projVariant === searchVariant;
+          const matchLabel = projVariantLabel.includes(searchVariant.replace('-', ' '));
+          const tagsStr = Array.isArray(project.tags) ? project.tags.join(' ').toLowerCase() : (project.tags || '').toLowerCase();
+          const matchTag = tagsStr.includes(searchVariant.replace('-', ' '));
 
-        // Correspondance intelligente selon les tags du projet
-        const tagsStr = Array.isArray(project.tags) ? project.tags.join(' ').toLowerCase() : (project.tags || '').toLowerCase();
-        const matchTag = tagsStr.includes(searchVariant.replace('-', ' '));
-
-        if (!matchDirect && !matchLabel && !matchTag) {
-          return false;
+          if (!matchDirect && !matchLabel && !matchTag) {
+            return false;
+          }
         }
       }
 
@@ -341,9 +384,10 @@
          </div>`;
 
     const isBrandbook = project.variant === 'avec-charte' || 
+                        Boolean(project.brandbookPdf && project.brandbookPdf.trim()) ||
+                        (Array.isArray(project.brandbookSlides) && project.brandbookSlides.length > 0) ||
                         (project.variantLabel && project.variantLabel.toLowerCase().includes('charte')) ||
-                        (project.title && project.title.toLowerCase().includes('charte')) ||
-                        (Array.isArray(project.brandbookSlides) && project.brandbookSlides.length > 0);
+                        (project.title && project.title.toLowerCase().includes('charte'));
 
     card.innerHTML = `
       <div class="pinterest-card-badges">
@@ -460,8 +504,11 @@
     }
 
     const isWithCharte = project.variant === 'avec-charte' || 
+                         Boolean(project.brandbookPdf && project.brandbookPdf.trim()) ||
+                         (Array.isArray(project.brandbookSlides) && project.brandbookSlides.length > 0) ||
                          (project.variantLabel && project.variantLabel.toLowerCase().includes('charte')) ||
-                         (project.title && project.title.toLowerCase().includes('charte'));
+                         (project.title && project.title.toLowerCase().includes('charte')) ||
+                         (project.description && project.description.toLowerCase().includes('charte'));
 
     if (isWithCharte) {
       return generateMasterBrandbookSlides(project);
@@ -911,7 +958,8 @@
     currentActiveProject = project;
 
     const brandbookSlides = getBrandbookSlidesForProject(project);
-    const isBrandbook = Boolean(brandbookSlides && brandbookSlides.length > 0);
+    const hasPdf = Boolean(project.brandbookPdf && project.brandbookPdf.trim());
+    const isBrandbook = Boolean(brandbookSlides && brandbookSlides.length > 0) || hasPdf;
 
     if (isBrandbook) {
       if (lightboxDialog) lightboxDialog.classList.add('brandbook-mode');

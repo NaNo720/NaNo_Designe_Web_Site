@@ -527,6 +527,16 @@
         projObj.createdAt = new Date().toISOString();
       }
 
+      // Auto-liaison 'avec-charte' si un Brand Book PDF est attaché ou si la charte est mentionnée
+      const hasPdf = Boolean(projObj.brandbookPdf && projObj.brandbookPdf.trim());
+      const mentionsCharte = `${projObj.title || ''} ${projObj.description || ''}`.toLowerCase().includes('charte');
+      if (hasPdf || mentionsCharte) {
+        if (!projObj.variant || projObj.variant === 'standard' || projObj.variant === 'logos') {
+          projObj.variant = 'avec-charte';
+          projObj.variantLabel = 'Avec charte graphique';
+        }
+      }
+
       // 1. Sauvegarde locale immédiate (avec fallback safe)
       let localSaved = false;
       try {
@@ -789,14 +799,30 @@
     if (Array.isArray(row.tags)) tagsArr = row.tags;
     else if (typeof row.tags === 'string') tagsArr = row.tags.split(',').map(t => t.trim()).filter(Boolean);
 
+    const hasPdf = Boolean(row.brandbook_pdf || row.brandbookPdf);
+    const hasSlides = Boolean(row.brandbook_slides || row.brandbookSlides);
+    const mentionsCharte = `${row.title || ''} ${row.description || ''} ${row.variant_label || ''}`.toLowerCase().includes('charte');
+
+    let variant = row.variant || row.service_variant;
+    let variantLabel = row.variant_label || row.variantLabel;
+
+    if (hasPdf || hasSlides || mentionsCharte) {
+      if (!variant || variant === 'standard' || variant === 'logos' || variant === 'avec-charte') {
+        variant = 'avec-charte';
+        variantLabel = 'Avec charte graphique';
+      }
+    }
+    if (!variant) variant = 'standard';
+    if (!variantLabel && variant === 'avec-charte') variantLabel = 'Avec charte graphique';
+
     return {
       id: row.id,
       title: row.title || 'Projet Studio',
       client: row.client || 'Client Privé',
       category: row.category || 'web',
       categoryLabel: row.category_label || (row.category === 'logos' ? 'Logo & Branding' : row.category === 'web' ? 'Site Web' : 'Signalétique'),
-      variant: row.variant || row.service_variant || 'standard',
-      variantLabel: row.variant_label || row.variantLabel || '',
+      variant: variant,
+      variantLabel: variantLabel,
       description: row.description || '',
       tags: tagsArr,
       imageUrl: row.image_url || '',

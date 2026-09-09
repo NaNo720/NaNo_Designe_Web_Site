@@ -3784,14 +3784,25 @@
             'marketing': 'Marketing Digital'
           };
 
+          let finalVariant = variant;
+          let finalVariantLabel = variantLabel;
+
+          // Si un Brand Book PDF est attaché ou si la charte est mentionnée, verrouiller 'avec-charte'
+          if (finalBrandbookPdf && finalBrandbookPdf.trim()) {
+            if (category === 'logos' || !finalVariant || finalVariant === 'standard') {
+              finalVariant = 'avec-charte';
+              finalVariantLabel = 'Avec charte graphique';
+            }
+          }
+
           const projObj = {
             id: currentEditingProjId || `PROJ-${Date.now().toString(36).toUpperCase()}`,
             title,
             client,
             category,
             categoryLabel: categoryLabels[category] || 'Création Studio',
-            variant,
-            variantLabel,
+            variant: finalVariant,
+            variantLabel: finalVariantLabel,
             description: desc,
             tags: tagsRaw.split(',').map(t => t.trim()).filter(Boolean),
             imageUrl: finalImageUrl,
@@ -3843,6 +3854,24 @@
           try {
             projects = JSON.parse(localStorage.getItem('nano_portfolio') || '[]');
           } catch (e) { projects = []; }
+        }
+
+        // Auto-migration locale : tout projet avec PDF ou charte est garanti 'avec-charte'
+        let hasFixedLocal = false;
+        projects = (projects || []).map(p => {
+          const hasPdf = Boolean(p.brandbookPdf && p.brandbookPdf.trim());
+          const mentionsCharte = `${p.title || ''} ${p.description || ''}`.toLowerCase().includes('charte');
+          if ((hasPdf || mentionsCharte) && (p.category === 'logos' || !p.variant || p.variant === 'standard')) {
+            if (p.variant !== 'avec-charte') {
+              p.variant = 'avec-charte';
+              p.variantLabel = 'Avec charte graphique';
+              hasFixedLocal = true;
+            }
+          }
+          return p;
+        });
+        if (hasFixedLocal) {
+          try { localStorage.setItem('nano_portfolio', JSON.stringify(projects)); } catch (e) { }
         }
 
         if (countFilterAll) countFilterAll.textContent = projects.length;
@@ -3961,7 +3990,12 @@
             document.getElementById('proj-form-title').value = target.title || '';
             document.getElementById('proj-form-client').value = target.client || '';
             document.getElementById('proj-form-category').value = target.category || 'web';
-            updateProjVariantOptions(target.category || 'web', target.variant || '');
+
+            let targetVariant = target.variant || 'standard';
+            if (target.brandbookPdf && target.brandbookPdf.trim() && (target.category === 'logos' || targetVariant === 'standard')) {
+              targetVariant = 'avec-charte';
+            }
+            updateProjVariantOptions(target.category || 'web', targetVariant);
             document.getElementById('proj-form-tags').value = Array.isArray(target.tags) ? target.tags.join(', ') : (target.tags || '');
             document.getElementById('proj-form-desc').value = target.description || '';
             document.getElementById('proj-form-url').value = target.projectUrl || '';
