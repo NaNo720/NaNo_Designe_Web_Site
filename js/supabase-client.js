@@ -486,18 +486,31 @@
 
       if (cli) {
         try {
-          const { data, error } = await cli.from('portfolio_projects').upsert({
+          const payload = {
             id: projObj.id,
             title: projObj.title,
             client: projObj.client,
             category: projObj.category,
             category_label: projObj.categoryLabel || projObj.category,
+            variant: projObj.variant || 'standard',
+            variant_label: projObj.variantLabel || '',
             description: projObj.description,
             tags: Array.isArray(projObj.tags) ? projObj.tags.join(', ') : (projObj.tags || ''),
             image_url: projObj.imageUrl || null,
             project_url: projObj.projectUrl || null,
             created_at: projObj.createdAt
-          }, { onConflict: 'id' });
+          };
+
+          let { data, error } = await cli.from('portfolio_projects').upsert(payload, { onConflict: 'id' });
+          
+          // Repli sécurisé si la table SQL Supabase n'a pas encore les colonnes variant
+          if (error && (error.message && (error.message.includes('variant') || error.message.includes('column')) || error.code === '42703' || error.code === 'PGRST204')) {
+            console.info('[NanoDB] Table Supabase sans colonnes variant, sauvegarde standard...');
+            delete payload.variant;
+            delete payload.variant_label;
+            const retry = await cli.from('portfolio_projects').upsert(payload, { onConflict: 'id' });
+            error = retry.error;
+          }
 
           if (error) {
             cloudError = error.message || error.code || 'Erreur Supabase';
@@ -565,6 +578,8 @@
         client: p.client,
         category: p.category,
         category_label: p.categoryLabel || p.category,
+        variant: p.variant || 'standard',
+        variant_label: p.variantLabel || '',
         description: p.description,
         tags: Array.isArray(p.tags) ? p.tags.join(', ') : (p.tags || ''),
         image_url: p.imageUrl || null,
@@ -573,7 +588,17 @@
       }));
 
       try {
-        const { data, error } = await cli.from('portfolio_projects').upsert(rows, { onConflict: 'id' });
+        let { data, error } = await cli.from('portfolio_projects').upsert(rows, { onConflict: 'id' });
+        if (error && (error.message && (error.message.includes('variant') || error.message.includes('column')) || error.code === '42703' || error.code === 'PGRST204')) {
+          const fallbackRows = rows.map(r => {
+            const copy = { ...r };
+            delete copy.variant;
+            delete copy.variant_label;
+            return copy;
+          });
+          const retry = await cli.from('portfolio_projects').upsert(fallbackRows, { onConflict: 'id' });
+          error = retry.error;
+        }
         if (error) {
           return { success: false, error: error.message || error.code };
         }
@@ -603,7 +628,7 @@
     }
   };
 
-  // Données initiales du portfolio studio
+  // Données initiales du portfolio studio enrichies de variantes
   const defaultProjects = [
     {
       id: 'PROJ-01',
@@ -611,6 +636,8 @@
       client: 'TERANGA LUXURY RESORT • ALMADIES',
       category: 'web',
       categoryLabel: 'Site Web',
+      variant: 'ecommerce',
+      variantLabel: 'E-Commerce & Plateforme',
       description: 'Refonte complète de l\'expérience digitale d\'un palace dakarois : moteur de réservation en direct, interface dark chic et paiement Wave/CB intégré.',
       tags: ['UI/UX', 'E-Commerce', 'Wave'],
       imageUrl: '',
@@ -623,6 +650,8 @@
       client: 'MAISON BAOBAB BIO • DAKAR / PARIS',
       category: 'logos',
       categoryLabel: 'Logo & Branding',
+      variant: 'avec-charte',
+      variantLabel: 'Avec charte graphique',
       description: 'Création de la marque mère, monogramme vectoriel intemporel, guide chromatique et packaging prestige pour soins naturels exportés à l\'international.',
       tags: ['Branding', 'Livre de Marque', 'Packaging'],
       imageUrl: '',
@@ -635,6 +664,8 @@
       client: 'SÉNÉGAL TECH HUB • DIAMNIADIO',
       category: 'supports',
       categoryLabel: 'Signalétique',
+      variant: 'signaletique-murale',
+      variantLabel: 'Signalétique Murale',
       description: 'Conception et supervision de pose de la signalétique directionnelle, totems d\'orientation et lettres géantes découpées en laiton avec rétro-éclairage LED.',
       tags: ['Laiton Brossé', 'Habillage', '3D'],
       imageUrl: '',
@@ -647,6 +678,8 @@
       client: 'DAKAR CONTEMPORARY ART',
       category: 'web',
       categoryLabel: 'Site Web',
+      variant: 'vitrine',
+      variantLabel: 'Site Vitrine & Mobile',
       description: 'Application web immersive présentant les artistes contemporains du Sénégal et de la diaspora, avec visite virtuelle et vente d\'œuvres sécurisée.',
       tags: ['Mobile First', 'Galerie', 'Art'],
       imageUrl: '',
@@ -659,6 +692,8 @@
       client: 'ALMADIES CAPITAL PARTNERS',
       category: 'logos',
       categoryLabel: 'Logo & Branding',
+      variant: 'sans-charte',
+      variantLabel: 'Sans charte graphique',
       description: 'Création de la signature visuelle d\'un fonds d\'investissement privé à Dakar : logo doré gaufré, cartes de visite thermogravées et présentation investisseurs.',
       tags: ['Logo', 'Finance', 'Papeterie'],
       imageUrl: '',
@@ -671,6 +706,8 @@
       client: 'VILLA TERANGA RESIDENCES • NGOR',
       category: 'supports',
       categoryLabel: 'Supports & Print',
+      variant: 'print',
+      variantLabel: 'Supports Imprimés & Print',
       description: 'Conception d\'une fresque murale graphique monumentale gravée sur panneaux composites en laiton patiné et chêne teinté.',
       tags: ['Habillage Mural', 'Luxe', 'Décoration'],
       imageUrl: '',
@@ -690,6 +727,8 @@
       client: row.client || 'Client Privé',
       category: row.category || 'web',
       categoryLabel: row.category_label || (row.category === 'logos' ? 'Logo & Branding' : row.category === 'web' ? 'Site Web' : 'Signalétique'),
+      variant: row.variant || row.service_variant || 'standard',
+      variantLabel: row.variant_label || row.variantLabel || '',
       description: row.description || '',
       tags: tagsArr,
       imageUrl: row.image_url || '',

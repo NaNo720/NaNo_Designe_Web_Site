@@ -263,18 +263,87 @@
       <div class="section-header">
         <div class="eyebrow-badge">
           <span class="dot"></span>
-          <span>Galerie de Réalisations</span>
+          <span>Hub de Réalisations & Domaines</span>
         </div>
-        <h2 class="section-title">Une signature visuelle éprouvée</h2>
-        <p class="section-desc">Découvrez une sélection de projets récents conçus par le studio Nano Design à Dakar, classés par catégorie.</p>
+        <h2 class="section-title">L'Art du Détail. <span class="font-serif text-gold">L'Excellence</span> en Images.</h2>
+        <p class="section-desc">Explorez nos 3 domaines d'intervention clés ou plongez dans notre galerie immersive style Pinterest pour visualiser l'ensemble des études de cas plein format.</p>
       </div>
 
-      <!-- Barre de Filtrage Interactive -->
-      <div class="portfolio-filter-bar">
-        <button class="filter-btn active" data-filter="all">Tous les projets</button>
-        <button class="filter-btn" data-filter="logos">Logos & Identités</button>
-        <button class="filter-btn" data-filter="web">Sites Web & Mobile</button>
-        <button class="filter-btn" data-filter="supports">Signalétique & Supports</button>
+      <!-- 3 Grandes Cartes Domaines de Réalisations (Hub d'Accès Rapide) -->
+      <div class="portfolio-hub-grid">
+        <!-- Carte 1 : Logos & Branding -->
+        <div class="domain-hub-card">
+          <div>
+            <div class="domain-hub-icon">✦</div>
+            <h3 class="domain-hub-title">Logos & Identités Visuelles</h3>
+            <p class="domain-hub-desc">Création de logotypes mémorables, monogrammes exclusifs, chartes graphiques complètes et refontes institutionnelles.</p>
+            <div class="domain-hub-chips">
+              <a href="realisations.html?cat=logos&sub=avec-charte" class="domain-hub-chip">Avec charte graphique</a>
+              <a href="realisations.html?cat=logos&sub=sans-charte" class="domain-hub-chip">Sans charte</a>
+              <a href="realisations.html?cat=logos&sub=refonte" class="domain-hub-chip">Refonte de marque</a>
+            </div>
+          </div>
+          <a href="realisations.html?cat=logos" class="domain-hub-cta">
+            <span>Explorer les Logos (Pinterest)</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Carte 2 : Sites Web & Mobile -->
+        <div class="domain-hub-card">
+          <div>
+            <div class="domain-hub-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            </div>
+            <h3 class="domain-hub-title">Sites Web & Mobile</h3>
+            <p class="domain-hub-desc">Expériences digitales immersives, plateformes vitrines haut de gamme et boutiques e-commerce avec paiement Wave & Cartes.</p>
+            <div class="domain-hub-chips">
+              <a href="realisations.html?cat=web&sub=vitrine" class="domain-hub-chip">Sites Vitrines</a>
+              <a href="realisations.html?cat=web&sub=ecommerce" class="domain-hub-chip">E-Commerce & Wave</a>
+              <a href="realisations.html?cat=web&sub=app" class="domain-hub-chip">Mobile First</a>
+            </div>
+          </div>
+          <a href="realisations.html?cat=web" class="domain-hub-cta">
+            <span>Explorer les Sites Web (Pinterest)</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <!-- Carte 3 : Signalétique & Supports -->
+        <div class="domain-hub-card">
+          <div>
+            <div class="domain-hub-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            </div>
+            <h3 class="domain-hub-title">Signalétique & Habillage Mural</h3>
+            <p class="domain-hub-desc">Signalétique architecturale prestigieuse, totems d'orientation, enseignes en laiton brossé et décors muraux 3D.</p>
+            <div class="domain-hub-chips">
+              <a href="realisations.html?cat=supports&sub=signaletique-murale" class="domain-hub-chip">Signalétique Murale</a>
+              <a href="realisations.html?cat=supports&sub=print" class="domain-hub-chip">Supports Print</a>
+              <a href="realisations.html?cat=supports&sub=habillage" class="domain-hub-chip">Habillage 3D</a>
+            </div>
+          </div>
+          <a href="realisations.html?cat=supports" class="domain-hub-cta">
+            <span>Explorer les Supports (Pinterest)</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- En-tête de Sélection Récente et Filtrage -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle);">
+        <div>
+          <span style="font-family: var(--font-tech); font-size: 0.74rem; color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700;">✦ Vitrine Studio</span>
+          <h3 style="font-family: var(--font-accent); font-size: 1.35rem; color: #FFF; font-weight: 700; margin-top: 0.2rem;">Sélection de Créations Phares</h3>
+        </div>
+
+        <!-- Barre de Filtrage Interactive -->
+        <div class="portfolio-filter-bar" style="margin-bottom: 0;">
+          <button class="filter-btn active" data-filter="all">Tous les projets</button>
+          <button class="filter-btn" data-filter="logos">Logos & Identités</button>
+          <button class="filter-btn" data-filter="web">Sites Web & Mobile</button>
+          <button class="filter-btn" data-filter="supports">Signalétique & Supports</button>
+        </div>
       </div>
 
       <!-- Grille des Projets -->
@@ -477,10 +546,22 @@
         </div>
       </div>
 
-      <!-- Lien vers Portfolio Complet -->
+      <!-- Grande Bannière d'Invitation au Catalogue Pinterest -->
+      <div class="portfolio-pinterest-banner">
+        <div class="pinterest-banner-content">
+          <span style="font-family: var(--font-tech); font-size: 0.74rem; color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700;">✦ Expérience Plein Format</span>
+          <h3>Explorez Notre Catalogue Complet Façon Pinterest</h3>
+          <p>Visualisez chaque création dans son format originel sans aucun recadrage, filtrez précisément selon vos besoins (avec ou sans charte, vitrine ou e-commerce, signalétique murale ou print) et ouvrez chaque étude de cas en haute définition.</p>
+        </div>
+        <a href="realisations.html" class="btn btn-primary" style="white-space: nowrap;">
+          <span>Ouvrir la Galerie Complète ➔</span>
+        </a>
+      </div>
+
+      <!-- Lien vers Portfolio Méthode -->
       <div class="portfolio-cta-box">
-        <button class="btn btn-secondary" data-open-modal="about">
-          <span>Voir + notre méthode & nos archives complètes</span>
+        <button class="btn btn-secondary btn-sm" data-open-modal="about">
+          <span>Voir + notre méthode de création & nos archives</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
@@ -1209,7 +1290,8 @@
           <ul class="footer-links-list">
             <li><a href="#accueil">Accueil Studio</a></li>
             <li><a href="#services">Nos 4 Expertises</a></li>
-            <li><a href="#portfolio">Projets & Portfolio</a></li>
+            <li><a href="#portfolio">Hub Réalisations</a></li>
+            <li><a href="realisations.html" style="color: var(--gold-light);">✦ Galerie Plein Format (Pinterest)</a></li>
             <li><a href="#apropos">À Propos du Studio</a></li>
             <li><a href="#devis">Assistant de Devis</a></li>
             <li><a href="#faq">Questions Fréquentes</a></li>

@@ -2048,7 +2048,7 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
             <div>
               <label
-                style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Catégorie
+                style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Domaine
                 *</label>
               <select id="proj-form-category" class="form-input proj-modal-input" required>
                 <option value="web">Sites Web & Mobile</option>
@@ -2059,11 +2059,20 @@
             </div>
             <div>
               <label
-                style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Mots-clés
-                / Tags</label>
-              <input type="text" id="proj-form-tags" class="form-input proj-modal-input"
-                placeholder="Ex: UI/UX, Wave, Luxe (séparés par des virgules)">
+                style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Sous-Type / Spécialité
+                *</label>
+              <select id="proj-form-variant" class="form-input proj-modal-input" required>
+                <!-- Dynamique selon le domaine -->
+              </select>
             </div>
+          </div>
+
+          <div>
+            <label
+              style="display: block; font-size: 0.76rem; text-transform: uppercase; color: var(--gold-light); font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.04em;">Mots-clés
+              / Tags</label>
+            <input type="text" id="proj-form-tags" class="form-input proj-modal-input"
+              placeholder="Ex: UI/UX, Wave, Luxe (séparés par des virgules)">
           </div>
 
           <!-- Section Image / Visuel -->
@@ -3409,6 +3418,48 @@
         });
       });
 
+      // Variantes contextuelles par domaine (synchronisées avec le tunnel de devis)
+      const variantDefinitions = {
+        'logos': [
+          { value: 'avec-charte', label: 'Avec charte graphique' },
+          { value: 'sans-charte', label: 'Sans charte graphique' },
+          { value: 'refonte', label: 'Refonte & Identité de marque' }
+        ],
+        'web': [
+          { value: 'vitrine', label: 'Site Vitrine & Mobile' },
+          { value: 'ecommerce', label: 'E-Commerce & Plateforme' },
+          { value: 'app', label: 'Application Mobile & Web App' }
+        ],
+        'supports': [
+          { value: 'signaletique-murale', label: 'Signalétique Murale & Totems' },
+          { value: 'print', label: 'Support Imprimé & Print' },
+          { value: 'habillage', label: 'Habillage & Décoration 3D' }
+        ],
+        'marketing': [
+          { value: 'social', label: 'Campagne Réseaux Sociaux' },
+          { value: 'contenu', label: 'Création de Contenus' }
+        ]
+      };
+
+      function updateProjVariantOptions(cat, selectedVariant = '') {
+        const selectVar = document.getElementById('proj-form-variant');
+        if (!selectVar) return;
+        const list = variantDefinitions[cat] || [
+          { value: 'standard', label: 'Prestation Standard' }
+        ];
+        selectVar.innerHTML = list.map(item => `<option value="${item.value}">${item.label}</option>`).join('');
+        if (selectedVariant) {
+          selectVar.value = selectedVariant;
+        }
+      }
+
+      const projCategorySelect = document.getElementById('proj-form-category');
+      if (projCategorySelect) {
+        projCategorySelect.addEventListener('change', (e) => {
+          updateProjVariantOptions(e.target.value);
+        });
+      }
+
       if (btnAddProj) {
         btnAddProj.addEventListener('click', () => {
           currentEditingProjId = null;
@@ -3419,6 +3470,8 @@
           document.getElementById('proj-modal-mode-badge').textContent = 'Création';
           document.getElementById('proj-modal-mode-badge').className = 'inv-badge-status inv-badge-pending';
           document.getElementById('btn-save-project').textContent = 'Enregistrer la création ✦';
+          document.getElementById('proj-form-category').value = 'web';
+          updateProjVariantOptions('web', 'vitrine');
           setProjPreview('');
           projModal.classList.add('is-open');
         });
@@ -3434,6 +3487,9 @@
           const title = document.getElementById('proj-form-title').value.trim();
           const client = document.getElementById('proj-form-client').value.trim();
           const category = document.getElementById('proj-form-category').value;
+          const variantSelect = document.getElementById('proj-form-variant');
+          const variant = variantSelect ? variantSelect.value : 'standard';
+          const variantLabel = variantSelect && variantSelect.selectedOptions && variantSelect.selectedOptions[0] ? variantSelect.selectedOptions[0].text : '';
           const tagsRaw = document.getElementById('proj-form-tags').value;
           const desc = document.getElementById('proj-form-desc').value.trim();
           const projectUrl = document.getElementById('proj-form-url').value.trim();
@@ -3454,6 +3510,8 @@
             client,
             category,
             categoryLabel: categoryLabels[category] || 'Création Studio',
+            variant,
+            variantLabel,
             description: desc,
             tags: tagsRaw.split(',').map(t => t.trim()).filter(Boolean),
             imageUrl: finalImageUrl,
@@ -3550,9 +3608,12 @@
           card.innerHTML = `
             <div style="position: relative;">
               ${thumbHtml}
-              <span style="position: absolute; top: 12px; left: 12px; background: rgba(8,8,12,0.85); backdrop-filter: blur(8px); border: 1px solid var(--border-gold); color: var(--gold-light); font-size: 0.68rem; font-family: var(--font-tech); text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: var(--radius-full);">
-                ${p.categoryLabel || p.category}
-              </span>
+              <div style="position: absolute; top: 12px; left: 12px; display: flex; flex-wrap: wrap; gap: 5px; max-width: calc(100% - 80px);">
+                <span style="background: rgba(8,8,12,0.9); backdrop-filter: blur(8px); border: 1px solid var(--border-gold); color: var(--gold-light); font-size: 0.65rem; font-family: var(--font-tech); text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: var(--radius-full);">
+                  ${p.categoryLabel || p.category}
+                </span>
+                ${p.variantLabel ? `<span style="background: rgba(197,160,89,0.22); backdrop-filter: blur(8px); border: 1px solid rgba(197,160,89,0.4); color: #FFF; font-size: 0.63rem; font-family: var(--font-tech); padding: 0.2rem 0.5rem; border-radius: var(--radius-full);">${p.variantLabel}</span>` : ''}
+              </div>
               <span style="position: absolute; top: 12px; right: 12px; font-family: var(--font-tech); font-size: 0.68rem; color: var(--text-muted); background: rgba(0,0,0,0.6); padding: 0.2rem 0.5rem; border-radius: var(--radius-sm);">
                 ${p.id}
               </span>
@@ -3608,6 +3669,7 @@
             document.getElementById('proj-form-title').value = target.title || '';
             document.getElementById('proj-form-client').value = target.client || '';
             document.getElementById('proj-form-category').value = target.category || 'web';
+            updateProjVariantOptions(target.category || 'web', target.variant || '');
             document.getElementById('proj-form-tags').value = Array.isArray(target.tags) ? target.tags.join(', ') : (target.tags || '');
             document.getElementById('proj-form-desc').value = target.description || '';
             document.getElementById('proj-form-url').value = target.projectUrl || '';
@@ -3652,11 +3714,16 @@ CREATE TABLE IF NOT EXISTS public.portfolio_projects (
     client TEXT NOT NULL,
     category TEXT NOT NULL,
     category_label TEXT,
+    variant TEXT DEFAULT 'standard',
+    variant_label TEXT DEFAULT '',
     description TEXT,
     tags TEXT,
     image_url TEXT,
     project_url TEXT
 );
+
+ALTER TABLE public.portfolio_projects ADD COLUMN IF NOT EXISTS variant TEXT DEFAULT 'standard';
+ALTER TABLE public.portfolio_projects ADD COLUMN IF NOT EXISTS variant_label TEXT DEFAULT '';
 
 CREATE INDEX IF NOT EXISTS idx_projects_created_at ON public.portfolio_projects(created_at DESC);
 ALTER TABLE public.portfolio_projects ENABLE ROW LEVEL SECURITY;

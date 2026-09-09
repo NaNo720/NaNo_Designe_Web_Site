@@ -15,6 +15,18 @@
       "destination": "/admin.html"
     },
     {
+      "source": "/realisations",
+      "destination": "/realisations.html"
+    },
+    {
+      "source": "/portfolio",
+      "destination": "/realisations.html"
+    },
+    {
+      "source": "/catalogue",
+      "destination": "/realisations.html"
+    },
+    {
       "source": "/pay",
       "destination": "/pay.html"
     },

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Réalisations & Portfolio Studio — Nano Design Dakar</title>
+  <!-- Favicon / Icône d'onglet officiel Nano Design -->
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/Favicon.png">
+  <link rel="shortcut icon" href="assets/Favicon.png">
+  <link rel="apple-touch-icon" href="assets/Favicon.png">
+  <meta name="description" content="Explorez le catalogue complet des créations de Nano Design Dakar : Logos et chartes graphiques, plateformes web/mobile sur-mesure et signalétiques prestigieuses. Galerie interactive style Pinterest.">
+  <meta name="keywords" content="Portfolio Nano Design, Créations Dakar, Logos Sénégal, Sites Web Dakar, Signalétique Dakar, Galerie Pinterest Studio">
+  <meta name="author" content="Nano Design Dakar">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Portfolio & Réalisations — Nano Design Dakar">
+  <meta property="og:description" content="Catalogue complet des créations du Studio Nano Design : Logos, Sites Web et Signalétique en haute définition.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_SN">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Feuilles de styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/portfolio-catalog.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       HEADER STUDIO
+       ========================================================================== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html#accueil" class="brand-logo" aria-label="Nano Design — Accueil">
+        <img src="assets/Logo.png" alt="Nano Design Studio" class="brand-logo-img" onerror="this.onerror=null; this.src='assets/logo.png';">
+      </a>
+
+      <nav aria-label="Navigation principale">
+        <ul class="nav-menu">
+          <li><a href="index.html#accueil" class="nav-link">Accueil</a></li>
+          <li><a href="index.html#services" class="nav-link">Services</a></li>
+          <li><a href="realisations.html" class="nav-link active">Réalisations</a></li>
+          <li><a href="index.html#apropos" class="nav-link">À propos</a></li>
+          <li><a href="index.html#faq" class="nav-link">FAQ</a></li>
+          <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+          <li class="nav-menu-cta-item">
+            <a href="index.html#devis" class="btn btn-primary nav-menu-cta-btn">
+              <span>Demander un devis</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <a href="index.html#devis" class="btn btn-primary btn-sm header-devis-btn">
+          <span>Demander un devis</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+
+        <button class="mobile-menu-toggle" aria-label="Ouvrir le menu de navigation">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       HERO CATALOGUE
+       ========================================================================== -->
+  <section class="catalog-hero">
+    <div class="catalog-hero-inner">
+      <div class="catalog-breadcrumb">
+        <a href="index.html">Accueil</a>
+        <span>/</span>
+        <a href="index.html#portfolio">Hub Réalisations</a>
+        <span>/</span>
+        <span style="color: var(--text-primary);">Catalogue Pinterest</span>
+      </div>
+
+      <h1 class="catalog-title">
+        Galerie Complète des <span class="catalog-title-gold">Créations Studio</span>
+      </h1>
+
+      <p class="catalog-desc">
+        Explorez nos réalisations en immersion visuelle totale. Choisissez un domaine pour filtrer selon vos exigences créatives (avec ou sans charte, vitrine ou e-commerce, signalétique murale ou supports print).
+      </p>
+
+      <div class="catalog-meta-stats">
+        <span>✦ Studio d'Art & Code Dakar</span>
+        <span>•</span>
+        <span><strong id="catalog-total-count">6</strong> Réalisations au catalogue</span>
+        <span>•</span>
+        <span style="color: var(--gold-light);">Affichage Plein Format</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       BARRE DE FILTRES STICKY (DOMAINES + SOUS-FILTRES)
+       ========================================================================== -->
+  <section class="catalog-filter-section" id="catalog-filter-bar">
+    <div class="catalog-filter-container">
+      <!-- Filtres Domaines Principaux -->
+      <div class="catalog-domain-tabs" role="tablist">
+        <button type="button" class="catalog-domain-btn active" data-domain="all">
+          <span>Tous les travaux</span>
+          <span class="catalog-domain-count">0</span>
+        </button>
+        <button type="button" class="catalog-domain-btn" data-domain="logos">
+          <span>Logos & Branding</span>
+          <span class="catalog-domain-count">0</span>
+        </button>
+        <button type="button" class="catalog-domain-btn" data-domain="web">
+          <span>Sites Web & Mobile</span>
+          <span class="catalog-domain-count">0</span>
+        </button>
+        <button type="button" class="catalog-domain-btn" data-domain="supports">
+          <span>Signalétique & Supports</span>
+          <span class="catalog-domain-count">0</span>
+        </button>
+      </div>
+
+      <!-- Sous-filtres contextuels animés (Chips) -->
+      <div class="catalog-subfilters-wrapper" id="catalog-subfilters-wrapper">
+        <!-- Rempli dynamiquement par portfolio-catalog.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       GRILLE MASONRY (STYLE PINTEREST)
+       ========================================================================== -->
+  <main class="catalog-main-area">
+    <div class="pinterest-masonry-grid" id="catalog-masonry-grid">
+      <!-- Les cartes Pinterest sont injectées ici dynamiquement -->
+    </div>
+
+    <!-- État Vide -->
+    <div class="catalog-empty-state" id="catalog-empty-state" style="display: none;">
+      <div class="catalog-empty-icon">✦</div>
+      <h3 class="catalog-empty-title">Aucune réalisation dans cette sous-catégorie</h3>
+      <p class="catalog-empty-text">
+        Nous enrichissons régulièrement notre galerie. Vous pouvez consulter l'ensemble des créations ou configurer votre propre demande sur-mesure.
+      </p>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="document.querySelector('[data-domain=\'all\']').click();">
+        Afficher tous les travaux
+      </button>
+    </div>
+  </main>
+
+  <!-- ==========================================================================
+       BANDEAU D'APPEL À L'ACTION
+       ========================================================================== -->
+  <section style="background: radial-gradient(circle at 50% 50%, rgba(201,168,76,0.12) 0%, transparent 70%), #0D0D15; border-top: 1px solid var(--border-subtle); padding: 5rem 1.5rem; text-align: center;">
+    <div style="max-width: 700px; margin: 0 auto;">
+      <span style="font-family: var(--font-tech); font-size: 0.8rem; color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700;">✦ Prêt à concevoir votre prochain chef-d'œuvre ?</span>
+      <h2 style="font-family: var(--font-accent); font-size: clamp(1.8rem, 4vw, 2.5rem); color: #FFF; font-weight: 800; margin: 0.8rem 0 1.2rem; line-height: 1.2;">
+        Donnez vie à une identité ou un site qui marque les esprits.
+      </h2>
+      <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 2rem; line-height: 1.6;">
+        Notre configurateur de devis en ligne calcule votre proposition personnalisée en quelques étapes simples.
+      </p>
+      <a href="index.html#devis" class="btn btn-primary">
+        <span>Configurer mon Devis Gratuitement ➔</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       MODALE LIGHTBOX HAUTE DÉFINITION (ÉTUDE DE CAS)
+       ========================================================================== -->
+  <div class="catalog-lightbox" id="catalog-lightbox-modal" role="dialog" aria-modal="true" aria-labelledby="lightbox-title">
+    <div class="lightbox-dialog">
+      <button type="button" class="lightbox-close-btn" id="lightbox-close-btn" aria-label="Fermer l'étude de cas">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Colonne Média HD -->
+      <div class="lightbox-media-col">
+        <div class="lightbox-img-wrapper">
+          <img src="" alt="Détail du projet" class="lightbox-img" id="lightbox-img">
+        </div>
+      </div>
+
+      <!-- Colonne Détails & CTA -->
+      <div class="lightbox-info-col">
+        <div>
+          <div class="lightbox-header-badges">
+            <span class="lightbox-id-tag" id="lightbox-id-tag">PROJ-01</span>
+            <span class="pinterest-badge-category" id="lightbox-cat-badge">Catégorie</span>
+            <span class="pinterest-badge-variant" id="lightbox-variant-badge" style="display: none;">Variante</span>
+          </div>
+
+          <div class="lightbox-client-lead" id="lightbox-client-lead">CLIENT PRESTIGE</div>
+          <h2 class="lightbox-title" id="lightbox-title">Titre de la Réalisation</h2>
+
+          <div class="lightbox-details-box">
+            <span style="font-family: var(--font-tech); font-size: 0.75rem; color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Challenge & Conception Studio</span>
+            <p class="lightbox-desc-text" id="lightbox-desc">
+              Description complète du projet.
+            </p>
+            <div class="lightbox-tags-container" id="lightbox-tags">
+              <!-- Tags injectés -->
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-actions-panel">
+          <a href="index.html#devis" class="lightbox-cta-quote" id="lightbox-cta-quote">
+            <span>Demander un devis similaire ✦</span>
+          </a>
+          <a href="#" target="_blank" rel="noopener noreferrer" class="lightbox-live-link" id="lightbox-live-link" style="display: none;">
+            <span>Explorer le site en direct</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       FOOTER OFFICIEL DU STUDIO
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand-col">
+          <a href="index.html#accueil" class="brand-logo">
+            <img src="assets/Logo.png" alt="Nano Design" class="brand-logo-img" onerror="this.onerror=null; this.src='assets/logo.png';">
+          </a>
+          <p class="footer-tagline">
+            Studio créatif & digital d'exception basé à Dakar. Nous forgeons des identités visuelles, des expériences web immersives et des signalétiques architecturales pour les marques qui visent l'excellence.
+          </p>
+          <div class="social-links-row" style="margin-top: 1.5rem;">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-link-icon" aria-label="Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-link-icon" aria-label="LinkedIn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            </a>
+            <a href="https://wa.me/221783800369" target="_blank" rel="noopener noreferrer" class="social-link-icon" aria-label="WhatsApp">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="footer-col-title">Navigation</h4>
+          <ul class="footer-nav-links">
+            <li><a href="index.html#accueil">Accueil</a></li>
+            <li><a href="index.html#services">Nos Services</a></li>
+            <li><a href="realisations.html">Catalogue Réalisations</a></li>
+            <li><a href="index.html#apropos">À Propos du Studio</a></li>
+            <li><a href="index.html#faq">Questions Fréquentes</a></li>
+            <li><a href="index.html#contact">Nous Contacter</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="footer-col-title">Domaines Créatifs</h4>
+          <ul class="footer-nav-links">
+            <li><a href="realisations.html?cat=logos">Logos & Identités</a></li>
+            <li><a href="realisations.html?cat=logos&sub=avec-charte">Logos avec Charte</a></li>
+            <li><a href="realisations.html?cat=web">Sites Web & Mobile</a></li>
+            <li><a href="realisations.html?cat=web&sub=ecommerce">E-Commerce & Wave</a></li>
+            <li><a href="realisations.html?cat=supports">Signalétique Murale</a></li>
+            <li><a href="realisations.html?cat=supports&sub=print">Supports Print</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-nav-col">
+          <h4 class="footer-col-title">Studio Dakar</h4>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+            Dakar — Sénégal<br><br>
+            <span style="color: var(--gold-light);">Horaires :</span><br>
+            Lun – Ven : 09h00 – 18h30 GMT<br>
+            Tél : +221 78 380 03 69
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <span>© 2026 Nano Design. Tous droits réservés. Dakar, Sénégal.</span>
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center;">
+          <a href="mentions-legales.html" style="color: inherit;">Mentions Légales</a>
+          <a href="confidentialite.html" style="color: inherit;">Confidentialité</a>
+          <a href="index.html#devis" style="color: inherit;">Demander un devis</a>
+          <a href="index.html#contact" style="color: inherit;">Contact</a>
+          <a href="admin.html" style="color: var(--gold-light); opacity: 0.8; font-size: 0.85rem;" title="Accès réservé à l'équipe Nano Design">✦ Espace Studio</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts et Dépendances -->
+  <script src="js/security.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/site-analytics.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/portfolio-catalog.js"></script>
+</body>
+</html>
