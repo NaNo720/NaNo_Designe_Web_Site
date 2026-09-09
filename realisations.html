@@ -193,9 +193,81 @@
       </button>
 
       <!-- Colonne Média HD -->
-      <div class="lightbox-media-col">
-        <div class="lightbox-img-wrapper">
+      <div class="lightbox-media-col" id="lightbox-media-col">
+        <!-- Mode Standard (Image unique) -->
+        <div class="lightbox-img-wrapper" id="lightbox-standard-media">
           <img src="" alt="Détail du projet" class="lightbox-img" id="lightbox-img">
+        </div>
+
+        <!-- Mode Brand Book (Pentagram / Behance 16:9 Deck Player) -->
+        <div class="lightbox-brandbook-player" id="lightbox-brandbook-player" style="display: none;">
+          <!-- Barre d'outils du Brand Book -->
+          <div class="brandbook-toolbar">
+            <div class="brandbook-badge-lead">
+              <span class="bb-gold-dot"></span>
+              <span id="bb-lead-label">✦ BRAND BOOK OFFICIEL • 1920×1080</span>
+            </div>
+            <div class="brandbook-view-switcher">
+              <button type="button" class="bb-switch-btn active" id="bb-view-deck-btn" title="Visionneuse Diaporama 16:9">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                <span>Diaporama 16:9</span>
+              </button>
+              <button type="button" class="bb-switch-btn" id="bb-view-scroll-btn" title="Défilement Continu Vertical (Style Behance)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 6v4M12 14v4"/></svg>
+                <span>Déroulant Behance</span>
+              </button>
+            </div>
+            <button type="button" class="bb-tool-btn" id="bb-fullscreen-toggle" title="Basculer en Plein Écran (Touche F)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+              <span>Plein Écran</span>
+            </button>
+          </div>
+
+          <!-- Écran Diaporama 16:9 -->
+          <div class="brandbook-stage-wrapper" id="brandbook-deck-stage">
+            <div class="brandbook-stage-16-9" id="brandbook-stage-frame">
+              <div class="brandbook-slide-container" id="brandbook-slide-container">
+                <!-- Slide active injectée dynamiquement (image ou SVG HD) -->
+                <img src="" alt="Planche de charte graphique" class="brandbook-slide-img" id="brandbook-slide-img">
+              </div>
+
+              <!-- Contrôles de Navigation Gauche / Droite -->
+              <button type="button" class="bb-nav-btn bb-nav-prev" id="bb-prev-btn" aria-label="Planche précédente (Flèche gauche)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button type="button" class="bb-nav-btn bb-nav-next" id="bb-next-btn" aria-label="Planche suivante (Flèche droite)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+
+              <!-- Barre d'Information Bas de Slide -->
+              <div class="brandbook-slide-meta-bar">
+                <div class="brandbook-slide-title-box">
+                  <span class="bb-slide-counter" id="bb-slide-counter">Planche 01 / 38</span>
+                  <span class="bb-slide-title-text" id="bb-slide-title">Construction Géométrique & Grille</span>
+                </div>
+                <div class="brandbook-keyboard-hint">
+                  <kbd>←</kbd> <kbd>→</kbd> feuilleter • <kbd>F</kbd> plein écran
+                </div>
+              </div>
+
+              <!-- Barre de Progression Linéaire -->
+              <div class="brandbook-progress-track">
+                <div class="brandbook-progress-bar" id="brandbook-progress-bar"></div>
+              </div>
+            </div>
+
+            <!-- Ruban de Miniatures Horizontales (Thumbnails) -->
+            <div class="brandbook-thumbs-strip" id="brandbook-thumbs-strip" aria-label="Miniatures des planches">
+              <!-- Miniatures injectées dynamiquement -->
+            </div>
+          </div>
+
+          <!-- Écran Défilement Continu (Style Behance Case Study) -->
+          <div class="brandbook-scroll-stage" id="brandbook-scroll-stage" style="display: none;">
+            <div class="brandbook-scroll-flow" id="brandbook-scroll-flow">
+              <!-- Toutes les planches empilées verticalement -->
+            </div>
+          </div>
         </div>
       </div>
 
@@ -210,6 +282,22 @@
 
           <div class="lightbox-client-lead" id="lightbox-client-lead">CLIENT PRESTIGE</div>
           <h2 class="lightbox-title" id="lightbox-title">Titre de la Réalisation</h2>
+
+          <!-- Spécifications Brand Book (visible uniquement si charte) -->
+          <div class="brandbook-specs-box" id="brandbook-specs-box" style="display: none;">
+            <div class="bb-spec-item">
+              <span class="bb-spec-label">Format de présentation</span>
+              <span class="bb-spec-val">1920 × 1080 px (16:9 Full HD)</span>
+            </div>
+            <div class="bb-spec-item">
+              <span class="bb-spec-label">Planches intégrées</span>
+              <span class="bb-spec-val" id="bb-specs-count">38 Planches HD</span>
+            </div>
+            <div class="bb-spec-item">
+              <span class="bb-spec-label">Systèmes normés</span>
+              <span class="bb-spec-val">Grille géométrique, CMJN/RVB/Pantone, Typographies, Papeterie & Signage</span>
+            </div>
+          </div>
 
           <div class="lightbox-details-box">
             <span style="font-family: var(--font-tech); font-size: 0.75rem; color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Challenge & Conception Studio</span>
@@ -233,6 +321,10 @@
               <polyline points="15 3 21 3 21 9"></polyline>
               <line x1="10" y1="14" x2="21" y2="3"></line>
             </svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener noreferrer" class="lightbox-btn-pdf" id="lightbox-btn-pdf" style="display: none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Consulter le Brand Book complet (PDF)</span>
           </a>
         </div>
       </div>

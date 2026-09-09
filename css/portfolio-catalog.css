@@ -779,7 +779,445 @@
 }
 
 /* --------------------------------------------------------------------------
-   6. ANIMATIONS
+   6. LECTEUR DE BRAND BOOK OFFICIEL (STYLE PENTAGRAM & BEHANCE 16:9)
+   -------------------------------------------------------------------------- */
+.lightbox-dialog.brandbook-mode {
+  max-width: 1440px;
+  width: 95vw;
+  max-height: 94vh;
+  grid-template-columns: 1.65fr 1fr;
+}
+
+.lightbox-brandbook-player {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* Barre d'outils du Brand Book */
+.brandbook-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(201, 168, 76, 0.18);
+}
+
+.brandbook-badge-lead {
+  font-family: var(--font-tech);
+  font-size: 0.72rem;
+  color: var(--gold-light);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bb-gold-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-light);
+  box-shadow: 0 0 8px var(--gold-light);
+  display: inline-block;
+}
+
+.brandbook-view-switcher {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.bb-switch-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--font-tech);
+  font-size: 0.72rem;
+  padding: 0.32rem 0.65rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all var(--transition-fast);
+}
+
+.bb-switch-btn.active {
+  background: rgba(201, 168, 76, 0.18);
+  color: var(--gold-light);
+  font-weight: 700;
+  border-color: rgba(201, 168, 76, 0.35);
+}
+
+.bb-tool-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: #FFF;
+  font-family: var(--font-tech);
+  font-size: 0.72rem;
+  padding: 0.32rem 0.65rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all var(--transition-fast);
+}
+
+.bb-tool-btn:hover {
+  border-color: var(--border-gold);
+  color: var(--gold-light);
+  background: rgba(201, 168, 76, 0.12);
+}
+
+/* Stage Diaporama 16:9 */
+.brandbook-stage-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.brandbook-stage-16-9 {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #07070C;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandbook-slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: #06060A;
+}
+
+.brandbook-slide-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  user-select: none;
+}
+
+/* Boutons de navigation diaporama */
+.bb-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(10, 10, 16, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+.bb-nav-btn:hover {
+  background: var(--gold-primary);
+  color: #08080E;
+  transform: translateY(-50%) scale(1.08);
+  border-color: #FFF;
+}
+
+.bb-nav-prev {
+  left: 12px;
+}
+
+.bb-nav-next {
+  right: 12px;
+}
+
+/* Barre d'information et métadonnées en bas de slide */
+.brandbook-slide-meta-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.8rem 1.2rem 0.9rem;
+  background: linear-gradient(180deg, transparent 0%, rgba(6, 6, 10, 0.96) 65%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 4;
+  gap: 1rem;
+  pointer-events: none;
+}
+
+.brandbook-slide-title-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.bb-slide-counter {
+  font-family: var(--font-tech);
+  font-size: 0.72rem;
+  color: var(--gold-light);
+  font-weight: 700;
+  background: rgba(13, 13, 20, 0.9);
+  padding: 0.22rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-gold);
+}
+
+.bb-slide-title-text {
+  font-family: var(--font-accent);
+  font-size: 0.84rem;
+  color: #FFF;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.brandbook-keyboard-hint {
+  font-family: var(--font-tech);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.brandbook-keyboard-hint kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.64rem;
+  color: var(--gold-light);
+}
+
+/* Barre de progression */
+.brandbook-progress-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  z-index: 6;
+}
+
+.brandbook-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--gold-gradient);
+  transition: width 0.3s ease;
+}
+
+/* Ruban de miniatures (Thumbnails) */
+.brandbook-thumbs-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0.4rem 0.2rem 0.6rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold-primary) rgba(255, 255, 255, 0.05);
+}
+
+.brandbook-thumbs-strip::-webkit-scrollbar {
+  height: 5px;
+}
+
+.brandbook-thumbs-strip::-webkit-scrollbar-thumb {
+  background: var(--gold-primary);
+  border-radius: 3px;
+}
+
+.brandbook-thumb-item {
+  flex: 0 0 96px;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  position: relative;
+  opacity: 0.6;
+  transition: all var(--transition-fast);
+  background: #08080E;
+}
+
+.brandbook-thumb-item.active,
+.brandbook-thumb-item:hover {
+  opacity: 1;
+  border-color: var(--gold-primary);
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.45);
+}
+
+.brandbook-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brandbook-thumb-num {
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  font-family: var(--font-tech);
+  font-size: 0.58rem;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 1px 4px;
+  border-radius: 2px;
+  color: var(--gold-light);
+  font-weight: 700;
+}
+
+/* Écran Défilement Continu Vertical (Behance Flow) */
+.brandbook-scroll-stage {
+  width: 100%;
+  max-height: 75vh;
+  overflow-y: auto;
+  padding-right: 0.6rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold-primary) rgba(255, 255, 255, 0.05);
+}
+
+.brandbook-scroll-stage::-webkit-scrollbar {
+  width: 6px;
+}
+
+.brandbook-scroll-stage::-webkit-scrollbar-thumb {
+  background: var(--gold-primary);
+  border-radius: 3px;
+}
+
+.brandbook-scroll-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.brandbook-scroll-item {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(201, 168, 76, 0.22);
+  background: #07070D;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
+}
+
+.brandbook-scroll-item img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+
+.brandbook-scroll-caption {
+  padding: 0.8rem 1.2rem;
+  font-family: var(--font-tech);
+  font-size: 0.75rem;
+  color: var(--gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0B0B13;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Boîte Spécifications de la Charte */
+.brandbook-specs-box {
+  background: rgba(201, 168, 76, 0.04);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  border-radius: var(--radius-md);
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-bottom: 1.2rem;
+}
+
+.bb-spec-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bb-spec-label {
+  font-family: var(--font-tech);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.bb-spec-val {
+  font-size: 0.85rem;
+  color: #FFF;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Bouton Téléchargement PDF */
+.lightbox-btn-pdf {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.2rem;
+  border-radius: var(--radius-full);
+  background: rgba(201, 168, 76, 0.12);
+  border: 1px solid var(--border-gold);
+  color: var(--gold-light);
+  font-family: var(--font-accent);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  margin-top: 0.4rem;
+}
+
+.lightbox-btn-pdf:hover {
+  background: var(--gold-primary);
+  color: #08080E;
+  box-shadow: 0 0 20px rgba(201, 168, 76, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Mode Plein Écran Natif sur le Stage */
+.brandbook-stage-16-9:fullscreen,
+.brandbook-stage-16-9:-webkit-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+  aspect-ratio: auto !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   7. ANIMATIONS
    -------------------------------------------------------------------------- */
 @keyframes fadeInDown {
   from {

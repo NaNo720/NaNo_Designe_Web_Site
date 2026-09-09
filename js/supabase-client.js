@@ -640,7 +640,7 @@
       variantLabel: 'E-Commerce & Plateforme',
       description: 'Refonte complète de l\'expérience digitale d\'un palace dakarois : moteur de réservation en direct, interface dark chic et paiement Wave/CB intégré.',
       tags: ['UI/UX', 'E-Commerce', 'Wave'],
-      imageUrl: '',
+      imageUrl: 'assets/web-mobile-coding.jpg',
       projectUrl: '',
       createdAt: '2026-08-15T10:00:00Z'
     },
@@ -654,7 +654,7 @@
       variantLabel: 'Avec charte graphique',
       description: 'Création de la marque mère, monogramme vectoriel intemporel, guide chromatique et packaging prestige pour soins naturels exportés à l\'international.',
       tags: ['Branding', 'Livre de Marque', 'Packaging'],
-      imageUrl: '',
+      imageUrl: 'assets/creative-studio-notes.jpg',
       projectUrl: '',
       createdAt: '2026-08-20T11:30:00Z'
     },
@@ -668,7 +668,7 @@
       variantLabel: 'Signalétique Murale',
       description: 'Conception et supervision de pose de la signalétique directionnelle, totems d\'orientation et lettres géantes découpées en laiton avec rétro-éclairage LED.',
       tags: ['Laiton Brossé', 'Habillage', '3D'],
-      imageUrl: '',
+      imageUrl: 'assets/signage-print-design.jpg',
       projectUrl: '',
       createdAt: '2026-08-25T14:00:00Z'
     },
