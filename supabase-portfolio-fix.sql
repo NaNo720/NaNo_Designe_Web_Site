@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS public.portfolio_projects (
 -- Migration automatique si la table existe déjà
 ALTER TABLE public.portfolio_projects ADD COLUMN IF NOT EXISTS variant TEXT DEFAULT 'standard';
 ALTER TABLE public.portfolio_projects ADD COLUMN IF NOT EXISTS variant_label TEXT DEFAULT '';
+ALTER TABLE public.portfolio_projects ADD COLUMN IF NOT EXISTS brandbook_pdf TEXT DEFAULT '';
+ALTER TABLE public.portfolio_projects ADD COLUMN IF NOT EXISTS brandbook_slides JSONB DEFAULT '[]'::jsonb;
 
 -- Index pour vitesse maximale d'affichage
 CREATE INDEX IF NOT EXISTS idx_projects_created_at ON public.portfolio_projects(created_at DESC);

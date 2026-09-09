@@ -986,8 +986,15 @@
 
     if (bbBtnPdf) {
       if (project.brandbookPdf && project.brandbookPdf.trim()) {
-        bbBtnPdf.href = project.brandbookPdf;
         bbBtnPdf.style.display = 'inline-flex';
+        if (project.brandbookPdf.startsWith('indexeddb:') && window.nanoDB && typeof window.nanoDB.resolvePdfUrl === 'function') {
+          bbBtnPdf.href = '#';
+          window.nanoDB.resolvePdfUrl(project.brandbookPdf).then(url => {
+            if (url && bbBtnPdf) bbBtnPdf.href = url;
+          });
+        } else {
+          bbBtnPdf.href = project.brandbookPdf;
+        }
       } else {
         bbBtnPdf.style.display = 'none';
       }

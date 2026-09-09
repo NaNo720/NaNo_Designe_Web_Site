@@ -408,6 +408,68 @@
       }
     },
 
+    // Stockage local haute capacité IndexedDB (pour les fichiers PDF de 10 à 50 Mo sans limite localStorage)
+    _openPdfDB() {
+      return new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          return reject(new Error('IndexedDB non supporté'));
+        }
+        const request = window.indexedDB.open('NanoStudioDB', 1);
+        request.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('brandbook_pdfs')) {
+            db.createObjectStore('brandbook_pdfs');
+          }
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    },
+
+    async savePdfToIndexedDB(key, fileOrBlob) {
+      try {
+        const db = await this._openPdfDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction('brandbook_pdfs', 'readwrite');
+          const store = tx.objectStore('brandbook_pdfs');
+          const req = store.put(fileOrBlob, key);
+          req.onsuccess = () => resolve(true);
+          req.onerror = () => reject(req.error);
+        });
+      } catch (err) {
+        console.warn('[NanoDB] Erreur IndexedDB savePdf:', err);
+        return false;
+      }
+    },
+
+    async getPdfFromIndexedDB(key) {
+      try {
+        const db = await this._openPdfDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction('brandbook_pdfs', 'readonly');
+          const store = tx.objectStore('brandbook_pdfs');
+          const req = store.get(key);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => reject(req.error);
+        });
+      } catch (err) {
+        console.warn('[NanoDB] Erreur IndexedDB getPdf:', err);
+        return null;
+      }
+    },
+
+    async resolvePdfUrl(pdfRef) {
+      if (!pdfRef || typeof pdfRef !== 'string') return '';
+      if (pdfRef.startsWith('indexeddb:')) {
+        const key = pdfRef.replace('indexeddb:', '');
+        const blob = await this.getPdfFromIndexedDB(key);
+        if (blob) {
+          return URL.createObjectURL(blob);
+        }
+      }
+      return pdfRef;
+    },
+
     async getProjects() {
       const cli = this.getClient();
       if (cli) {
@@ -498,17 +560,20 @@
             tags: Array.isArray(projObj.tags) ? projObj.tags.join(', ') : (projObj.tags || ''),
             image_url: projObj.imageUrl || null,
             project_url: projObj.projectUrl || null,
+            brandbook_pdf: projObj.brandbookPdf || null,
             created_at: projObj.createdAt
           };
 
           let { data, error } = await cli.from('portfolio_projects').upsert(payload, { onConflict: 'id' });
           
-          // Repli sécurisé si la table SQL Supabase n'a pas encore les colonnes variant
-          if (error && (error.message && (error.message.includes('variant') || error.message.includes('column')) || error.code === '42703' || error.code === 'PGRST204')) {
-            console.info('[NanoDB] Table Supabase sans colonnes variant, sauvegarde standard...');
-            delete payload.variant;
-            delete payload.variant_label;
-            const retry = await cli.from('portfolio_projects').upsert(payload, { onConflict: 'id' });
+          // Repli sécurisé si la table SQL Supabase n'a pas encore les colonnes variant ou brandbook_pdf
+          if (error && (error.message && (error.message.includes('variant') || error.message.includes('brandbook') || error.message.includes('column')) || error.code === '42703' || error.code === 'PGRST204')) {
+            console.info('[NanoDB] Table Supabase sans colonnes étendues, sauvegarde standard...');
+            const fallbackPayload = { ...payload };
+            delete fallbackPayload.brandbook_pdf;
+            delete fallbackPayload.variant;
+            delete fallbackPayload.variant_label;
+            const retry = await cli.from('portfolio_projects').upsert(fallbackPayload, { onConflict: 'id' });
             error = retry.error;
           }
 
@@ -584,14 +649,16 @@
         tags: Array.isArray(p.tags) ? p.tags.join(', ') : (p.tags || ''),
         image_url: p.imageUrl || null,
         project_url: p.projectUrl || null,
+        brandbook_pdf: p.brandbookPdf || null,
         created_at: p.createdAt || new Date().toISOString()
       }));
 
       try {
         let { data, error } = await cli.from('portfolio_projects').upsert(rows, { onConflict: 'id' });
-        if (error && (error.message && (error.message.includes('variant') || error.message.includes('column')) || error.code === '42703' || error.code === 'PGRST204')) {
+        if (error && (error.message && (error.message.includes('variant') || error.message.includes('brandbook') || error.message.includes('column')) || error.code === '42703' || error.code === 'PGRST204')) {
           const fallbackRows = rows.map(r => {
             const copy = { ...r };
+            delete copy.brandbook_pdf;
             delete copy.variant;
             delete copy.variant_label;
             return copy;
@@ -656,6 +723,7 @@
       tags: ['Branding', 'Livre de Marque', 'Packaging'],
       imageUrl: 'assets/creative-studio-notes.jpg',
       projectUrl: '',
+      brandbookPdf: 'assets/brandbook-teranga-prestige.pdf',
       createdAt: '2026-08-20T11:30:00Z'
     },
     {
@@ -733,6 +801,8 @@
       tags: tagsArr,
       imageUrl: row.image_url || '',
       projectUrl: row.project_url || '',
+      brandbookPdf: row.brandbook_pdf || row.brandbookPdf || '',
+      brandbookSlides: row.brandbook_slides || row.brandbookSlides || null,
       createdAt: row.created_at || new Date().toISOString()
     };
   }
