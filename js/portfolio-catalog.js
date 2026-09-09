@@ -76,6 +76,7 @@
   const bbSpecsBox = document.getElementById('brandbook-specs-box');
   const bbSpecsCount = document.getElementById('bb-specs-count');
   const bbBtnPdf = document.getElementById('lightbox-btn-pdf');
+  const bbLeadLabel = document.getElementById('bb-lead-label');
 
   // État local du Brand Book
   let currentBrandbookSlides = [];
@@ -216,6 +217,20 @@
         closeLightbox();
       }
     });
+
+    // Délégation d'événements sur la grille : tout clic sur une carte ou ses éléments enfants ouvre immédiatement la Lightbox
+    if (gridContainer) {
+      gridContainer.addEventListener('click', (e) => {
+        const card = e.target.closest('.pinterest-card');
+        if (!card) return;
+        const projId = card.getAttribute('data-id');
+        const project = allProjects.find(p => p.id === projId);
+        if (project) {
+          e.preventDefault();
+          openLightbox(project);
+        }
+      });
+    }
 
     // Écoute des synchronisations temps réel (Supabase et admin)
     window.addEventListener('nanoProjectSaved', async () => {
@@ -420,6 +435,7 @@
     // Clic pour ouvrir la Lightbox
     const openHandler = (e) => {
       e.preventDefault();
+      e.stopPropagation();
       openLightbox(project);
     };
 
@@ -430,6 +446,11 @@
         openLightbox(project);
       }
     });
+
+    const zoomBtn = card.querySelector('.pinterest-quick-zoom');
+    if (zoomBtn) {
+      zoomBtn.addEventListener('click', openHandler);
+    }
 
     return card;
   }
@@ -451,6 +472,21 @@
 
     if (bbFullscreenToggle) {
       bbFullscreenToggle.addEventListener('click', toggleBrandbookFullscreen);
+    }
+
+    // Clic sécurisé pour consulter le Brand Book PDF complet
+    if (bbBtnPdf) {
+      bbBtnPdf.addEventListener('click', async (e) => {
+        if (!currentActiveProject || !currentActiveProject.brandbookPdf) return;
+        const pdfRef = currentActiveProject.brandbookPdf;
+        if (pdfRef.startsWith('indexeddb:') && window.nanoDB && typeof window.nanoDB.resolvePdfUrl === 'function') {
+          e.preventDefault();
+          const blobUrl = await window.nanoDB.resolvePdfUrl(pdfRef);
+          if (blobUrl) {
+            window.open(blobUrl, '_blank', 'noopener,noreferrer');
+          }
+        }
+      });
     }
 
     // Navigation Clavier pour la charte
@@ -882,9 +918,22 @@
           viewport: viewport
         }).promise;
 
+        const pageTitles = [
+          "Couverture & Identité Institutionnelle",
+          "Architecture Visuelle & Sommaire",
+          "Grille de Construction & Proportions",
+          "Zone d'Isolement & Tailles Minimales",
+          "Palette Chromatique (CMJN, RVB, Pantone)",
+          "Système Typographique & Hiérarchies",
+          "Variantes Autorisées & Interdits",
+          "Papeterie Institutionnelle & Cartes",
+          "Applications Signalétiques & Merchandising",
+          "Guide d'Export & Normes de Marque"
+        ];
+        const slideTitle = pageTitles[i - 1] || `Système Normé • Section ${i.toString().padStart(2, '0')}`;
         const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
         slides.push({
-          title: `Planche ${i.toString().padStart(2, '0')} / ${numPages.toString().padStart(2, '0')}`,
+          title: slideTitle,
           url: dataUrl
         });
       }
@@ -1034,132 +1083,140 @@
   // ==============================================================================
 
   async function openLightbox(project) {
-    if (!lightboxModal) return;
+    if (!lightboxModal) {
+      console.warn('[Lightbox] Element catalog-lightbox-modal introuvable');
+      return;
+    }
     currentActiveProject = project;
 
-    const brandbookSlides = getBrandbookSlidesForProject(project);
-    const hasPdf = Boolean(project.brandbookPdf && project.brandbookPdf.trim());
-    const isBrandbook = Boolean(brandbookSlides && brandbookSlides.length > 0) || hasPdf;
+    // 1. Ouvrir immédiatement la modale pour une réactivité instantanée
+    document.body.style.overflow = 'hidden';
+    lightboxModal.classList.add('is-open');
 
-    if (isBrandbook) {
-      if (lightboxDialog) lightboxDialog.classList.add('brandbook-mode');
-      if (lightboxStandardMedia) lightboxStandardMedia.style.display = 'none';
-      if (lightboxBrandbookPlayer) lightboxBrandbookPlayer.style.display = 'flex';
-      if (bbSpecsBox) bbSpecsBox.style.display = 'flex';
+    try {
+      if (lightboxIdTag) lightboxIdTag.textContent = project.id || 'PROJET';
+      if (lightboxCatBadge) lightboxCatBadge.textContent = project.categoryLabel || project.category;
+      
+      if (lightboxVariantBadge) {
+        if (project.variantLabel) {
+          lightboxVariantBadge.textContent = project.variantLabel;
+          lightboxVariantBadge.style.display = 'inline-block';
+        } else {
+          lightboxVariantBadge.style.display = 'none';
+        }
+      }
 
-      const initialSlides = (brandbookSlides && brandbookSlides.length > 0) ? brandbookSlides : generateMasterBrandbookSlides(project);
-      if (bbSpecsCount) bbSpecsCount.textContent = `${initialSlides.length} Planches HD`;
-      renderBrandbook(initialSlides, project);
+      if (lightboxClientLead) lightboxClientLead.textContent = project.client || 'CLIENT CONFIDENTIEL';
+      if (lightboxTitle) lightboxTitle.textContent = project.title;
+      if (lightboxDesc) lightboxDesc.textContent = project.description || 'Conception et réalisation sur-mesure signées par l\'équipe créative Nano Design Dakar.';
 
-      if (hasPdf) {
-        if (bbLeadLabel) bbLeadLabel.textContent = '✦ CHARGEMENT DU BRAND BOOK PDF (1920×1080)...';
-        loadPdfBrandbookSlides(project.brandbookPdf, (curr, total) => {
-          if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
-            bbLeadLabel.textContent = `✦ RENDU DU BRAND BOOK PDF (${curr}/${total} PLANCHES)...`;
-          }
-        }).then(pdfSlides => {
-          if (pdfSlides && pdfSlides.length > 0 && currentActiveProject && currentActiveProject.id === project.id) {
-            if (bbSpecsCount) bbSpecsCount.textContent = `${pdfSlides.length} Planches HD (PDF)`;
-            if (bbLeadLabel) bbLeadLabel.textContent = `✦ BRAND BOOK OFFICIEL • ${pdfSlides.length} PLANCHES HD`;
-            renderBrandbook(pdfSlides, project);
-          } else if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
-            bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • ÉDITION STUDIO 16:9';
-          }
-        }).catch(err => {
-          console.warn('[BrandBook] Repli sur les planches vectorielles studio:', err);
-          if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
-            bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • ÉDITION STUDIO 16:9';
+      if (lightboxTags) {
+        lightboxTags.innerHTML = '';
+        const tags = Array.isArray(project.tags) ? project.tags : (typeof project.tags === 'string' ? project.tags.split(',') : []);
+        tags.forEach(t => {
+          if (t && typeof t === 'string' && t.trim() && !t.includes('|| META:')) {
+            const pill = document.createElement('span');
+            pill.className = 'lightbox-tag-pill';
+            pill.textContent = `#${t.trim()}`;
+            lightboxTags.appendChild(pill);
           }
         });
-      } else {
-        if (bbLeadLabel) bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • 1920×1080';
       }
-    } else {
-      if (lightboxDialog) lightboxDialog.classList.remove('brandbook-mode');
-      if (lightboxStandardMedia) lightboxStandardMedia.style.display = 'flex';
-      if (lightboxBrandbookPlayer) lightboxBrandbookPlayer.style.display = 'none';
-      if (bbSpecsBox) bbSpecsBox.style.display = 'none';
 
-      if (lightboxImg) {
-        lightboxImg.src = project.imageUrl || '';
-        lightboxImg.alt = project.title;
-        lightboxImg.style.display = project.imageUrl ? 'block' : 'none';
+      const brandbookSlides = getBrandbookSlidesForProject(project);
+      const hasPdf = Boolean(project.brandbookPdf && project.brandbookPdf.trim());
+      const isBrandbook = Boolean(brandbookSlides && brandbookSlides.length > 0) || hasPdf;
+
+      if (lightboxCta) {
+        const categoryMap = {
+          'logos': 'logo',
+          'web': 'siteweb',
+          'supports': 'support'
+        };
+        const quoteService = categoryMap[project.category] || 'logo';
+        lightboxCta.href = `index.html#devis?service=${quoteService}&variant=${encodeURIComponent(project.variant || '')}`;
+        lightboxCta.innerHTML = isBrandbook
+          ? `<span>Demander une charte graphique similaire ✦</span>`
+          : `<span>Demander un devis similaire ✦</span>`;
       }
-    }
 
-    if (lightboxIdTag) lightboxIdTag.textContent = project.id || 'PROJET';
-    if (lightboxCatBadge) lightboxCatBadge.textContent = project.categoryLabel || project.category;
-    
-    if (lightboxVariantBadge) {
-      if (project.variantLabel) {
-        lightboxVariantBadge.textContent = project.variantLabel;
-        lightboxVariantBadge.style.display = 'inline-block';
-      } else {
-        lightboxVariantBadge.style.display = 'none';
-      }
-    }
-
-    if (lightboxClientLead) lightboxClientLead.textContent = project.client || 'CLIENT CONFIDENTIEL';
-    if (lightboxTitle) lightboxTitle.textContent = project.title;
-    if (lightboxDesc) lightboxDesc.textContent = project.description || 'Conception et réalisation sur-mesure signées par l\'équipe créative Nano Design Dakar.';
-
-    if (lightboxTags) {
-      lightboxTags.innerHTML = '';
-      const tags = Array.isArray(project.tags) ? project.tags : (typeof project.tags === 'string' ? project.tags.split(',') : []);
-      tags.forEach(t => {
-        if (t.trim()) {
-          const pill = document.createElement('span');
-          pill.className = 'lightbox-tag-pill';
-          pill.textContent = `#${t.trim()}`;
-          lightboxTags.appendChild(pill);
+      if (lightboxLiveLink) {
+        if (project.projectUrl && project.projectUrl.trim()) {
+          lightboxLiveLink.href = project.projectUrl;
+          lightboxLiveLink.style.display = 'inline-flex';
+        } else {
+          lightboxLiveLink.style.display = 'none';
         }
-      });
-    }
-
-    if (lightboxCta) {
-      const categoryMap = {
-        'logos': 'logo',
-        'web': 'siteweb',
-        'supports': 'support'
-      };
-      const quoteService = categoryMap[project.category] || 'logo';
-      lightboxCta.href = `index.html#devis?service=${quoteService}&variant=${encodeURIComponent(project.variant || '')}`;
-      lightboxCta.innerHTML = isBrandbook
-        ? `<span>Demander une charte graphique similaire ✦</span>`
-        : `<span>Demander un devis similaire ✦</span>`;
-    }
-
-    if (lightboxLiveLink) {
-      if (project.projectUrl && project.projectUrl.trim()) {
-        lightboxLiveLink.href = project.projectUrl;
-        lightboxLiveLink.style.display = 'inline-flex';
-      } else {
-        lightboxLiveLink.style.display = 'none';
       }
-    }
 
-    if (bbBtnPdf) {
-      if (project.brandbookPdf && project.brandbookPdf.trim()) {
-        bbBtnPdf.style.display = 'inline-flex';
-        bbBtnPdf.target = '_blank';
-        bbBtnPdf.setAttribute('rel', 'noopener noreferrer');
-        if (project.brandbookPdf.startsWith('indexeddb:') && window.nanoDB && typeof window.nanoDB.resolvePdfUrl === 'function') {
-          bbBtnPdf.href = '#';
-          window.nanoDB.resolvePdfUrl(project.brandbookPdf).then(url => {
-            if (url && bbBtnPdf) {
-              bbBtnPdf.href = url;
+      if (bbBtnPdf) {
+        if (project.brandbookPdf && project.brandbookPdf.trim()) {
+          bbBtnPdf.style.display = 'inline-flex';
+          bbBtnPdf.target = '_blank';
+          bbBtnPdf.setAttribute('rel', 'noopener noreferrer');
+          if (project.brandbookPdf.startsWith('indexeddb:') && window.nanoDB && typeof window.nanoDB.resolvePdfUrl === 'function') {
+            bbBtnPdf.href = '#';
+            window.nanoDB.resolvePdfUrl(project.brandbookPdf).then(url => {
+              if (url && bbBtnPdf) {
+                bbBtnPdf.href = url;
+              }
+            });
+          } else {
+            bbBtnPdf.href = project.brandbookPdf;
+          }
+        } else {
+          bbBtnPdf.style.display = 'none';
+        }
+      }
+
+      if (isBrandbook) {
+        if (lightboxDialog) lightboxDialog.classList.add('brandbook-mode');
+        if (lightboxStandardMedia) lightboxStandardMedia.style.display = 'none';
+        if (lightboxBrandbookPlayer) lightboxBrandbookPlayer.style.display = 'flex';
+        if (bbSpecsBox) bbSpecsBox.style.display = 'flex';
+
+        const initialSlides = (brandbookSlides && brandbookSlides.length > 0) ? brandbookSlides : generateMasterBrandbookSlides(project);
+        if (bbSpecsCount) bbSpecsCount.textContent = `${initialSlides.length} Planches HD`;
+        renderBrandbook(initialSlides, project);
+
+        if (hasPdf) {
+          if (bbLeadLabel) bbLeadLabel.textContent = '✦ CHARGEMENT DU BRAND BOOK PDF (1920×1080)...';
+          loadPdfBrandbookSlides(project.brandbookPdf, (curr, total) => {
+            if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
+              bbLeadLabel.textContent = `✦ RENDU DU BRAND BOOK PDF (${curr}/${total} PLANCHES)...`;
+            }
+          }).then(pdfSlides => {
+            if (pdfSlides && pdfSlides.length > 0 && currentActiveProject && currentActiveProject.id === project.id) {
+              if (bbSpecsCount) bbSpecsCount.textContent = `${pdfSlides.length} Planches HD (PDF)`;
+              if (bbLeadLabel) bbLeadLabel.textContent = `✦ BRAND BOOK OFFICIEL • ${pdfSlides.length} PLANCHES HD`;
+              renderBrandbook(pdfSlides, project);
+            } else if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
+              bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • ÉDITION STUDIO 16:9';
+            }
+          }).catch(err => {
+            console.warn('[BrandBook] Repli sur les planches vectorielles studio:', err);
+            if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
+              bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • ÉDITION STUDIO 16:9';
             }
           });
         } else {
-          bbBtnPdf.href = project.brandbookPdf;
+          if (bbLeadLabel) bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • 1920×1080';
         }
       } else {
-        bbBtnPdf.style.display = 'none';
-      }
-    }
+        if (lightboxDialog) lightboxDialog.classList.remove('brandbook-mode');
+        if (lightboxStandardMedia) lightboxStandardMedia.style.display = 'flex';
+        if (lightboxBrandbookPlayer) lightboxBrandbookPlayer.style.display = 'none';
+        if (bbSpecsBox) bbSpecsBox.style.display = 'none';
 
-    document.body.style.overflow = 'hidden';
-    lightboxModal.classList.add('is-open');
+        if (lightboxImg) {
+          lightboxImg.src = project.imageUrl || '';
+          lightboxImg.alt = project.title;
+          lightboxImg.style.display = project.imageUrl ? 'block' : 'none';
+        }
+      }
+    } catch (err) {
+      console.error('[Lightbox] Exception openLightbox:', err);
+    }
   }
 
   function closeLightbox() {
