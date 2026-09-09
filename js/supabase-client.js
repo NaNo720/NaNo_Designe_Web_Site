@@ -558,6 +558,17 @@
 
       if (cli) {
         try {
+          const metaEnvelope = {
+            variant: projObj.variant || 'standard',
+            variantLabel: projObj.variantLabel || '',
+            brandbookPdf: projObj.brandbookPdf || '',
+            brandbookSlides: projObj.brandbookSlides || null
+          };
+          const cleanTags = Array.isArray(projObj.tags)
+            ? projObj.tags.filter(t => typeof t === 'string' && !t.includes('|| META:')).join(', ')
+            : (projObj.tags || '').split('|| META:')[0].trim();
+          const enrichedTags = cleanTags + ' || META:' + JSON.stringify(metaEnvelope);
+
           const payload = {
             id: projObj.id,
             title: projObj.title,
@@ -567,7 +578,7 @@
             variant: projObj.variant || 'standard',
             variant_label: projObj.variantLabel || '',
             description: projObj.description,
-            tags: Array.isArray(projObj.tags) ? projObj.tags.join(', ') : (projObj.tags || ''),
+            tags: enrichedTags,
             image_url: projObj.imageUrl || null,
             project_url: projObj.projectUrl || null,
             brandbook_pdf: projObj.brandbookPdf || null,
@@ -578,11 +589,12 @@
           
           // Repli sécurisé si la table SQL Supabase n'a pas encore les colonnes variant ou brandbook_pdf
           if (error && (error.message && (error.message.includes('variant') || error.message.includes('brandbook') || error.message.includes('column')) || error.code === '42703' || error.code === 'PGRST204')) {
-            console.info('[NanoDB] Table Supabase sans colonnes étendues, sauvegarde standard...');
+            console.info('[NanoDB] Table Supabase sans colonnes étendues, sauvegarde standard avec métadonnées sécurisées...');
             const fallbackPayload = { ...payload };
             delete fallbackPayload.brandbook_pdf;
             delete fallbackPayload.variant;
             delete fallbackPayload.variant_label;
+            fallbackPayload.tags = enrichedTags;
             const retry = await cli.from('portfolio_projects').upsert(fallbackPayload, { onConflict: 'id' });
             error = retry.error;
           }
@@ -647,21 +659,34 @@
         localList = defaultProjects;
       }
 
-      const rows = localList.map(p => ({
-        id: p.id,
-        title: p.title,
-        client: p.client,
-        category: p.category,
-        category_label: p.categoryLabel || p.category,
-        variant: p.variant || 'standard',
-        variant_label: p.variantLabel || '',
-        description: p.description,
-        tags: Array.isArray(p.tags) ? p.tags.join(', ') : (p.tags || ''),
-        image_url: p.imageUrl || null,
-        project_url: p.projectUrl || null,
-        brandbook_pdf: p.brandbookPdf || null,
-        created_at: p.createdAt || new Date().toISOString()
-      }));
+      const rows = localList.map(p => {
+        const metaEnvelope = {
+          variant: p.variant || 'standard',
+          variantLabel: p.variantLabel || '',
+          brandbookPdf: p.brandbookPdf || '',
+          brandbookSlides: p.brandbookSlides || null
+        };
+        const cleanTags = Array.isArray(p.tags)
+          ? p.tags.filter(t => typeof t === 'string' && !t.includes('|| META:')).join(', ')
+          : (p.tags || '').split('|| META:')[0].trim();
+        const enrichedTags = cleanTags + ' || META:' + JSON.stringify(metaEnvelope);
+
+        return {
+          id: p.id,
+          title: p.title,
+          client: p.client,
+          category: p.category,
+          category_label: p.categoryLabel || p.category,
+          variant: p.variant || 'standard',
+          variant_label: p.variantLabel || '',
+          description: p.description,
+          tags: enrichedTags,
+          image_url: p.imageUrl || null,
+          project_url: p.projectUrl || null,
+          brandbook_pdf: p.brandbookPdf || null,
+          created_at: p.createdAt || new Date().toISOString()
+        };
+      });
 
       try {
         let { data, error } = await cli.from('portfolio_projects').upsert(rows, { onConflict: 'id' });
@@ -795,18 +820,36 @@
   ];
 
   function dbToProject(row) {
+    let rawTags = row.tags || '';
+    let meta = {};
+
+    if (typeof rawTags === 'string' && rawTags.includes('|| META:')) {
+      const parts = rawTags.split('|| META:');
+      rawTags = parts[0].trim();
+      try {
+        meta = JSON.parse(parts[1].trim());
+      } catch (e) {
+        console.warn('[NanoDB] Erreur décodage META tags:', e);
+      }
+    }
+
     let tagsArr = [];
-    if (Array.isArray(row.tags)) tagsArr = row.tags;
-    else if (typeof row.tags === 'string') tagsArr = row.tags.split(',').map(t => t.trim()).filter(Boolean);
+    if (Array.isArray(rawTags)) {
+      tagsArr = rawTags.filter(t => typeof t === 'string' && !t.includes('|| META:'));
+    } else if (typeof rawTags === 'string') {
+      tagsArr = rawTags.split(',').map(t => t.trim()).filter(Boolean);
+    }
 
-    const hasPdf = Boolean(row.brandbook_pdf || row.brandbookPdf);
-    const hasSlides = Boolean(row.brandbook_slides || row.brandbookSlides);
-    const mentionsCharte = `${row.title || ''} ${row.description || ''} ${row.variant_label || ''}`.toLowerCase().includes('charte');
+    const pdfRef = row.brandbook_pdf || row.brandbookPdf || meta.brandbookPdf || '';
+    const hasPdf = Boolean(pdfRef && pdfRef.trim());
+    const slidesData = row.brandbook_slides || row.brandbookSlides || meta.brandbookSlides || null;
+    const hasSlides = Boolean(slidesData && (Array.isArray(slidesData) ? slidesData.length > 0 : true));
+    const mentionsCharte = `${row.title || ''} ${row.description || ''} ${row.variant_label || ''} ${meta.variantLabel || ''}`.toLowerCase().includes('charte');
 
-    let variant = row.variant || row.service_variant;
-    let variantLabel = row.variant_label || row.variantLabel;
+    let variant = row.variant || row.service_variant || meta.variant;
+    let variantLabel = row.variant_label || row.variantLabel || meta.variantLabel;
 
-    if (hasPdf || hasSlides || mentionsCharte) {
+    if (hasPdf || hasSlides || mentionsCharte || (row.category === 'logos' && (hasPdf || mentionsCharte))) {
       if (!variant || variant === 'standard' || variant === 'logos' || variant === 'avec-charte') {
         variant = 'avec-charte';
         variantLabel = 'Avec charte graphique';
@@ -827,8 +870,8 @@
       tags: tagsArr,
       imageUrl: row.image_url || '',
       projectUrl: row.project_url || '',
-      brandbookPdf: row.brandbook_pdf || row.brandbookPdf || '',
-      brandbookSlides: row.brandbook_slides || row.brandbookSlides || null,
+      brandbookPdf: pdfRef,
+      brandbookSlides: slidesData,
       createdAt: row.created_at || new Date().toISOString()
     };
   }

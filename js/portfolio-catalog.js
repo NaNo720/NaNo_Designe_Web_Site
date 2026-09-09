@@ -557,6 +557,31 @@
       return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg.trim());
     }
 
+    const hasImg = Boolean(project.imageUrl && project.imageUrl.trim());
+    const logoEmbedCover = hasImg
+      ? `<image href="${project.imageUrl}" x="-220" y="-150" width="440" height="220" preserveAspectRatio="xMidYMid meet" />`
+      : `<circle cx="0" cy="-50" r="140" fill="none" stroke="url(#pGold)" stroke-width="3" stroke-dasharray="8 6"/>
+         <polygon points="0,-160 120,-20 75,100 -75,100 -120,-20" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="2"/>
+         <path d="M-60,30 L0,-90 L60,30 L30,30 L0,-30 L-30,30 Z" fill="url(#pGold)"/>`;
+
+    const cardLogoDark = hasImg
+      ? `<image href="${project.imageUrl}" x="40" y="150" width="450" height="320" preserveAspectRatio="xMidYMid meet" />`
+      : `<circle cx="0" cy="-30" r="85" fill="none" stroke="url(#pGold)" stroke-width="2"/>
+         <path d="M-40,20 L0,-60 L40,20 L20,20 L0,-20 L-20,20 Z" fill="url(#pGold)"/>
+         <text x="0" y="95" fill="#FFFFFF" font-family="'Syne', sans-serif" font-size="28" font-weight="800" text-anchor="middle" letter-spacing="4">${clientName}</text>`;
+
+    const cardLogoLight = hasImg
+      ? `<image href="${project.imageUrl}" x="620" y="150" width="450" height="320" preserveAspectRatio="xMidYMid meet" />`
+      : `<circle cx="0" cy="-30" r="85" fill="none" stroke="#7A5E1E" stroke-width="2"/>
+         <path d="M-40,20 L0,-60 L40,20 L20,20 L0,-20 L-20,20 Z" fill="#0C0C16"/>
+         <text x="0" y="95" fill="#0C0C16" font-family="'Syne', sans-serif" font-size="28" font-weight="800" text-anchor="middle" letter-spacing="4">${clientName}</text>`;
+
+    const cardLogoMono = hasImg
+      ? `<image href="${project.imageUrl}" x="1200" y="150" width="450" height="320" preserveAspectRatio="xMidYMid meet" />`
+      : `<circle cx="0" cy="-30" r="85" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+         <path d="M-40,20 L0,-60 L40,20 L20,20 L0,-20 L-20,20 Z" fill="#FFFFFF"/>
+         <text x="0" y="95" fill="#FFFFFF" font-family="'Syne', sans-serif" font-size="28" font-weight="800" text-anchor="middle" letter-spacing="4">${clientName}</text>`;
+
     return [
       {
         title: "01. Couverture & Identité Institutionnelle",
@@ -564,14 +589,12 @@
           "01 / 10 • COUVERTURE DU BRAND BOOK",
           "SYSTEM IDENTIFICATION & STANDARDS",
           `
-          <g transform="translate(960, 490)">
-            <circle cx="0" cy="-50" r="140" fill="none" stroke="url(#pGold)" stroke-width="3" stroke-dasharray="8 6"/>
-            <polygon points="0,-160 120,-20 75,100 -75,100 -120,-20" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="2"/>
-            <path d="M-60,30 L0,-90 L60,30 L30,30 L0,-30 L-30,30 Z" fill="url(#pGold)"/>
-            <text x="0" y="140" fill="#FFFFFF" font-family="'Syne', sans-serif" font-size="52" font-weight="800" text-anchor="middle" letter-spacing="8">${clientName}</text>
-            <text x="0" y="185" fill="#C9A84C" font-family="'Playfair Display', serif" font-size="24" font-style="italic" text-anchor="middle">Livre de Marque & Système Visuel de Référence</text>
-            <rect x="-180" y="225" width="360" height="38" rx="19" fill="rgba(201,168,76,0.12)" stroke="rgba(201,168,76,0.4)" stroke-width="1.2"/>
-            <text x="0" y="249" fill="#E8D49E" font-family="'Space Grotesk', monospace" font-size="14" font-weight="700" text-anchor="middle" letter-spacing="3">VOLUME 01 • ÉDITION COMPLÈTE (38 PLANCHES)</text>
+          <g transform="translate(960, 480)">
+            ${logoEmbedCover}
+            <text x="0" y="130" fill="#FFFFFF" font-family="'Syne', sans-serif" font-size="50" font-weight="800" text-anchor="middle" letter-spacing="6">${(project.title || clientName).toUpperCase()}</text>
+            <text x="0" y="180" fill="#C9A84C" font-family="'Playfair Display', serif" font-size="24" font-style="italic" text-anchor="middle">Livre de Marque & Système Visuel de Référence • ${clientName}</text>
+            <rect x="-220" y="220" width="440" height="38" rx="19" fill="rgba(201,168,76,0.12)" stroke="rgba(201,168,76,0.4)" stroke-width="1.2"/>
+            <text x="0" y="244" fill="#E8D49E" font-family="'Space Grotesk', monospace" font-size="14" font-weight="700" text-anchor="middle" letter-spacing="3">VOLUME OFFICIEL • ÉDITION HAUTE DÉFINITION 16:9</text>
           </g>
           `
         )
@@ -608,27 +631,15 @@
           <g transform="translate(110, 220)">
             <rect x="0" y="0" width="530" height="620" rx="14" fill="#0C0C16" stroke="rgba(201,168,76,0.3)" stroke-width="1.5"/>
             <text x="35" y="55" fill="#C9A84C" font-family="'Space Grotesk', monospace" font-size="15" font-weight="700">01. VERSION SOMBRE • MASTER</text>
-            <g transform="translate(265, 340)">
-              <circle cx="0" cy="-30" r="85" fill="none" stroke="url(#pGold)" stroke-width="2"/>
-              <path d="M-40,20 L0,-60 L40,20 L20,20 L0,-20 L-20,20 Z" fill="url(#pGold)"/>
-              <text x="0" y="95" fill="#FFFFFF" font-family="'Syne', sans-serif" font-size="28" font-weight="800" text-anchor="middle" letter-spacing="4">${clientName}</text>
-            </g>
+            ${hasImg ? cardLogoDark : `<g transform="translate(265, 340)">${cardLogoDark}</g>`}
 
             <rect x="580" y="0" width="530" height="620" rx="14" fill="#F8F6F0" stroke="rgba(201,168,76,0.5)" stroke-width="1.5"/>
             <text x="615" y="55" fill="#7A5E1E" font-family="'Space Grotesk', monospace" font-size="15" font-weight="700">02. VERSION CLAIRE • PAPIER & LÉGAL</text>
-            <g transform="translate(845, 340)">
-              <circle cx="0" cy="-30" r="85" fill="none" stroke="#7A5E1E" stroke-width="2"/>
-              <path d="M-40,20 L0,-60 L40,20 L20,20 L0,-20 L-20,20 Z" fill="#0C0C16"/>
-              <text x="0" y="95" fill="#0C0C16" font-family="'Syne', sans-serif" font-size="28" font-weight="800" text-anchor="middle" letter-spacing="4">${clientName}</text>
-            </g>
+            ${hasImg ? cardLogoLight : `<g transform="translate(845, 340)">${cardLogoLight}</g>`}
 
             <rect x="1160" y="0" width="530" height="620" rx="14" fill="#151522" stroke="rgba(201,168,76,0.3)" stroke-width="1.5"/>
             <text x="1195" y="55" fill="#C9A84C" font-family="'Space Grotesk', monospace" font-size="15" font-weight="700">03. MONOCHROME • GRAVURE & FOIL</text>
-            <g transform="translate(1425, 340)">
-              <circle cx="0" cy="-30" r="85" fill="none" stroke="#FFFFFF" stroke-width="2"/>
-              <path d="M-40,20 L0,-60 L40,20 L20,20 L0,-20 L-20,20 Z" fill="#FFFFFF"/>
-              <text x="0" y="95" fill="#FFFFFF" font-family="'Syne', sans-serif" font-size="28" font-weight="800" text-anchor="middle" letter-spacing="4">${clientName}</text>
-            </g>
+            ${hasImg ? cardLogoMono : `<g transform="translate(1425, 340)">${cardLogoMono}</g>`}
           </g>
           `
         )
@@ -817,6 +828,75 @@
     ];
   }
 
+  const pdfSlidesCache = new Map();
+
+  async function loadPdfBrandbookSlides(pdfSource, onProgress) {
+    if (!window.pdfjsLib) {
+      console.warn('[BrandBook] Moteur PDF.js non disponible');
+      return null;
+    }
+
+    if (pdfSlidesCache.has(pdfSource)) {
+      return pdfSlidesCache.get(pdfSource);
+    }
+
+    try {
+      if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+
+      let docInitParams = pdfSource;
+      if (typeof pdfSource === 'string' && pdfSource.startsWith('indexeddb:') && window.nanoDB && typeof window.nanoDB.getPdfFromIndexedDB === 'function') {
+        const key = pdfSource.replace('indexeddb:', '');
+        const blob = await window.nanoDB.getPdfFromIndexedDB(key);
+        if (blob) {
+          const buffer = await blob.arrayBuffer();
+          docInitParams = { data: buffer };
+        } else {
+          return null;
+        }
+      }
+
+      const loadingTask = window.pdfjsLib.getDocument(docInitParams);
+      const pdf = await loadingTask.promise;
+      const numPages = pdf.numPages;
+      const slides = [];
+
+      for (let i = 1; i <= numPages; i++) {
+        if (typeof onProgress === 'function') {
+          onProgress(i, numPages);
+        }
+        const page = await pdf.getPage(i);
+        const unscaledViewport = page.getViewport({ scale: 1.0 });
+        const targetWidth = 1920;
+        const scale = Math.min(targetWidth / unscaledViewport.width, 2.0);
+        const viewport = page.getViewport({ scale });
+
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d', { alpha: false });
+
+        await page.render({
+          canvasContext: ctx,
+          viewport: viewport
+        }).promise;
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+        slides.push({
+          title: `Planche ${i.toString().padStart(2, '0')} / ${numPages.toString().padStart(2, '0')}`,
+          url: dataUrl
+        });
+      }
+
+      pdfSlidesCache.set(pdfSource, slides);
+      return slides;
+    } catch (err) {
+      console.warn('[BrandBook] Erreur rendu PDF.js:', err);
+      return null;
+    }
+  }
+
   function renderBrandbook(slides, project) {
     currentBrandbookSlides = slides || [];
     currentSlideIndex = 0;
@@ -953,7 +1033,7 @@
   // GESTION DU MODAL LIGHTBOX ÉTUDE DE CAS
   // ==============================================================================
 
-  function openLightbox(project) {
+  async function openLightbox(project) {
     if (!lightboxModal) return;
     currentActiveProject = project;
 
@@ -966,8 +1046,34 @@
       if (lightboxStandardMedia) lightboxStandardMedia.style.display = 'none';
       if (lightboxBrandbookPlayer) lightboxBrandbookPlayer.style.display = 'flex';
       if (bbSpecsBox) bbSpecsBox.style.display = 'flex';
-      if (bbSpecsCount) bbSpecsCount.textContent = `${brandbookSlides.length} Planches HD`;
-      renderBrandbook(brandbookSlides, project);
+
+      const initialSlides = (brandbookSlides && brandbookSlides.length > 0) ? brandbookSlides : generateMasterBrandbookSlides(project);
+      if (bbSpecsCount) bbSpecsCount.textContent = `${initialSlides.length} Planches HD`;
+      renderBrandbook(initialSlides, project);
+
+      if (hasPdf) {
+        if (bbLeadLabel) bbLeadLabel.textContent = '✦ CHARGEMENT DU BRAND BOOK PDF (1920×1080)...';
+        loadPdfBrandbookSlides(project.brandbookPdf, (curr, total) => {
+          if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
+            bbLeadLabel.textContent = `✦ RENDU DU BRAND BOOK PDF (${curr}/${total} PLANCHES)...`;
+          }
+        }).then(pdfSlides => {
+          if (pdfSlides && pdfSlides.length > 0 && currentActiveProject && currentActiveProject.id === project.id) {
+            if (bbSpecsCount) bbSpecsCount.textContent = `${pdfSlides.length} Planches HD (PDF)`;
+            if (bbLeadLabel) bbLeadLabel.textContent = `✦ BRAND BOOK OFFICIEL • ${pdfSlides.length} PLANCHES HD`;
+            renderBrandbook(pdfSlides, project);
+          } else if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
+            bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • ÉDITION STUDIO 16:9';
+          }
+        }).catch(err => {
+          console.warn('[BrandBook] Repli sur les planches vectorielles studio:', err);
+          if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
+            bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • ÉDITION STUDIO 16:9';
+          }
+        });
+      } else {
+        if (bbLeadLabel) bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • 1920×1080';
+      }
     } else {
       if (lightboxDialog) lightboxDialog.classList.remove('brandbook-mode');
       if (lightboxStandardMedia) lightboxStandardMedia.style.display = 'flex';
@@ -1035,10 +1141,14 @@
     if (bbBtnPdf) {
       if (project.brandbookPdf && project.brandbookPdf.trim()) {
         bbBtnPdf.style.display = 'inline-flex';
+        bbBtnPdf.target = '_blank';
+        bbBtnPdf.setAttribute('rel', 'noopener noreferrer');
         if (project.brandbookPdf.startsWith('indexeddb:') && window.nanoDB && typeof window.nanoDB.resolvePdfUrl === 'function') {
           bbBtnPdf.href = '#';
           window.nanoDB.resolvePdfUrl(project.brandbookPdf).then(url => {
-            if (url && bbBtnPdf) bbBtnPdf.href = url;
+            if (url && bbBtnPdf) {
+              bbBtnPdf.href = url;
+            }
           });
         } else {
           bbBtnPdf.href = project.brandbookPdf;
