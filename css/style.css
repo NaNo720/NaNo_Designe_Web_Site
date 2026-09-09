@@ -1138,7 +1138,7 @@ button, input, textarea, select {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.8rem;
-  margin-bottom: 3.5rem;
+  margin-bottom: 2.2rem;
 }
 
 @media (max-width: 992px) {
@@ -1263,7 +1263,7 @@ button, input, textarea, select {
   border: 1px solid var(--border-gold);
   border-radius: var(--radius-lg);
   padding: 2.5rem 2.8rem;
-  margin-top: 3rem;
+  margin-top: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
