@@ -110,14 +110,14 @@
    -------------------------------------------------------------------------- */
 .catalog-filter-section {
   position: sticky;
-  top: 76px;
+  top: var(--header-h, 76px);
   z-index: 90;
-  background: rgba(8, 8, 12, 0.92);
+  background: rgba(8, 8, 12, 0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
   padding: 1rem 1.5rem;
-  transition: box-shadow var(--transition-fast);
+  transition: top var(--transition-normal), box-shadow var(--transition-fast), padding var(--transition-fast);
 }
 
 .catalog-filter-container {
@@ -1230,3 +1230,334 @@
     transform: translateY(0);
   }
 }
+
+/* ==========================================================================
+   8. RESPONSIVE OPTIMISATIONS MOBILES ET TABLETTES (CATALOGUE & BRAND BOOK)
+   ========================================================================== */
+
+/* Tablettes & Petits Écrans Desktop (< 860px) */
+@media (max-width: 860px) {
+  /* Écrasement impératif du mode 2 colonnes du Brand Book */
+  .lightbox-dialog.brandbook-mode {
+    grid-template-columns: 1fr !important;
+    width: 95vw !important;
+    max-width: 95vw !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    margin: 1rem auto;
+  }
+
+  .lightbox-dialog.brandbook-mode .lightbox-media-col {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 1rem 0.9rem 1.4rem !important;
+    min-height: auto;
+  }
+
+  .brandbook-toolbar {
+    gap: 0.6rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .brandbook-badge-lead {
+    font-size: 0.7rem;
+  }
+
+  .bb-switch-btn {
+    font-size: 0.7rem;
+    padding: 0.32rem 0.6rem;
+  }
+
+  .brandbook-stage-16-9 {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 50vh;
+    border-radius: var(--radius-sm);
+  }
+
+  .bb-nav-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 0.88rem;
+  }
+
+  .bb-nav-prev {
+    left: 8px;
+  }
+
+  .bb-nav-next {
+    right: 8px;
+  }
+
+  .brandbook-slide-meta-bar {
+    padding: 0.45rem 0.8rem;
+  }
+
+  .brandbook-keyboard-hint {
+    display: none !important;
+  }
+
+  .bb-slide-counter {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .bb-slide-title-text {
+    font-size: 0.78rem;
+  }
+
+  .brandbook-thumbs-strip {
+    gap: 6px;
+    padding: 0.3rem 0;
+  }
+
+  .brandbook-thumb-item {
+    flex: 0 0 74px;
+  }
+
+  .brandbook-scroll-stage {
+    max-height: 58vh;
+    padding-right: 0.3rem;
+  }
+
+  .brandbook-scroll-flow {
+    gap: 1.2rem;
+  }
+
+  .brandbook-scroll-caption {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.72rem;
+  }
+
+  .lightbox-dialog.brandbook-mode .lightbox-info-col {
+    padding: 1.5rem 1.25rem !important;
+  }
+
+  .brandbook-specs-box {
+    padding: 0.95rem 1rem;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .bb-spec-label {
+    font-size: 0.65rem;
+  }
+
+  .bb-spec-val {
+    font-size: 0.82rem;
+  }
+
+  .lightbox-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.65rem;
+  }
+
+  .lightbox-btn-devis,
+  .lightbox-btn-pdf {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+  }
+}
+
+/* Écrans Mobiles & Tablettes Portrait (< 768px) */
+@media (max-width: 768px) {
+  .catalog-filter-section {
+    top: var(--header-h, 80px);
+    padding: 0.65rem 0.85rem;
+  }
+
+  .catalog-filter-container {
+    gap: 0.55rem;
+  }
+
+  /* Carousel horizontal fluide et tactile pour les onglets principaux */
+  .catalog-domain-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    justify-content: flex-start;
+    gap: 0.45rem;
+    padding: 0.2rem 0.2rem 0.35rem;
+    width: 100%;
+  }
+
+  .catalog-domain-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .catalog-domain-btn {
+    flex-shrink: 0;
+    padding: 0.46rem 0.95rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .catalog-domain-count {
+    font-size: 0.68rem;
+    padding: 0.12rem 0.4rem;
+  }
+
+  /* Carousel horizontal fluide et tactile pour les sous-filtres */
+  .catalog-subfilters-wrapper {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    padding: 0.2rem 0.2rem 0.35rem;
+    width: 100%;
+  }
+
+  .catalog-subfilters-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .catalog-subfilter-chip {
+    flex-shrink: 0;
+    padding: 0.32rem 0.8rem;
+    font-size: 0.74rem;
+    white-space: nowrap;
+  }
+
+  .catalog-main-area {
+    padding: 1.8rem 1.1rem 4.5rem;
+  }
+
+  /* Rendre le bouton zoom visible sur smartphone sans hover */
+  .pinterest-quick-zoom {
+    opacity: 0.92;
+    transform: scale(1);
+  }
+}
+
+/* Smartphones (< 480px) */
+@media (max-width: 480px) {
+  .catalog-hero {
+    padding: 6.5rem 1rem 2.2rem;
+  }
+
+  .catalog-breadcrumb {
+    font-size: 0.72rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .catalog-title {
+    font-size: 1.85rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .catalog-desc {
+    font-size: 0.92rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .catalog-meta-stats {
+    gap: 0.75rem;
+    font-size: 0.74rem;
+    padding: 0.38rem 0.85rem;
+  }
+
+  .catalog-filter-section {
+    top: var(--header-h, 74px);
+    padding: 0.5rem 0.65rem;
+  }
+
+  .catalog-domain-btn {
+    padding: 0.42rem 0.85rem;
+    font-size: 0.76rem;
+  }
+
+  .catalog-subfilter-chip {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.72rem;
+  }
+
+  /* Modale Brand Book en plein écran smartphone */
+  .lightbox-dialog,
+  .lightbox-dialog.brandbook-mode {
+    width: 98vw !important;
+    max-width: 98vw !important;
+    max-height: 94vh !important;
+    margin: 0.4rem auto;
+    border-radius: var(--radius-md);
+  }
+
+  .lightbox-close-btn {
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    z-index: 30;
+    background: rgba(14, 14, 22, 0.95);
+  }
+
+  .brandbook-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .brandbook-toolbar > div:last-child {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brandbook-view-switcher {
+    flex-grow: 1;
+  }
+
+  .bb-switch-btn {
+    flex: 1;
+    justify-content: center;
+    font-size: 0.68rem;
+    padding: 0.3rem 0.45rem;
+  }
+
+  .bb-tool-btn {
+    padding: 0.3rem 0.55rem;
+    font-size: 0.68rem;
+  }
+
+  .bb-nav-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+
+  .bb-nav-prev {
+    left: 4px;
+  }
+
+  .bb-nav-next {
+    right: 4px;
+  }
+
+  .brandbook-thumb-item {
+    flex: 0 0 58px;
+  }
+
+  .lightbox-dialog.brandbook-mode .lightbox-info-col {
+    padding: 1.2rem 0.9rem !important;
+  }
+
+  .lightbox-title {
+    font-size: 1.2rem;
+  }
+
+  .pinterest-card-footer {
+    padding: 0.75rem 0.9rem;
+  }
+
+  .pinterest-footer-title {
+    font-size: 0.86rem;
+  }
+}
+

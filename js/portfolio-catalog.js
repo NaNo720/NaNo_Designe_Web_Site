@@ -371,6 +371,20 @@
       const card = createPinterestCard(project, index);
       gridContainer.appendChild(card);
     });
+
+    // Auto-ouverture fluide si paramètre URL (ex: ?open=1 ou ?open=first)
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const openParam = urlParams.get('open');
+      if (openParam && filtered.length > 0) {
+        const target = (openParam === 'first' || openParam === '1')
+          ? filtered[0]
+          : (filtered.find(p => p.id === openParam) || filtered[0]);
+        if (target) {
+          setTimeout(() => openLightbox(target), 80);
+        }
+      }
+    } catch (e) {}
   }
 
   // Création d'une carte Pinterest Masonry
