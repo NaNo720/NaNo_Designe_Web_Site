@@ -553,8 +553,12 @@
       });
     }
 
+    // Si le projet dispose d'un vrai fichier PDF, le moteur PDF progressif prend le relais (pas de fausses planches)
+    if (project.brandbookPdf && project.brandbookPdf.trim()) {
+      return null;
+    }
+
     const isWithCharte = project.variant === 'avec-charte' || 
-                         Boolean(project.brandbookPdf && project.brandbookPdf.trim()) ||
                          (Array.isArray(project.brandbookSlides) && project.brandbookSlides.length > 0) ||
                          (project.variantLabel && project.variantLabel.toLowerCase().includes('charte')) ||
                          (project.title && project.title.toLowerCase().includes('charte')) ||
@@ -895,132 +899,299 @@
     ];
   }
 
-  const pdfSlidesCache = new Map();
+  // ==============================================================================
+  // MOTEUR DE RENDU PDF PROGRESSIF & HAUTE PERFORMANCE (ZÉRO BLOCAGE MÉMOIRE MOBILE)
+  // ==============================================================================
+  const pdfDocCache = new Map();
+  let currentActivePdfDoc = null;
+  let currentActivePdfSource = '';
 
-  async function loadPdfBrandbookSlides(pdfSource, onProgress) {
+  // Configuration du worker PDF.js local
+  function ensurePdfWorker() {
+    if (window.pdfjsLib && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/pdf.worker.min.js';
+    }
+  }
+
+  // Rendu d'une page PDF unique à la volée (résolution optimale sans saturer la RAM mobile)
+  async function renderSinglePdfPage(pdfDoc, pageNum, maxWidth = 1600) {
+    if (!pdfDoc) return null;
+    try {
+      const page = await pdfDoc.getPage(pageNum);
+      const unscaledViewport = page.getViewport({ scale: 1.0 });
+      // Optimisation mobile : limiter la taille du canvas pour éviter l'épuisement mémoire
+      const isMobile = window.innerWidth <= 768;
+      const targetW = isMobile ? Math.min(maxWidth, 1280) : maxWidth;
+      const scale = Math.min(targetW / unscaledViewport.width, 2.2);
+      const viewport = page.getViewport({ scale });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      const ctx = canvas.getContext('2d', { alpha: false });
+
+      await page.render({
+        canvasContext: ctx,
+        viewport: viewport
+      }).promise;
+
+      const quality = isMobile ? 0.82 : 0.88;
+      const dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+      // Libération mémoire immédiate du canvas
+      canvas.width = 0;
+      canvas.height = 0;
+
+      return dataUrl;
+    } catch (err) {
+      console.warn(`[BrandBook] Exception rendu page ${pageNum}:`, err);
+      return null;
+    }
+  }
+
+  // Chargement asynchrone du document PDF avec mise en cache
+  async function loadPdfDocument(pdfSource) {
     if (!window.pdfjsLib) {
-      console.warn('[BrandBook] Moteur PDF.js non disponible');
+      console.warn('[BrandBook] Moteur PDF.js introuvable');
       return null;
     }
 
-    if (pdfSlidesCache.has(pdfSource)) {
-      return pdfSlidesCache.get(pdfSource);
+    if (pdfDocCache.has(pdfSource)) {
+      return pdfDocCache.get(pdfSource);
     }
 
     try {
-      if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      }
+      ensurePdfWorker();
 
       let docInitParams = pdfSource;
-      if (typeof pdfSource === 'string' && pdfSource.startsWith('indexeddb:') && window.nanoDB && typeof window.nanoDB.getPdfFromIndexedDB === 'function') {
-        const key = pdfSource.replace('indexeddb:', '');
-        const blob = await window.nanoDB.getPdfFromIndexedDB(key);
-        if (blob) {
-          const buffer = await blob.arrayBuffer();
-          docInitParams = { data: buffer };
+      if (typeof pdfSource === 'string') {
+        if (pdfSource.startsWith('indexeddb:') && window.nanoDB && typeof window.nanoDB.getPdfFromIndexedDB === 'function') {
+          const key = pdfSource.replace('indexeddb:', '');
+          const blob = await window.nanoDB.getPdfFromIndexedDB(key);
+          if (blob) {
+            const buffer = await blob.arrayBuffer();
+            docInitParams = { data: buffer };
+          } else {
+            return null;
+          }
         } else {
-          return null;
+          docInitParams = {
+            url: pdfSource,
+            cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+            cMapPacked: true,
+            disableAutoFetch: false,
+            disableStream: false
+          };
         }
       }
 
       const loadingTask = window.pdfjsLib.getDocument(docInitParams);
       const pdf = await loadingTask.promise;
-      const numPages = pdf.numPages;
-      const slides = [];
-
-      for (let i = 1; i <= numPages; i++) {
-        if (typeof onProgress === 'function') {
-          onProgress(i, numPages);
-        }
-        const page = await pdf.getPage(i);
-        const unscaledViewport = page.getViewport({ scale: 1.0 });
-        const targetWidth = 1920;
-        const scale = Math.min(targetWidth / unscaledViewport.width, 2.0);
-        const viewport = page.getViewport({ scale });
-
-        const canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        const ctx = canvas.getContext('2d', { alpha: false });
-
-        await page.render({
-          canvasContext: ctx,
-          viewport: viewport
-        }).promise;
-
-        const pageTitles = [
-          "Couverture & Identité Institutionnelle",
-          "Architecture Visuelle & Sommaire",
-          "Grille de Construction & Proportions",
-          "Zone d'Isolement & Tailles Minimales",
-          "Palette Chromatique (CMJN, RVB, Pantone)",
-          "Système Typographique & Hiérarchies",
-          "Variantes Autorisées & Interdits",
-          "Papeterie Institutionnelle & Cartes",
-          "Applications Signalétiques & Merchandising",
-          "Guide d'Export & Normes de Marque"
-        ];
-        const slideTitle = pageTitles[i - 1] || `Système Normé • Section ${i.toString().padStart(2, '0')}`;
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-        slides.push({
-          title: slideTitle,
-          url: dataUrl
-        });
-      }
-
-      pdfSlidesCache.set(pdfSource, slides);
-      return slides;
+      pdfDocCache.set(pdfSource, pdf);
+      return pdf;
     } catch (err) {
-      console.warn('[BrandBook] Erreur rendu PDF.js:', err);
+      console.warn('[BrandBook] Erreur chargement document PDF:', err);
       return null;
     }
   }
 
+  // Initialisation ultra-réactive du Brand Book à partir d'un vrai PDF
+  async function initPdfBrandbook(pdfSource, project) {
+    currentActivePdfSource = pdfSource;
+    currentActivePdfDoc = null;
+    currentBrandbookSlides = [];
+    currentSlideIndex = 0;
+
+    // 1. Indicateur d'ouverture immédiat (Feedback visuel en < 50ms)
+    if (bbLeadLabel) bbLeadLabel.textContent = '✦ CHARGEMENT DU BRAND BOOK PDF OFFICIEL...';
+    if (bbSlideCounter) bbSlideCounter.textContent = 'Connexion...';
+    if (bbSlideTitle) bbSlideTitle.textContent = `Ouverture du Brand Book officiel (${project.title})...`;
+    if (bbSpecsCount) bbSpecsCount.textContent = 'Document PDF HD';
+    if (bbProgressBar) bbProgressBar.style.width = '10%';
+
+    if (bbSlideImg) {
+      bbSlideImg.style.opacity = '0.35';
+      bbSlideImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+          <rect width="1920" height="1080" fill="#0A0A10"/>
+          <circle cx="960" cy="500" r="55" fill="none" stroke="#C9A84C" stroke-width="4" stroke-dasharray="70 25"/>
+          <text x="960" y="615" fill="#FFF" font-family="'Syne', sans-serif" font-size="28" font-weight="700" text-anchor="middle">CHARGEMENT DU DOCUMENT HAUTE DÉFINITION...</text>
+          <text x="960" y="655" fill="#C9A84C" font-family="'Space Grotesk', monospace" font-size="16" text-anchor="middle">LIVRE DE MARQUE OFFICIEL • NANO DESIGN STUDIO DAKAR</text>
+        </svg>
+      `);
+    }
+
+    if (bbThumbsStrip) {
+      bbThumbsStrip.innerHTML = `
+        <div style="display:flex; align-items:center; gap:0.6rem; color:var(--text-secondary); font-size:0.75rem; padding:0.6rem 1rem;">
+          <span style="display:inline-block; width:14px; height:14px; border:2px solid rgba(201,168,76,0.3); border-top-color:var(--gold-light); border-radius:50%; animation:spin 0.8s linear infinite;"></span>
+          <span>Indexation du document PDF original...</span>
+        </div>
+      `;
+    }
+
+    // 2. Récupération du fichier PDF
+    const pdfDoc = await loadPdfDocument(pdfSource);
+    if (!pdfDoc) {
+      console.warn('[BrandBook] Échec de chargement PDF, repli sur le visualiseur studio:', pdfSource);
+      if (bbLeadLabel) bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • ÉDITION STUDIO 16:9';
+      const fallbackSlides = generateMasterBrandbookSlides(project);
+      renderBrandbook(fallbackSlides, project);
+      return;
+    }
+
+    // Si l'utilisateur a changé de projet entre-temps, ne pas écraser
+    if (!currentActiveProject || currentActiveProject.id !== project.id) return;
+
+    currentActivePdfDoc = pdfDoc;
+    const totalPages = pdfDoc.numPages;
+
+    // 3. Mise à jour instantanée des spécifications avec le VRAI nombre de planches
+    if (bbSpecsCount) bbSpecsCount.textContent = `${totalPages} Planches HD (PDF)`;
+    if (bbLeadLabel) bbLeadLabel.textContent = `✦ BRAND BOOK OFFICIEL • ${totalPages} PLANCHES HD`;
+    if (bbBtnPdf) {
+      bbBtnPdf.style.display = 'inline-flex';
+      bbBtnPdf.innerHTML = `<span>Ouvrir le PDF (${totalPages} pages) ↗</span>`;
+    }
+
+    // 4. RENDU IMMÉDIAT DE LA COUVERTURE / PLANCHE 01 (< 300ms)
+    if (bbSlideTitle) bbSlideTitle.textContent = `✦ Rendu de la Planche 01 / ${totalPages}...`;
+    const page1DataUrl = await renderSinglePdfPage(pdfDoc, 1, 1600);
+
+    if (!currentActiveProject || currentActiveProject.id !== project.id) return;
+
+    // 5. Création de la liste virtuelle des slides pour l'ensemble des planches
+    currentBrandbookSlides = Array.from({ length: totalPages }, (_, i) => {
+      const pNum = i + 1;
+      return {
+        pageNumber: pNum,
+        title: pNum === 1 ? 'Couverture & Identité de Marque' : `Planche ${pNum.toString().padStart(2, '0')} / ${totalPages.toString().padStart(2, '0')}`,
+        url: pNum === 1 ? page1DataUrl : null,
+        rendered: pNum === 1
+      };
+    });
+
+    // 6. Affichage de la Planche 1 à l'écran
+    if (bbSlideImg && page1DataUrl) {
+      bbSlideImg.src = page1DataUrl;
+      bbSlideImg.alt = `Planche 01 / ${totalPages} - ${project.title}`;
+      bbSlideImg.style.opacity = '1';
+    }
+    if (bbSlideCounter) bbSlideCounter.textContent = `Planche 01 / ${totalPages.toString().padStart(2, '0')}`;
+    if (bbSlideTitle) bbSlideTitle.textContent = currentBrandbookSlides[0].title;
+    if (bbProgressBar) bbProgressBar.style.width = `${(1 / totalPages) * 100}%`;
+
+    // 7. Génération du carrousel de vignettes
+    renderBrandbookThumbnails(currentBrandbookSlides);
+
+    // 8. Rendu du mode défilement vertical (Scroll View)
+    renderBrandbookScrollFlow(currentBrandbookSlides, totalPages);
+
+    toggleBrandbookMode('deck');
+
+    // 9. Pré-rendu d'arrière-plan de la Planche 02 pour navigation instantanée
+    if (totalPages > 1) {
+      setTimeout(async () => {
+        if (currentActivePdfDoc && currentBrandbookSlides[1] && !currentBrandbookSlides[1].url) {
+          const p2Data = await renderSinglePdfPage(currentActivePdfDoc, 2, 1600);
+          if (p2Data && currentBrandbookSlides[1]) {
+            currentBrandbookSlides[1].url = p2Data;
+            currentBrandbookSlides[1].rendered = true;
+            updateThumbPreview(1, p2Data);
+          }
+        }
+      }, 200);
+    }
+  }
+
+  // Construction du ruban de vignettes avec placeholders légers
+  function renderBrandbookThumbnails(slides) {
+    if (!bbThumbsStrip) return;
+    bbThumbsStrip.innerHTML = '';
+
+    slides.forEach((slide, idx) => {
+      const thumb = document.createElement('button');
+      thumb.type = 'button';
+      thumb.className = `brandbook-thumb-item ${idx === currentSlideIndex ? 'active' : ''}`;
+      thumb.setAttribute('data-index', idx);
+      thumb.setAttribute('aria-label', `Aller à la planche ${idx + 1}`);
+
+      const innerContent = slide.url
+        ? `<img src="${slide.url}" alt="${slide.title}" class="brandbook-thumb-img" loading="lazy">`
+        : `<div class="bb-thumb-empty"><span class="bb-thumb-num-lead">${(idx + 1).toString().padStart(2, '0')}</span></div>`;
+
+      thumb.innerHTML = `
+        <div class="brandbook-thumb-box" id="bb-thumb-box-${idx}">
+          ${innerContent}
+        </div>
+        <span class="brandbook-thumb-num">${(idx + 1).toString().padStart(2, '0')}</span>
+      `;
+
+      thumb.addEventListener('click', () => {
+        goToBrandbookSlide(idx);
+      });
+
+      bbThumbsStrip.appendChild(thumb);
+    });
+  }
+
+  // Mise à jour de l'image de la miniature dès qu'une planche est calculée
+  function updateThumbPreview(index, dataUrl) {
+    if (!bbThumbsStrip) return;
+    const box = document.getElementById(`bb-thumb-box-${index}`);
+    if (box) {
+      box.innerHTML = `<img src="${dataUrl}" alt="Planche ${index + 1}" class="brandbook-thumb-img" loading="lazy">`;
+    }
+  }
+
+  // Rendu du flux de défilement vertical Behance avec chargement progressif
+  function renderBrandbookScrollFlow(slides, totalPages) {
+    if (!bbScrollFlow) return;
+    bbScrollFlow.innerHTML = '';
+
+    slides.forEach((slide, idx) => {
+      const item = document.createElement('div');
+      item.className = 'brandbook-scroll-item';
+      item.setAttribute('data-scroll-index', idx);
+
+      const imgHtml = slide.url
+        ? `<img src="${slide.url}" alt="${slide.title}" id="bb-scroll-img-${idx}">`
+        : `<div class="bb-scroll-placeholder" id="bb-scroll-box-${idx}" style="aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; background:#0D0D15; color:var(--text-muted); font-family:var(--font-tech); font-size:0.85rem;">
+             <span>✦ Planche ${(idx + 1).toString().padStart(2, '0')} / ${totalPages}</span>
+           </div>`;
+
+      item.innerHTML = `
+        ${imgHtml}
+        <div class="brandbook-scroll-caption">
+          <span><strong>Planche ${(idx + 1).toString().padStart(2, '0')}</strong> • ${slide.title}</span>
+          <span>DOCUMENT OFFICIEL • NANO DESIGN DAKAR</span>
+        </div>
+      `;
+
+      bbScrollFlow.appendChild(item);
+    });
+  }
+
+  // Rendu classique pour les projets vectoriels ou sans PDF
   function renderBrandbook(slides, project) {
     currentBrandbookSlides = slides || [];
     currentSlideIndex = 0;
+    currentActivePdfDoc = null;
 
     if (bbThumbsStrip) {
-      bbThumbsStrip.innerHTML = '';
-      currentBrandbookSlides.forEach((slide, idx) => {
-        const thumb = document.createElement('button');
-        thumb.type = 'button';
-        thumb.className = `brandbook-thumb-item ${idx === 0 ? 'active' : ''}`;
-        thumb.setAttribute('data-index', idx);
-        thumb.setAttribute('aria-label', `Aller à la planche ${idx + 1}`);
-        thumb.innerHTML = `
-          <img src="${slide.url}" alt="${slide.title}" class="brandbook-thumb-img" loading="lazy">
-          <span class="brandbook-thumb-num">${(idx + 1).toString().padStart(2, '0')}</span>
-        `;
-        thumb.addEventListener('click', () => {
-          goToBrandbookSlide(idx);
-        });
-        bbThumbsStrip.appendChild(thumb);
-      });
+      renderBrandbookThumbnails(currentBrandbookSlides);
     }
 
     if (bbScrollFlow) {
-      bbScrollFlow.innerHTML = '';
-      currentBrandbookSlides.forEach((slide, idx) => {
-        const item = document.createElement('div');
-        item.className = 'brandbook-scroll-item';
-        item.innerHTML = `
-          <img src="${slide.url}" alt="${slide.title}" loading="lazy">
-          <div class="brandbook-scroll-caption">
-            <span><strong>Planche ${(idx + 1).toString().padStart(2, '0')}</strong> • ${slide.title}</span>
-            <span>1920 × 1080 • NANO DESIGN</span>
-          </div>
-        `;
-        bbScrollFlow.appendChild(item);
-      });
+      renderBrandbookScrollFlow(currentBrandbookSlides, currentBrandbookSlides.length);
     }
 
     toggleBrandbookMode('deck');
     goToBrandbookSlide(0);
   }
 
-  function goToBrandbookSlide(index) {
+  // Navigation vers une planche avec rendu à la demande pour les PDF
+  async function goToBrandbookSlide(index) {
     if (!currentBrandbookSlides || currentBrandbookSlides.length === 0) return;
 
     if (index < 0) index = 0;
@@ -1028,29 +1199,21 @@
 
     currentSlideIndex = index;
     const slide = currentBrandbookSlides[currentSlideIndex];
+    const total = currentBrandbookSlides.length;
 
-    if (bbSlideImg) {
-      bbSlideImg.style.opacity = '0';
-      setTimeout(() => {
-        bbSlideImg.src = slide.url;
-        bbSlideImg.alt = slide.title;
-        bbSlideImg.style.opacity = '1';
-      }, 120);
-    }
-
+    // Mise à jour de l'interface immédiatement
     if (bbSlideCounter) {
-      bbSlideCounter.textContent = `Planche ${(currentSlideIndex + 1).toString().padStart(2, '0')} / ${currentBrandbookSlides.length.toString().padStart(2, '0')}`;
+      bbSlideCounter.textContent = `Planche ${(currentSlideIndex + 1).toString().padStart(2, '0')} / ${total.toString().padStart(2, '0')}`;
     }
-
     if (bbSlideTitle) {
       bbSlideTitle.textContent = slide.title;
     }
-
     if (bbProgressBar) {
-      const pct = ((currentSlideIndex + 1) / currentBrandbookSlides.length) * 100;
+      const pct = ((currentSlideIndex + 1) / total) * 100;
       bbProgressBar.style.width = `${pct}%`;
     }
 
+    // Déplacement de la vignette active
     if (bbThumbsStrip) {
       const thumbs = bbThumbsStrip.querySelectorAll('.brandbook-thumb-item');
       thumbs.forEach((t, i) => {
@@ -1061,6 +1224,63 @@
           t.classList.remove('active');
         }
       });
+    }
+
+    // Affichage de la planche
+    if (slide.url) {
+      if (bbSlideImg) {
+        bbSlideImg.style.opacity = '0';
+        setTimeout(() => {
+          bbSlideImg.src = slide.url;
+          bbSlideImg.alt = slide.title;
+          bbSlideImg.style.opacity = '1';
+        }, 60);
+      }
+    } else if (currentActivePdfDoc && slide.pageNumber) {
+      // Planche PDF non encore rendue : rendu à la demande ultra-rapide
+      if (bbSlideImg) bbSlideImg.style.opacity = '0.35';
+      if (bbSlideTitle) bbSlideTitle.textContent = `✦ Rendu de la Planche ${(currentSlideIndex + 1).toString().padStart(2, '0')} / ${total}...`;
+
+      const pageData = await renderSinglePdfPage(currentActivePdfDoc, slide.pageNumber, 1600);
+      if (pageData) {
+        slide.url = pageData;
+        slide.rendered = true;
+        updateThumbPreview(currentSlideIndex, pageData);
+
+        // Mise à jour de l'image de défilement scroll si présente
+        const scrollBox = document.getElementById(`bb-scroll-box-${currentSlideIndex}`);
+        if (scrollBox) {
+          scrollBox.outerHTML = `<img src="${pageData}" alt="${slide.title}" id="bb-scroll-img-${currentSlideIndex}">`;
+        }
+
+        if (currentSlideIndex === index && bbSlideImg) {
+          bbSlideImg.src = pageData;
+          bbSlideImg.alt = slide.title;
+          bbSlideImg.style.opacity = '1';
+          if (bbSlideTitle) bbSlideTitle.textContent = slide.title;
+        }
+      }
+    }
+
+    // Pré-rendu spéculatif de la planche suivante (Slide N+1)
+    if (currentActivePdfDoc && currentSlideIndex + 1 < total) {
+      const nextSlide = currentBrandbookSlides[currentSlideIndex + 1];
+      if (nextSlide && !nextSlide.url && nextSlide.pageNumber) {
+        setTimeout(async () => {
+          if (!nextSlide.url && currentActivePdfDoc) {
+            const nextData = await renderSinglePdfPage(currentActivePdfDoc, nextSlide.pageNumber, 1600);
+            if (nextData && nextSlide) {
+              nextSlide.url = nextData;
+              nextSlide.rendered = true;
+              updateThumbPreview(currentSlideIndex + 1, nextData);
+              const nextScrollBox = document.getElementById(`bb-scroll-box-${currentSlideIndex + 1}`);
+              if (nextScrollBox) {
+                nextScrollBox.outerHTML = `<img src="${nextData}" alt="${nextSlide.title}" id="bb-scroll-img-${currentSlideIndex + 1}">`;
+              }
+            }
+          }
+        }, 150);
+      }
     }
   }
 
@@ -1206,32 +1426,15 @@
         if (lightboxBrandbookPlayer) lightboxBrandbookPlayer.style.display = 'flex';
         if (bbSpecsBox) bbSpecsBox.style.display = 'flex';
 
-        const initialSlides = (brandbookSlides && brandbookSlides.length > 0) ? brandbookSlides : generateMasterBrandbookSlides(project);
-        if (bbSpecsCount) bbSpecsCount.textContent = `${initialSlides.length} Planches HD`;
-        renderBrandbook(initialSlides, project);
-
         if (hasPdf) {
-          if (bbLeadLabel) bbLeadLabel.textContent = '✦ CHARGEMENT DU BRAND BOOK PDF (1920×1080)...';
-          loadPdfBrandbookSlides(project.brandbookPdf, (curr, total) => {
-            if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
-              bbLeadLabel.textContent = `✦ RENDU DU BRAND BOOK PDF (${curr}/${total} PLANCHES)...`;
-            }
-          }).then(pdfSlides => {
-            if (pdfSlides && pdfSlides.length > 0 && currentActiveProject && currentActiveProject.id === project.id) {
-              if (bbSpecsCount) bbSpecsCount.textContent = `${pdfSlides.length} Planches HD (PDF)`;
-              if (bbLeadLabel) bbLeadLabel.textContent = `✦ BRAND BOOK OFFICIEL • ${pdfSlides.length} PLANCHES HD`;
-              renderBrandbook(pdfSlides, project);
-            } else if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
-              bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • ÉDITION STUDIO 16:9';
-            }
-          }).catch(err => {
-            console.warn('[BrandBook] Repli sur les planches vectorielles studio:', err);
-            if (bbLeadLabel && currentActiveProject && currentActiveProject.id === project.id) {
-              bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • ÉDITION STUDIO 16:9';
-            }
-          });
+          // PROJET AVEC DOCUMENT PDF RÉEL : Lancement immédiat du moteur progressif HD
+          initPdfBrandbook(project.brandbookPdf, project);
         } else {
-          if (bbLeadLabel) bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • 1920×1080';
+          // Projet sans PDF attaché : planches vectorielles de démonstration studio
+          const initialSlides = (brandbookSlides && brandbookSlides.length > 0) ? brandbookSlides : generateMasterBrandbookSlides(project);
+          if (bbSpecsCount) bbSpecsCount.textContent = `${initialSlides.length} Planches HD`;
+          if (bbLeadLabel) bbLeadLabel.textContent = '✦ BRAND BOOK OFFICIEL • ÉDITION STUDIO 16:9';
+          renderBrandbook(initialSlides, project);
         }
       } else {
         if (lightboxDialog) lightboxDialog.classList.remove('brandbook-mode');
@@ -1255,6 +1458,8 @@
     lightboxModal.classList.remove('is-open');
     document.body.style.overflow = '';
     currentActiveProject = null;
+    currentActivePdfDoc = null;
+    currentActivePdfSource = '';
     currentBrandbookSlides = [];
   }
 

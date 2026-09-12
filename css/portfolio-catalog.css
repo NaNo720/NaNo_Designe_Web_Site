@@ -1075,10 +1075,36 @@
   box-shadow: 0 0 12px rgba(201, 168, 76, 0.45);
 }
 
+.brandbook-thumb-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #08080E;
+}
+
 .brandbook-thumb-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.bb-thumb-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(201, 168, 76, 0.2);
+}
+
+.bb-thumb-num-lead {
+  font-family: var(--font-tech);
+  font-size: 0.65rem;
+  color: var(--gold-light);
+  opacity: 0.6;
 }
 
 .brandbook-thumb-num {
