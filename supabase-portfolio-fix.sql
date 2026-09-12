@@ -85,3 +85,37 @@ BEGIN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.site_visits;
   END IF;
 END $$;
+
+-- 5. Bucket de Stockage Cloud Supabase (Téléversement direct depuis Smartphone ou PC sans Git)
+-- Permet d'uploader des Brand Books PDF et des images directement depuis un téléphone portable
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+    'portfolio-brandbooks',
+    'portfolio-brandbooks',
+    true,
+    52428800, -- 50 Mo max par fichier
+    ARRAY['application/pdf', 'image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']
+)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Politiques RLS pour permettre la consultation et l'upload
+DROP POLICY IF EXISTS "Permettre lecture publique brandbooks" ON storage.objects;
+CREATE POLICY "Permettre lecture publique brandbooks"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'portfolio-brandbooks');
+
+DROP POLICY IF EXISTS "Permettre upload brandbooks" ON storage.objects;
+CREATE POLICY "Permettre upload brandbooks"
+ON storage.objects FOR INSERT
+WITH CHECK (bucket_id = 'portfolio-brandbooks');
+
+DROP POLICY IF EXISTS "Permettre modification brandbooks" ON storage.objects;
+CREATE POLICY "Permettre modification brandbooks"
+ON storage.objects FOR UPDATE
+USING (bucket_id = 'portfolio-brandbooks');
+
+DROP POLICY IF EXISTS "Permettre suppression brandbooks" ON storage.objects;
+CREATE POLICY "Permettre suppression brandbooks"
+ON storage.objects FOR DELETE
+USING (bucket_id = 'portfolio-brandbooks');
+

@@ -3496,15 +3496,40 @@
             return;
           }
 
-          showToast('Optimisation et compression de l’image...');
+          showToast('Optimisation et synchronisation de l’image...');
           try {
             const originalSizeKb = Math.round(file.size / 1024);
             const compressed = await compressImageFile(file, 1200, 1200, 0.82);
             currentUploadedImageDataUrl = compressed;
             setProjPreview(currentUploadedImageDataUrl);
-            if (projImageUrlInput) projImageUrlInput.value = '';
-            const newSizeKb = Math.round(compressed.length * 0.75 / 1024);
-            showToast(`✦ Image optimisée : ${originalSizeKb} Ko ➔ ${newSizeKb} Ko (Haute Définition)`);
+
+            // Tenter le téléversement Cloud Supabase Storage immédiat
+            let cloudImgUrl = null;
+            try {
+              const cli = window.nanoDB && typeof window.nanoDB.getClient === 'function' ? window.nanoDB.getClient() : null;
+              if (cli && cli.storage) {
+                const cleanImgName = `images/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+                const { data, error } = await cli.storage.from('portfolio-brandbooks').upload(cleanImgName, file, { upsert: true });
+                if (!error && data) {
+                  const { data: pubData } = cli.storage.from('portfolio-brandbooks').getPublicUrl(cleanImgName);
+                  if (pubData && pubData.publicUrl) {
+                    cloudImgUrl = pubData.publicUrl;
+                  }
+                }
+              }
+            } catch (cloudErr) {
+              console.warn('[Admin] Erreur upload image cloud:', cloudErr);
+            }
+
+            if (cloudImgUrl) {
+              currentUploadedImageDataUrl = cloudImgUrl;
+              if (projImageUrlInput) projImageUrlInput.value = cloudImgUrl;
+              showToast(`✦ Image synchronisée sur le Cloud Supabase ! (${originalSizeKb} Ko)`);
+            } else {
+              if (projImageUrlInput) projImageUrlInput.value = '';
+              const newSizeKb = Math.round(compressed.length * 0.75 / 1024);
+              showToast(`✦ Image optimisée HD : ${originalSizeKb} Ko ➔ ${newSizeKb} Ko`);
+            }
           } catch (err) {
             console.warn('Fallback FileReader image:', err);
             const reader = new FileReader();

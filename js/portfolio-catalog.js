@@ -567,11 +567,25 @@
     return null;
   }
 
+  function xmlEscape(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
+
   function generateMasterBrandbookSlides(project) {
-    const clientName = (project.client || 'MAISON BAOBAB BIO').toUpperCase();
+    const rawClientName = (project.client || 'MAISON BAOBAB BIO').toUpperCase();
+    const clientName = xmlEscape(rawClientName);
+    const projectTitle = xmlEscape((project.title || rawClientName).toUpperCase());
 
     function makeSvgSlide(title, sub, contentSvg) {
-      const svg = `
+      const safeTitle = xmlEscape(title);
+      const safeSub = xmlEscape(sub);
+      let svg = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
   <defs>
     <linearGradient id="pGold" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -594,8 +608,8 @@
   <text x="95" y="74" fill="#C9A84C" font-family="'Space Grotesk', monospace, sans-serif" font-size="15" font-weight="700" letter-spacing="3">${clientName}</text>
   <text x="95" y="94" fill="rgba(255,255,255,0.45)" font-family="'Space Grotesk', monospace, sans-serif" font-size="13" letter-spacing="2">BRAND IDENTITY GUIDELINES • NANO DESIGN STUDIO DAKAR</text>
   
-  <text x="1850" y="78" fill="#FFF" font-family="'Syne', sans-serif" font-size="18" font-weight="700" text-anchor="end">${title}</text>
-  <text x="1850" y="96" fill="#C9A84C" font-family="'Space Grotesk', monospace, sans-serif" font-size="13" text-anchor="end" letter-spacing="1">${sub}</text>
+  <text x="1850" y="78" fill="#FFF" font-family="'Syne', sans-serif" font-size="18" font-weight="700" text-anchor="end">${safeTitle}</text>
+  <text x="1850" y="96" fill="#C9A84C" font-family="'Space Grotesk', monospace, sans-serif" font-size="13" text-anchor="end" letter-spacing="1">${safeSub}</text>
   <line x1="70" y1="120" x2="1850" y2="120" stroke="rgba(201,168,76,0.22)" stroke-width="1.5"/>
   
   ${contentSvg}
@@ -604,7 +618,10 @@
   <text x="70" y="1030" fill="rgba(201,168,76,0.8)" font-family="'Space Grotesk', monospace, sans-serif" font-size="14" letter-spacing="2">FORMAT MASTER 1920 × 1080 PX • RATIO 16:9 • LIVRE DE MARQUE OFFICIEL</text>
   <text x="1850" y="1030" fill="rgba(255,255,255,0.4)" font-family="'Space Grotesk', monospace, sans-serif" font-size="14" text-anchor="end" letter-spacing="1">SYSTÈME GRAPHIQUE NANO DESIGN • DAKAR, SÉNÉGAL</text>
 </svg>`;
-      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg.trim());
+
+      // Remplacement automatique de tout '&' qui n'est pas déjà une entité XML valide par '&amp;'
+      const cleanSvg = svg.trim().replace(/&(?!(amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;');
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(cleanSvg);
     }
 
     const hasImg = Boolean(project.imageUrl && project.imageUrl.trim());

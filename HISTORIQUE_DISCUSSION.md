@@ -101,6 +101,9 @@ NaNo Design/
    * Éviter de décoder 10 planches 4K simultanément sur Safari iOS. Privilégier le rendu progressif (planche 1 immédiate, suivantes en différé).
 3. **Biais de Cache Navigateur :**
    * Toujours incrémenter les query strings (`?v=3.x`) lors des modifications de CSS/JS pour forcer le rechargement sur les appareils des clients.
+4. **Échappement XML Strict dans les Planches SVG :**
+   * *Constat :* Les symboles `&` bruts dans les textes de planches SVG (`SYSTEM IDENTIFICATION & STANDARDS`) invalidaient le parseur XML sur mobile Chrome/Safari, provoquant des images brisées (sauf la planche 04 qui n'avait aucun `&`).
+   * *Solution :* Fonction `xmlEscape` et assainissement automatique regex `replace(/&(?!(amp|...);)/g, '&amp;')` dans `portfolio-catalog.js`.
 
 ---
 
