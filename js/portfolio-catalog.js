@@ -422,7 +422,7 @@
       <div class="pinterest-card-badges">
         <span class="pinterest-badge-category">${project.categoryLabel || project.category}</span>
         ${project.variantLabel ? `<span class="pinterest-badge-variant">${project.variantLabel}</span>` : ''}
-        ${isBrandbook ? `<span class="pinterest-badge-variant" style="background: rgba(201, 168, 76, 0.28); border-color: var(--border-gold); color: #FFF; font-weight: 700;">✦ Brand Book (38 Planches)</span>` : ''}
+        ${isBrandbook ? `<span class="pinterest-badge-variant" style="background: rgba(201, 168, 76, 0.28); border-color: var(--border-gold); color: #FFF; font-weight: 700;">✦ Brand Book 16:9</span>` : ''}
       </div>
       <button type="button" class="pinterest-quick-zoom" title="Agrandir et voir l'étude de cas" aria-label="Agrandir">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
